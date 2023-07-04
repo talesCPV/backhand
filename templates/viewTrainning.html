@@ -6,10 +6,22 @@
             height: 200px;
         }
 
+        p{
+            text-indent: 0;
+        }
+
+        h2, p{
+            padding: 0 20px;
+        }
+
     </style>
 
     <div class="form">
+        <p id="atv-atleta"></p>
+        <h2 id="atv-titulo"></h2>
         <div id="map"></div>
+        <p id="atv-parceiro"></p>
+        
 
     </div>
 
@@ -23,6 +35,11 @@
     console.log(data)
 
     document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
+    document.querySelector('#atv-atleta').innerHTML = data.ATLETA
+    document.querySelector('#atv-titulo').innerHTML = data.nome
+    document.querySelector('#atv-parceiro').innerHTML = data.parceiro
+
+
 
     map = createMap('map',[data.lat, data.lng])
     pinMap([data.lat, data.lng],map)

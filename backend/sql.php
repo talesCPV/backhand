@@ -15,7 +15,7 @@
             AND MQ.id_usuario = "x00";',
         "7" => 'INSERT INTO tb_minhasquadras (id_usuario,id_quadra) VALUES ("x00","x01");',
         "8" => 'DELETE FROM tb_minhasquadras WHERE id_usuario="x00" AND id_quadra="x01";',
-        "9" => 'SELECT ATV.id,ATV.id_usuario, ATV.nome, ATV.parceiro, ATV.dia, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA, QD.lat, QD.lng 
+        "9" => 'SELECT ATV.id,ATV.id_usuario, ATV.nome, ATV.parceiro, ATV.dia, ATV.duracao, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA, QD.lat, QD.lng , QD.nome AS QUADRA
             FROM tb_atividades AS ATV 
             INNER JOIN tb_sport AS SP
             INNER JOIN tb_evento AS EV
