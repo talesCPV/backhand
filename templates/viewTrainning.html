@@ -1,0 +1,33 @@
+<title></title>
+<template>
+    <style>
+        #map{
+            width: 100%;
+            height: 200px;
+        }
+
+    </style>
+
+    <div class="form">
+        <div id="map"></div>
+
+    </div>
+
+
+
+
+</template>
+<script>
+
+    const data = mainData.viewTrainning.data
+    console.log(data)
+
+    document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
+
+    map = createMap('map',[data.lat, data.lng])
+    pinMap([data.lat, data.lng],map)
+    map.locate({setView: false, maxZoom: 30})
+    
+
+
+</script>

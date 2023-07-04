@@ -1,0 +1,62 @@
+<title>Social</title>
+<template>
+    <style>
+        .form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+            padding: 50px;
+        }
+
+        #btnLogin, input, select, label, .edtbtn, #map{
+            width: 250px;
+            height: 30px;
+        }
+
+        .edtbtn{
+            display: flex;
+        }
+
+        .edtbtn input, .edtbtn select{
+            width: 80%;
+        }
+
+        .edtbtn button{
+            width: 20%;
+        }
+
+    </style>
+
+    <div class="form">
+        <label for="cmbCourts">My Courts</label>
+        <div class="edtbtn">
+            <select id="cmbCourts"></select>
+            <button id="btnMyCourts">+</button>
+        </div>
+                
+        <label for="cmbFriends">My Friends</label>
+        <div class="edtbtn">
+            <select id="cmbFriends"></select>
+            <button id="btnMyFriends">+</button>
+        </div>
+
+    </div>
+
+
+</template>
+<script>
+    
+    mainData.social.courtParams = new Object;
+    mainData.social.courtParams.idUser = localStorage.getItem('idUser')
+
+    fillCombo('cmbCourts',mainData.social.courtParams,6,['id','nome'])
+
+    document.querySelector('#btnMyCourts').addEventListener('click',()=>{
+        openHTML('myCourts.html', 'modal',null,500)
+    })
+
+
+
+
+</script>

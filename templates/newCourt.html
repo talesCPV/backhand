@@ -1,0 +1,123 @@
+<title>Create New Court</title>
+<template>
+    <style>
+        #map_1 { 
+            width: 100%;
+            height: 30vh;
+        }
+        
+        .courtForm > *{
+            width: 100%;
+        }
+
+    </style>
+
+    <div class="form courtForm">
+
+        <label for="edtCourtName">Name</label>
+        <input type="text" id="edtCourtName">
+
+        <label for="map">Mark the location</label>
+        <div id="map_1"></div>
+        <select id="mapSource_1">
+            <option value="maplayer">Maps</option>
+            <option value="satlayer">Satellite</option>
+        </select>
+
+        <label for="cmbSport">Sport</label>
+        <select id="cmbSport">
+            <option value="tennis">Tennis</option>
+            <option value="beachtennis">Beach Tennis</option>
+            <option value="squash">Squash</option>
+        </select>
+
+
+        <button id="btnSaveCourt" class="btn btn-primary">Save</button>
+    </div>
+
+
+</template>
+<script>
+    var marker = new L.Marker([0, 0]);
+
+/*    
+    var mbAttr = 'www.backhand.com.br';
+    var mapUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';    
+    var satUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+//    var marker = new L.Marker([0, 0]);
+
+    maplayer = L.tileLayer(mapUrl, {
+        id: 'mapbox.streets',
+        attribution: mbAttr
+    });
+
+    satlayer = L.tileLayer(satUrl, {
+        id: 'mapbox.streets',
+        attribution: mbAttr
+    });
+
+*/
+/*
+    map_1 = L.map('map_1', {
+        center: [30, 0],
+        zoom: 25,
+        layers: [maplayer]
+    }).setView([-23.104669483341,-45.69642752409], 30);
+*/
+
+    map_1 = createMap('map_1')
+
+
+    document.querySelector('#mapSource_1').addEventListener('change',()=>{
+        map_1.removeLayer(satlayer);
+        map_1.removeLayer(maplayer);
+        map_1.addLayer(window[document.querySelector('#mapSource_1').value]);
+    })
+
+    function onMapClick(e) {
+        var newLatLng = new L.LatLng(e.latlng.lat, e.latlng.lng);
+        marker.setLatLng(newLatLng);        
+    }
+/*
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+        var location = e.latlng
+    }
+*/
+    map_1.on('click', onMapClick);
+    marker.addTo(map_1)
+//    map_1.on('locationfound', onLocationFound);
+//    map_1.locate({setView: true, maxZoom: 16});
+
+    document.querySelector('#btnSaveCourt').addEventListener('click',()=>{
+
+        console.log(marker.getLatLng().lat)
+        console.log(marker.getLatLng().lng)
+
+        const lat = marker.getLatLng().lat
+        const lng = marker.getLatLng().lng
+
+        if(goon('edtCourtName') && lat != 0 && lng != 0){
+
+            const params = new Object;
+                params.id = 'DEFAULT'
+                params.nome = document.querySelector('#edtCourtName').value.trim().toUpperCase()
+                params.lat = lat
+                params.lng = lng
+                params.tipo = document.querySelector('#cmbSport').value
+
+            const myPromisse = queryDB(params,4);
+            myPromisse.then((resolve)=>{
+                    alert('Court Saved!')
+                    closeModal('')       
+            })
+
+        }
+
+    })
+
+
+
+
+
+</script>

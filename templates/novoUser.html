@@ -1,0 +1,126 @@
+<title>
+    Novo Usuário
+</title>
+<template>
+    <style>
+        .line{
+            display: flex;
+            margin: 5px;
+        }
+
+        .line label{
+            width: 100px;
+        }
+        
+        .form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding-top: 50px;
+        }
+
+        #btnLogin, input{
+            width: 250px;
+            height: 30px;
+        }
+
+        #map { 
+            width: 100%;
+            height: 30vh;
+        }
+
+    </style>
+
+    <div class="form">
+        <div class="line">
+            <input id="edtMail" type="email" maxlength="70" placeholder="* Email">
+        </div>
+
+        <div class="line">
+            <input id="edtPass" type="password" maxlength="12" placeholder="* Senha">
+        </div>
+
+        <div class="line">
+            <input id="edtName" type="text" maxlength="60" placeholder="* Nome">
+        </div>
+
+        <div class="line">
+            <input id="edtNick" type="text" maxlength="15" placeholder="Apelido">
+        </div>
+
+        <div class="line">
+            <input id="edtCel" type="text" maxlength="14" placeholder="Celular" onkeyup="phone(this)">
+        </div>
+
+        <div id="map"></div>
+
+
+        <button  class="btn btn-primary" id="btnAddUser">Salvar</button>
+    </div>
+
+</template>
+<script>
+/**
+var mbAttr = 'www.backhand.com.br';
+    var mapUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';    
+    var satUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+    
+    maplayer = L.tileLayer(mapUrl, {
+        id: 'mapbox.streets',
+        attribution: mbAttr
+    });
+
+    satlayer = L.tileLayer(satUrl, {
+        id: 'mapbox.streets',
+        attribution: mbAttr
+    });
+*/
+    map = L.map('map', {
+        center: [30, 0],
+        zoom: 25,
+        layers: [satlayer]
+    })
+
+    map.locate({setView: true, maxZoom: 16});
+    map.on('click',(e)=>{
+        var newLatLng = new L.LatLng(e.latlng.lat, e.latlng.lng);
+        marker.setLatLng(newLatLng); 
+    });
+
+    var marker = new L.Marker([map.getCenter().lat, map.getCenter().lng]);
+    marker.addTo(map)
+
+
+document.querySelector('#btnAddUser').addEventListener('click',()=>{
+
+    if(goon('edtMail,edtPass,edtName')){
+        const email = document.querySelector('#edtMail').value.trim().toLowerCase()
+        const pass = document.querySelector('#edtPass').value.trim()
+        const nome = document.querySelector('#edtName').value.trim().toUpperCase()
+
+        const params = new Object;
+            params.id = 'DEFAULT'
+            params.email = email
+            params.hash = (email+pass).getHash(77)
+            params.name = nome
+            params.nick = document.querySelector('#edtNick').value.trim()
+            params.cel = document.querySelector('#edtCel').value.trim()
+            params.lat = map.getCenter().lat
+            params.lng = map.getCenter().lng
+        const myPromisse = queryDB(params,1);
+        myPromisse.then((resolve)=>{
+                alert('Usuário cadastrado com sucesso!')
+                closeModal()       
+        })
+
+    }
+
+
+        
+  
+
+    })
+
+
+</script>

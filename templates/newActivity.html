@@ -1,0 +1,152 @@
+<title>
+    New Activity
+</title>
+<template>
+    <style>
+
+        .form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+            padding: 10px;
+        }
+
+        #btnLogin, input, select, label, .edtbtn{
+            width: 250px;
+            height: 30px;
+        }
+
+        input[type="date"], input[type="time"]{
+            text-align: center;
+        }
+
+        .edtbtn{
+            display: flex;
+        }
+
+        .edtbtn input, .edtbtn select{
+            width: 80%;
+        }
+
+        .edtbtn button{
+            width: 20%;
+        }
+
+    </style>
+
+    <div class="form">
+
+        <label for="edtDesc">Description</label>
+        <input type="text" id="edtDesc">
+
+        <label for="cmbSport">Sport</label>
+        <select id="cmbSport"></select>
+
+        <label for="cmbTipo">Type</label>
+        <select id="cmbTipo"></select>
+
+        <label for="edtParceiro">Partner</label>
+        <div class="edtbtn">
+            <input type="text" id="edtParceiro">
+            <button>+</button>
+        </div>
+
+        <label for="edtData">Date</label>
+        <input type="date" id="edtData">
+
+        <label for="edtHora">Time</label>
+        <input type="time" id="edtHora">
+
+        <label for="edtTempo">Duration</label>
+        <input type="time" id="edtTempo" value="01:00">
+
+        <label for="cmbQuadra">Court</label>
+        <div class="edtbtn">
+            <select id="cmbQuadra"></select>
+            <button id="btnAddCourt">+</button>
+        </div>
+
+        <div class="sets">
+            <label for="cmbSets">Sets</label>
+            <div class="edtbtn">
+                <select id="cmbSets"></select>
+                <button id="btnSetScore">+</button>
+            </div>
+            
+
+        </div>
+
+
+
+        <button id="btnAdd" class="btn btn-primary">Add Activity</button>
+
+
+
+
+    </div>
+
+</template>
+<script>
+
+    const today =  new Date
+
+    document.querySelector('#edtData').value = today.getFormatDate()
+    document.querySelector('#edtHora').value = today.getFullTime()
+
+//    console.log(today.getFullTime())
+
+    const courtParams = new Object;
+    courtParams.idUser = localStorage.getItem('idUser')
+
+    fillCombo('cmbQuadra',courtParams,6,['id','nome'])
+    fillCombo('cmbSport',courtParams,12,['id','nome'])
+    fillCombo('cmbTipo',courtParams,13,['id','nome'])
+
+    document.querySelector('#btnAddCourt').addEventListener('click',()=>{
+        openHTML('myCourts.html','modal',null,500)
+    })
+
+
+    document.querySelector('#btnSetScore').addEventListener('click',()=>{
+        openHTML('addSets.html','modal',null,500)
+    })
+
+    document.querySelector('#btnAdd').addEventListener('click',()=>{
+
+        if(goon('edtDesc,edtParceiro,edtData,edtHora,edtTempo')){
+            const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
+            const parc = document.querySelector('#edtParceiro').value.trim().toUpperCase()
+            const data = document.querySelector('#edtData').value.trim()+" "+document.querySelector('#edtHora').value.trim()+':00'            
+            const temp = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
+            const sport = document.querySelector('#cmbSport').value.trim()
+            const tipo = document.querySelector('#cmbTipo').value.trim()
+            const quad = document.querySelector('#cmbQuadra').value.trim()
+
+            const params = new Object;
+                params.id = 'DEFAULT'
+                params.id_usuario = localStorage.getItem('idUser')
+                params.nome = nome
+                params.id_sport = sport
+                params.id_evento = tipo
+                params.parceiro = parc
+                params.data = data
+                params.duracao = temp
+                params.id_quadra = quad
+                console.log(params)
+                
+            const myPromisse = queryDB(params,10);
+            myPromisse.then((resolve)=>{
+                    closeModal()       
+            })
+
+        }
+
+
+        
+
+
+    })
+
+
+</script>

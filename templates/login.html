@@ -1,0 +1,77 @@
+<title>
+    Login de Usuário
+</title>
+<template>
+    <style>
+
+        .form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding-top: 50px;
+        }
+
+        #btnLogin, input[type="email"], input[type="password"]{
+            width: 250px;
+            height: 30px;
+        }
+
+    </style>
+
+    <div class="form">
+
+
+        <input type="email" id="edtEmail" placeholder="* Email">
+        <input type="password" id="edtSenha" placeholder="* Senha">
+        <button id="btnLogin" class="btn btn-primary" >login</button>
+
+
+        <p>New User? <a onclick="javascript:openHTML('novoUser.html')" style="color: blue;">Sign up</a></p>
+
+    </div>
+
+</template>
+<script>
+
+    function novoUsuario(){        
+        openHTML('novoUser.html')
+    }
+
+
+
+    document.querySelector('#btnLogin').addEventListener('click',()=>{
+
+        if(goon('edtEmail,edtSenha')){
+            const params = new Object;
+                params.email =  document.querySelector('#edtEmail').value.trim()
+                params.hash = (params.email+document.querySelector('#edtSenha').value.trim()).getHash(77)
+
+            const myPromisse = queryDB(params,0)
+
+            myPromisse.then((resolve)=>{
+                const json = JSON.parse(resolve)                
+                if(json.length > 0){
+           
+                    localStorage.setItem('idUser',json[0].id)
+                    localStorage.setItem('email',json[0].email)
+                    localStorage.setItem('hash',json[0].hash)
+                    localStorage.setItem('nome',json[0].nome)
+                    localStorage.setItem('nick',json[0].nick)
+                    localStorage.setItem('cel',json[0].cel)
+                    localStorage.setItem('class',json[0].class)
+                    checkLogin()
+                    closeModal()
+                    
+                }else{
+                    alert('Usuário ou senha inválido!')
+                    localStorage.clear();
+                    checkLogin()
+                }
+            })
+        }
+
+    })
+
+
+</script>
