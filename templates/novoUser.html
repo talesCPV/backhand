@@ -61,65 +61,30 @@
 
 </template>
 <script>
-/**
-var mbAttr = 'www.backhand.com.br';
-    var mapUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';    
-    var satUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-    
-    maplayer = L.tileLayer(mapUrl, {
-        id: 'mapbox.streets',
-        attribution: mbAttr
-    });
-
-    satlayer = L.tileLayer(satUrl, {
-        id: 'mapbox.streets',
-        attribution: mbAttr
-    });
-*/
-    map = L.map('map', {
-        center: [30, 0],
-        zoom: 25,
-        layers: [satlayer]
-    })
-
-    map.locate({setView: true, maxZoom: 16});
-    map.on('click',(e)=>{
-        var newLatLng = new L.LatLng(e.latlng.lat, e.latlng.lng);
-        marker.setLatLng(newLatLng); 
-    });
-
-    var marker = new L.Marker([map.getCenter().lat, map.getCenter().lng]);
-    marker.addTo(map)
 
 
-document.querySelector('#btnAddUser').addEventListener('click',()=>{
+    document.querySelector('#btnAddUser').addEventListener('click',()=>{
 
-    if(goon('edtMail,edtPass,edtName')){
-        const email = document.querySelector('#edtMail').value.trim().toLowerCase()
-        const pass = document.querySelector('#edtPass').value.trim()
-        const nome = document.querySelector('#edtName').value.trim().toUpperCase()
+        if(goon('edtMail,edtPass,edtName')){
+            const email = document.querySelector('#edtMail').value.trim().toLowerCase()
+            const pass = document.querySelector('#edtPass').value.trim()
+            const nome = document.querySelector('#edtName').value.trim().toUpperCase()
 
-        const params = new Object;
-            params.id = 'DEFAULT'
-            params.email = email
-            params.hash = (email+pass).getHash(77)
-            params.name = nome
-            params.nick = document.querySelector('#edtNick').value.trim()
-            params.cel = document.querySelector('#edtCel').value.trim()
-            params.lat = map.getCenter().lat
-            params.lng = map.getCenter().lng
-        const myPromisse = queryDB(params,1);
-        myPromisse.then((resolve)=>{
-                alert('Usuário cadastrado com sucesso!')
-                closeModal()       
-        })
-
-    }
-
-
-        
-  
-
+            const params = new Object;
+                params.id = 'DEFAULT'
+                params.email = email
+                params.hash = (email+pass).getHash(77)
+                params.name = nome
+                params.nick = document.querySelector('#edtNick').value.trim()
+                params.cel = document.querySelector('#edtCel').value.trim()
+                params.lat = mainData.login.coords.lat
+                params.lng = mainData.login.coords.lng
+            const myPromisse = queryDB(params,1);
+            myPromisse.then((resolve)=>{
+                    alert('Usuário cadastrado com sucesso!')
+                    closeModal()       
+            })
+        }
     })
 
 

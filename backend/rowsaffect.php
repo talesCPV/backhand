@@ -6,7 +6,7 @@
 
         $cod = $_POST["cod"];
         $params = json_decode($_POST["params"],true); 
-        $rows = array();
+//        $rows = array();
 
         include "connect.php";        
         include "sql.php"; 
@@ -26,8 +26,8 @@
 
 //    echo $query; 
 
-            $result = mysqli_query($conexao, $query);
-//  echo $result->affected_rows;         
+            $rows -> query($conexao, $query);
+/*         
             if(is_object($result)){
                 if($result->num_rows > 0){			
                     while($r = mysqli_fetch_assoc($result)) {
@@ -35,10 +35,10 @@
                     }
                 }        
             }
-
+*/
 	    $conexao->close();        
 
-        print json_encode($rows);
+        print json_encode($rows -> affected_rows);
 
     }
 

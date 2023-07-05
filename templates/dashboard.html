@@ -4,12 +4,7 @@
 
     </style>
 
-    <div class="view-activity">
-
-        teste
-        <h2>olá mundo</h2>
-
-    </div>
+    <div class="view-activity"></div>
 
 
 </template>
@@ -45,26 +40,29 @@
                         <p>Partner - ${json[i].parceiro}</p>
                         <p>Sport   - ${json[i].SPORT}</p>
                         <p>Event   - ${json[i].EVENTO}</p>
-                        <a> Kudos <i class="fas fa-thumbs-up"></i></a>
+                        <a class="only-login hide-menu"> Kudos <i class="fas fa-thumbs-up"></i></a>
+                        <br>
                         <a id="btnViewMore-${i}">view more...</a>
                         <br>
-                        <!-- facebook -->
-                        <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
-                        
-                        <!-- twitter -->
-                        <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
-                        
-                        <!-- linkedin -->
-                        <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
-                        
-                        <!-- reddit -->
-                        <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
+                        <div class="only-login hide-menu">
+                            <!-- facebook -->
+                            <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
+                            
+                            <!-- twitter -->
+                            <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
+                            
+                            <!-- linkedin -->
+                            <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
+                            
+                            <!-- reddit -->
+                            <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
 
-                        <!-- whatsapp-->
-                        <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
+                            <!-- whatsapp-->
+                            <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
 
-                        <!-- telegram-->
-                        <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a>                        
+                            <!-- telegram-->
+                            <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
+                        </div>                       
                     </div>
                 </div>`
 

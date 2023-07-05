@@ -44,3 +44,12 @@ function pinMap(latlng,map){
     var marker = new L.Marker(latlng);
     marker.addTo(map)
 }
+
+
+function initGeolocation(){
+
+    return navigator.geolocation.getCurrentPosition((a)=>{console.log(a)})
+
+}
+
+

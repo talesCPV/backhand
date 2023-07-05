@@ -17,7 +17,13 @@
             height: 30px;
         }
 
+        #local{
+            display: none;
+        }
+
     </style>
+
+    <div id="local"></div>
 
     <div class="form">
 
@@ -27,18 +33,24 @@
         <button id="btnLogin" class="btn btn-primary" >login</button>
 
 
-        <p>New User? <a onclick="javascript:openHTML('novoUser.html')" style="color: blue;">Sign up</a></p>
+        <p>New User? <a onclick="javascript:openHTML('novoUser.html','modal',coords)" style="color: blue;">Sign up</a></p>
 
     </div>
 
 </template>
 <script>
 
+    mainData.login.coords = new Object
+
+
     function novoUsuario(){        
         openHTML('novoUser.html')
     }
 
-
+    navigator.geolocation.getCurrentPosition((latlng)=>{
+        mainData.login.coords.lat = latlng.coords.latitude
+        mainData.login.coords.lng = latlng.coords.longitude
+    })
 
     document.querySelector('#btnLogin').addEventListener('click',()=>{
 
@@ -59,7 +71,10 @@
                     localStorage.setItem('nome',json[0].nome)
                     localStorage.setItem('nick',json[0].nick)
                     localStorage.setItem('cel',json[0].cel)
-                    localStorage.setItem('class',json[0].class)
+                    localStorage.setItem('class',json[0].class)   
+                    localStorage.setItem('lat',mainData.login.coords.lat)   
+                    localStorage.setItem('lng',mainData.login.coords.lng)   
+
                     checkLogin()
                     closeModal()
                     

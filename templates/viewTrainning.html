@@ -14,10 +14,20 @@
             padding: 0 20px;
         }
 
+        .line{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
     </style>
 
     <div class="form">
-        <p id="atv-atleta"></p>
+        <div class="line">
+            <p id="atv-atleta"></p>
+            <button id="btnEdit" class="btn btn-primary">EDIT</button>
+        </div>
         <h2 id="atv-titulo"></h2>
         <div id="map"></div>
         <p id="atv-parceiro"></p>
@@ -39,12 +49,18 @@
     document.querySelector('#atv-titulo').innerHTML = data.nome
     document.querySelector('#atv-parceiro').innerHTML = data.parceiro
 
-
+    if(data.id_usuario != localStorage.getItem('idUser')){
+        document.querySelector('#btnEdit').style.display = 'none'
+    }
 
     map = createMap('map',[data.lat, data.lng])
     pinMap([data.lat, data.lng],map)
     map.locate({setView: false, maxZoom: 30})
     
+    document.querySelector('#btnEdit').addEventListener('click',()=>{
+        openHTML('newActivity.html','modal',data,400)
+    })
+
 
 
 </script>

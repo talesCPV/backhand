@@ -89,19 +89,32 @@
 </template>
 <script>
 
+    const data = mainData.newActivity.data
     const today =  new Date
+    let id = 'DEFAULT'
 
-    document.querySelector('#edtData').value = today.getFormatDate()
-    document.querySelector('#edtHora').value = today.getFullTime()
+    if(data != undefined){
+        const dur = Math.floor(parseFloat(data.duracao)/60).toString().padStart(2,'0') +':'+(parseFloat(data.duracao)%60).toString().padStart(2,'0')
+        id = data.id
+        document.querySelector('#edtDesc').value = data.nome
+        document.querySelector('#edtParceiro').value = data.parceiro
+        document.querySelector('#edtData').value = data.dia.substr(0,10)
+        document.querySelector('#edtHora').value = data.dia.showTime()
+        document.querySelector('#edtTempo').value = dur
+        document.querySelector('.title-newActivity').innerHTML = 'Edit Activity'
+        document.querySelector('#btnAdd').innerHTML = "SAVE"
 
-//    console.log(today.getFullTime())
+    }else{
+        document.querySelector('#edtData').value = today.getFormatDate()
+        document.querySelector('#edtHora').value = today.getFullTime()
+    }
 
     const courtParams = new Object;
     courtParams.idUser = localStorage.getItem('idUser')
 
-    fillCombo('cmbQuadra',courtParams,6,['id','nome'])
-    fillCombo('cmbSport',courtParams,12,['id','nome'])
-    fillCombo('cmbTipo',courtParams,13,['id','nome'])
+    fillCombo('cmbQuadra',courtParams,6,['id','nome'], data != undefined ? data.id_quadra : '')
+    fillCombo('cmbSport',courtParams,12,['id','nome'], data != undefined ? data.id_sport : '')
+    fillCombo('cmbTipo',courtParams,13,['id','nome'], data != undefined ? data.id_evento : '')
 
     document.querySelector('#btnAddCourt').addEventListener('click',()=>{
         openHTML('myCourts.html','modal',null,500)
@@ -124,7 +137,7 @@
             const quad = document.querySelector('#cmbQuadra').value.trim()
 
             const params = new Object;
-                params.id = 'DEFAULT'
+                params.id = id
                 params.id_usuario = localStorage.getItem('idUser')
                 params.nome = nome
                 params.id_sport = sport
