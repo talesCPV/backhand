@@ -47,9 +47,7 @@ function pinMap(latlng,map){
 
 
 function initGeolocation(){
-
     return navigator.geolocation.getCurrentPosition((a)=>{console.log(a)})
-
 }
 
 

@@ -1,6 +1,8 @@
 /* GLOBAL DATA */ 
 
     var mainData = new Object
+    const maps = []
+
 
 /* FUNCTIONS */
 
@@ -16,7 +18,83 @@ function checkLogin(){
         hideMenu(false)
         out = true
     }
+    
     return out
+}
+
+function loadActivity(D,S,L){
+
+    const screen = document.querySelector('#dashboard')
+    S == '0' ? screen.innerHTML = '' : 0
+    const params = new Object;
+        params.lat = localStorage.getItem('lat')
+        params.lng = localStorage.getItem('lng')
+        params.maxDistance = D
+        params.start = S
+        params.limit = L
+
+    const myPromisse = queryDB(params,9);
+    myPromisse.then((resolve)=>{
+        const json = JSON.parse(resolve)  
+        for(let i=0; i<json.length; i++){
+            
+            const div = document.createElement('div')
+            div.className = 'post-activity'
+
+            div.innerHTML = `<p>${json[i].ATLETA}</p>
+            <h2>${json[i].nome}</h2>
+            <h4>${json[i].dia.showDate()} ${json[i].dia.showTime()} - ${json[i].QUADRA}</h4>
+            <div style="display:flex; gap:20px;">
+                <div id="map-${i}" class="map-activity"></div>
+                <div>
+                    <h2></h2>
+                    <p>Partner - ${json[i].parceiro}</p>
+                    <p>Sport   - ${json[i].SPORT}</p>
+                    <p>Event   - ${json[i].EVENTO}</p>
+                    <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Kudos <i class="fas fa-thumbs-up"></i></a>
+                    <br>
+                    <a id="btnViewMore-${i}">view more...</a>
+                    <br>
+                    <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
+                        <!-- facebook -->
+                        <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
+                        
+                        <!-- twitter -->
+                        <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
+                        
+                        <!-- linkedin -->
+                        <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
+                        
+                        <!-- reddit -->
+                        <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
+
+                        <!-- whatsapp-->
+                        <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
+
+                        <!-- telegram-->
+                        <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
+                    </div>                       
+                </div>
+            </div>`
+//            console.log(json[i].distance)      
+
+            div.database = json[i]
+            screen.appendChild(div)
+            maps.push(createMap('map-'+i,[json[i].lat, json[i].lng],30))
+
+            pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
+
+            maps[maps.length-1].locate({setView: false, maxZoom: 30})
+            maps[maps.length-1].zoomControl = false
+            maps[maps.length-1].on('click',()=>{
+                openHTML('viewTrainning.html','modal',json[i])
+            })
+
+            document.querySelector('#btnViewMore-'+i).addEventListener('click',()=>{
+                openHTML('viewTrainning.html','modal',json[i])
+            })
+        }
+    })
 }
 
 

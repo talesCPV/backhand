@@ -54,6 +54,20 @@
 
     document.querySelector('#btnLogin').addEventListener('click',()=>{
 
+        function localizaUser(data){
+            const params = new Object;
+                params.id =  data.id
+                params.email =  data.email
+                params.hash = data.hash
+                params.nome = data.nome
+                params.nick = data.nick
+                params.cel = data.cel
+                params.class = data.class
+                params.lat = mainData.login.coords.lat
+                params.lng = mainData.login.coords.lng
+            queryDB(params,1)
+        }
+
         if(goon('edtEmail,edtSenha')){
             const params = new Object;
                 params.email =  document.querySelector('#edtEmail').value.trim()
@@ -74,7 +88,7 @@
                     localStorage.setItem('class',json[0].class)   
                     localStorage.setItem('lat',mainData.login.coords.lat)   
                     localStorage.setItem('lng',mainData.login.coords.lng)   
-
+                    localizaUser(json[0])
                     checkLogin()
                     closeModal()
                     
@@ -82,7 +96,9 @@
                     alert('Usuário ou senha inválido!')
                     localStorage.clear();
                     checkLogin()
+
                 }
+
             })
         }
 
