@@ -77,6 +77,7 @@
                 params.name = nome
                 params.nick = document.querySelector('#edtNick').value.trim()
                 params.cel = document.querySelector('#edtCel').value.trim()
+                params.class = 0
                 params.lat = mainData.login.coords.lat
                 params.lng = mainData.login.coords.lng
             const myPromisse = queryDB(params,1);

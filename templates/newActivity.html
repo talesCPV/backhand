@@ -71,6 +71,7 @@
             <label for="cmbSets">Sets</label>
             <div class="edtbtn">
                 <select id="cmbSets"></select>
+                <button id="btnEdtSet">EDT</button>
                 <button id="btnSetScore">+</button>
             </div>
             
@@ -89,11 +90,13 @@
 </template>
 <script>
 
+    mainData.newActivity.data.sets = []
     const data = mainData.newActivity.data
     const today =  new Date
+    const edit = Object.keys(data).length > 1
     let id = 'DEFAULT'
 
-    if(data != undefined){
+    if(edit){
         const dur = Math.floor(parseFloat(data.duracao)/60).toString().padStart(2,'0') +':'+(parseFloat(data.duracao)%60).toString().padStart(2,'0')
         id = data.id
         document.querySelector('#edtDesc').value = data.nome
@@ -115,6 +118,8 @@
     fillCombo('cmbQuadra',courtParams,6,['id','nome'], data != undefined ? data.id_quadra : '')
     fillCombo('cmbSport',courtParams,12,['id','nome'], data != undefined ? data.id_sport : '')
     fillCombo('cmbTipo',courtParams,13,['id','nome'], data != undefined ? data.id_evento : '')
+    querySets()
+
 
     document.querySelector('#btnAddCourt').addEventListener('click',()=>{
         openHTML('myCourts.html','modal',null,500)
@@ -124,6 +129,20 @@
     document.querySelector('#btnSetScore').addEventListener('click',()=>{
         openHTML('addSets.html','modal',null,500)
     })
+
+    document.querySelector('#btnEdtSet').addEventListener('click',()=>{
+
+        const opt = document.querySelector('#cmbSets').querySelectorAll('option').length
+ 
+        if(opt > 0){
+            const index = document.querySelector('#cmbSets').value
+            const set = mainData.newActivity.data.sets[index]
+            set.index = index
+            openHTML('addSets.html','modal',{sets : set},500)
+        }
+            
+    })
+    
 
     document.querySelector('#btnAdd').addEventListener('click',()=>{
 
@@ -146,20 +165,68 @@
                 params.data = data
                 params.duracao = temp
                 params.id_quadra = quad
-                console.log(params)
                 
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
-                    closeModal()       
-            })
 
+                addSets(edit)
+                closeModal()       
+            })
+        }
+    })
+
+    mainData.newActivity.func.fillSets = ()=>{
+        const sets = mainData.newActivity.data.sets
+        const cmb = document.querySelector('#cmbSets')
+        cmb.innerHTML = ''
+        for(let i=0; i< sets.length; i++){
+            const opt = document.createElement('option')
+            opt.value = i
+            sets[i].index = i
+            opt.innerHTML = `SET ${i+1}`
+            cmb.appendChild(opt)
         }
 
+    }
 
-        
+    function addSets(edit){
 
+        const sets = mainData.newActivity.data.sets
+        console.log(sets)
+        for(let i=0; i<sets.length; i++){
+            const params = new Object;
+                params.id = i
+                params.id_atividade = edit ? mainData.newActivity.data.id : '(SELECT MAX(id) FROM tb_atividades)'
+                params.p1 = sets[i].p1
+                params.p2 = sets[i].p2
+                params.obs = sets[i].obs
 
-    })
+            queryDB(params,14)
+        }
+    }
+
+    function querySets(){
+        const params = new Object;
+                params.id_atividade = mainData.newActivity.data.id
+                
+            const myPromisse = queryDB(params,15);
+            myPromisse.then((resolve)=>{
+                const json = JSON.parse(resolve)  
+                console.log(json)
+                mainData.newActivity.data.sets = []
+                for(let i=0; i<json.length; i++){
+                    const set = new Object
+                        set.p1 = parseInt(json[i].p1_score)
+                        set.p2 = parseInt(json[i].p2_score)
+                        set.obs = json[i].obs
+                        set.id = json[i].id
+                    mainData.newActivity.data.sets.push(set)
+                }
+                mainData.newActivity.func.fillSets()
+             
+            })
+    }
+
 
 
 </script>

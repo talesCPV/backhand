@@ -97,6 +97,7 @@ function loadActivity(D,S,L){
     })
 }
 
+/* VALIDATION */
 
 function valInt(edt){
     edt.value = getNum(edt.value)

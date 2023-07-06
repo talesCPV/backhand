@@ -25,12 +25,12 @@
         }
 
     </style>
-
+    
     <div class="inline">
         <label for="edtP1">Me</label>
-        <input type="text" id="edtP1">
+        <input type="text" id="edtP1" onkeyup="valInt(this)">
         <label>VS</label>
-        <input type="text" id="edtP2">
+        <input type="text" id="edtP2" onkeyup="valInt(this)">
         <label for="edtP2">My Partner</label>
     </div>
  
@@ -39,11 +39,54 @@
     </div>
 
     <div class="inline">
-        <button class="btn btn-primary">Add Set</button>
+        <button id="btnAddSet" class="btn btn-primary">Add Set</button>
+        <button id="btnDelSet" class="btn btn-primary">Delete</button>
     </div>
 
 
 </template>
 <script>
+
+    const data = mainData.addSets.data
+    const edit = Object.keys(data).length > 0
+
+    if(edit){
+        document.querySelector('#edtP1').value = data.sets.p1
+        document.querySelector('#edtP2').value = data.sets.p2
+        document.querySelector('#edtAboutSet').value = data.sets.obs
+        document.querySelector('#btnAddSet').innerHTML = 'Save' 
+        document.querySelector('#btnDelSet').style.display = 'block'
+    }else{
+        document.querySelector('#btnDelSet').style.display = 'none'
+    }
+
+    document.querySelector('#btnAddSet').addEventListener('click',()=>{
+        const set = new Object
+            set.p1 = parseInt(document.querySelector('#edtP1').value)
+            set.p2 = parseInt(document.querySelector('#edtP2').value)
+            set.obs = document.querySelector('#edtAboutSet').value
+            set.id = edit ? mainData.newActivity.data.sets[mainData.addSets.data.sets.index].id : 0
+        edit ? mainData.newActivity.data.sets[mainData.addSets.data.sets.index] = set : mainData.newActivity.data.sets.push(set)
+        mainData.newActivity.func.fillSets()
+        closeModal('')
+    })
+
+    document.querySelector('#btnDelSet').addEventListener('click',()=>{
+
+        const params = new Object;
+            params.id = data.sets.index
+            params.id_atividade = mainData.newActivity.data.id
+
+        const myPromisse = queryDB(params,17);
+        myPromisse.then(()=>{
+
+            mainData.newActivity.data.sets.splice(data.sets.index,1)
+            mainData.newActivity.func.fillSets()
+            closeModal('')
+        })
+        
+
+    })
+
 
 </script>

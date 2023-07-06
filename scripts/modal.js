@@ -18,15 +18,12 @@ async function openHTML(  template="",where="modal", data=null, max='',){
 
                 if(where == "modal"){
                     mainData[template.split('.')[0]] = new Object
-                    data != null ? mainData[template.split('.')[0]].data = data : 0
+                    mainData[template.split('.')[0]].func = new Object
+                    mainData[template.split('.')[0]].data = data != null ? data : new Object
                     newModal(temp,max)
                 }else{
-
-//                    document.querySelector('#dashboard').innerHTML = temp.getElementsByTagName('title')[0].innerHTML
                     document.querySelector('#dashboard').innerHTML = temp.getElementsByTagName('template')[0].innerHTML
                     eval(temp.getElementsByTagName('script')[0].innerHTML);                                  
-//                    document.getElementById("myModal").style.display = "block";  
-                    
                 }
                 
           }); 
@@ -39,12 +36,17 @@ function closeModal(id='all'){
     if(id=='all'){
         while(mod_main.querySelectorAll('.modal').length > 0){
             mod_main.querySelectorAll('.modal')[0].remove()    
+            Object.entries(mainData).forEach(entry => {
+                const [key, value] = entry;
+                delete mainData[key]
+              });
         }
     }else{
         id = (id=='')? mod_main.querySelectorAll('.modal').length-1 : id
+        const template = mod_main.querySelector('#modal-'+id).name.split('.')[0]
         delete mainData[mod_main.querySelector('#modal-'+id).name] 
         mod_main.querySelector('#modal-'+id).remove()
-//        delete main_data[id]
+        delete mainData[template.split('.')[0]]
     }
     mod_main.style.display = (mod_main.querySelectorAll('.modal').length < 1) ? "none" : 'block'
 //    checkMail()
