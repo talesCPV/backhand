@@ -49,8 +49,7 @@
         "11" => 'CALL sp_delAtividades("x00");',
         "12" => 'SELECT * FROM tb_sport',
         "13" => 'SELECT * FROM tb_evento',
-        "14" => 'INSERT INTO tb_sets (id,id_atividade,p1_score,p2_score,obs) VALUES ("x00","x01","x02","x03","x04")
-            ON DUPLICATE KEY UPDATE p1_score="x02", p2_score="x03", obs="x04";',
+        "14" => 'CALL sp_insertSets("x00","x01","x02","x03","x04");',
         "15" => 'SELECT * FROM tb_sets WHERE id_atividade="x00"',
         "16" => 'DELETE FROM tb_sets WHERE AND id_atividade="x01"',
         "17" => 'DELETE FROM tb_sets WHERE id="x00" AND id_atividade="x01"',

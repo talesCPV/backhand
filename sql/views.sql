@@ -1,5 +1,5 @@
 
-CREATE VIEW vw_distance AS
+CREATE VIEW vw.distance AS
 	SELECT lat1,lng1,lat2,lng2,ROUND(6371 *
         acos(
             cos(radians(lat1)) *

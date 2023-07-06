@@ -22,15 +22,7 @@ SELECT ROUND(6371 *
 FROM tb_usuario; -- HAVING distance <= 5
 
 
-SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA, QD.lat, QD.lng , QD.nome AS QUADRA,
-			ROUND(6371 *
-				acos(
-					cos(radians(QD.lat)) *
-					cos(radians(US.lat)) *
-					cos(radians(QD.lng) - radians(US.lng)) +
-					sin(radians(QD.lat)) *
-					sin(radians(US.lat))
-			),3) AS distance
+SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA, QD.lat, QD.lng , QD.nome AS QUADRA
             FROM tb_atividades AS ATV 
             INNER JOIN tb_sport AS SP
             INNER JOIN tb_evento AS EV

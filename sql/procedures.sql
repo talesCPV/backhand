@@ -1,24 +1,3 @@
-/*
-DROP PROCEDURE distance;
-DELIMITER $$
-
-	CREATE PROCEDURE distance(IN lat1 DOUBLE, IN lng1 DOUBLE, IN lat2 DOUBLE,IN lng2 DOUBLE)
-	BEGIN
-
-		SELECT ROUND(6371 *
-        acos(
-            cos(radians(lat1)) *
-            cos(radians(lat2)) *
-            cos(radians(lng1) - radians(lng2)) +
-            sin(radians(lat1)) *
-            sin(radians(lat2))
-        ),3) AS distance;
-			
-	END $$
-DELIMITER ;
-
-CALL distance(-23.01491109452432,-45.564878769127105,-23.5,-45.5);
-*/
 
 /*  USUARIO  */
 
