@@ -14,14 +14,7 @@
         "7" => 'CALL sp_insertMinhasQuadras("x00","x01");',
         "8" => 'CALL sp_delMinhasQuadras("x00","x01");',
         "9" => 'SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA, QD.lat, QD.lng , QD.nome AS QUADRA,
-            ROUND(6371 *
-                acos(
-                    cos(radians(QD.lat)) *
-                    cos(radians(x00)) *
-                    cos(radians(QD.lng) - radians(x01)) +
-                    sin(radians(QD.lat)) *
-                    sin(radians(x00))
-            ),3) AS distance
+            (SELECT calcDist(QD.lat,QD.lng,US.lat,US.lng)) AS distance
             FROM tb_atividades AS ATV 
             INNER JOIN tb_sport AS SP
             INNER JOIN tb_evento AS EV
@@ -31,18 +24,8 @@
             ON SP.id = ATV.id_sport
             AND EV.id = ATV.id_evento
             AND US.id = ATV.id_usuario
-            AND QD.id = ATV.id_quadra
-            
-            AND(
-            SELECT ROUND(6371 *
-				acos(
-					cos(radians(QD.lat)) *
-					cos(radians(US.lat)) *
-					cos(radians(QD.lng) - radians(US.lng)) +
-					sin(radians(QD.lat)) *
-					sin(radians(US.lat))
-			),3) ) <= x02
-
+            AND QD.id = ATV.id_quadra            
+            AND(SELECT calcDist(QD.lat,QD.lng,US.lat,US.lng))<= x02
             ORDER BY ATV.dia DESC        
             LIMIT x03,x04;',
         "10" => 'CALL sp_insertAtividades("x00","x01","x02","x03","x04","x05","x06","x07","x08");',

@@ -36,6 +36,7 @@ function loadActivity(D,S,L){
     const myPromisse = queryDB(params,9);
     myPromisse.then((resolve)=>{
         const json = JSON.parse(resolve)  
+console.log(json)        
         for(let i=0; i<json.length; i++){
             
             const div = document.createElement('div')
