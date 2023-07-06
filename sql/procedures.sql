@@ -1,4 +1,4 @@
-/**
+/*
 DROP PROCEDURE distance;
 DELIMITER $$
 
@@ -126,8 +126,12 @@ DELIMITER $$
 		INSERT INTO tb_atividades (id,id_usuario,nome,id_sport,id_evento,parceiro,dia,duracao,id_quadra)
         VALUES (Iid,Iid_usuario,Inome,Iid_sport,Iid_evento,Iparceiro,Idia,Iduracao,Iid_quadra)
 		ON DUPLICATE KEY 
-        UPDATE nome="x02", id_sport="x03", id_evento="x04", parceiro="x05", dia="x06", duracao="x07", id_quadra="x08";	END $$
+        UPDATE nome="x02", id_sport="x03", id_evento="x04", parceiro="x05", dia="x06", duracao="x07", id_quadra="x08";        
+        SELECT LAST_INSERT_ID() AS lastID;        
+        END $$
 DELIMITER ;
+
+CALL sp_insertAtividades("DEFAULT","1","sql teste","1","1","parceiro teste","2023-07-07 12:00:00","80","2");
 
 -- DROP PROCEDURE sp_delAtividades;
 DELIMITER $$
@@ -138,3 +142,23 @@ DELIMITER $$
 		DELETE FROM tb_atividades WHERE id=Iid;                                    
 	END $$
 DELIMITER ;
+
+/* SETS */
+
+-- DROP PROCEDURE sp_insertSets;
+DELIMITER $$
+	CREATE PROCEDURE sp_insertSets(
+		IN Iid int(11),
+		IN Iid_atividade int(11), 
+		IN Ip1_score int(11),
+		IN Ip2_score int(11),
+		IN Iobs varchar(255)
+    )
+	BEGIN			            
+		INSERT INTO tb_sets (id,id_atividade,p1_score,p2_score,obs)
+        VALUES (Iid,Iid_Iatividade,Ip1_score,Ip2_score,Iobs)
+        ON DUPLICATE KEY
+        UPDATE p1_score=Ip1_score, p2_score=Io2_score, obs=Iobs;
+	END $$
+DELIMITER ;
+

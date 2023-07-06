@@ -106,6 +106,7 @@
         document.querySelector('#edtTempo').value = dur
         document.querySelector('.title-newActivity').innerHTML = 'Edit Activity'
         document.querySelector('#btnAdd').innerHTML = "SAVE"
+        querySets()
 
     }else{
         document.querySelector('#edtData').value = today.getFormatDate()
@@ -118,7 +119,6 @@
     fillCombo('cmbQuadra',courtParams,6,['id','nome'], data != undefined ? data.id_quadra : '')
     fillCombo('cmbSport',courtParams,12,['id','nome'], data != undefined ? data.id_sport : '')
     fillCombo('cmbTipo',courtParams,13,['id','nome'], data != undefined ? data.id_evento : '')
-    querySets()
 
 
     document.querySelector('#btnAddCourt').addEventListener('click',()=>{
@@ -168,8 +168,9 @@
                 
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
-
-                addSets(edit)
+                const json = JSON.parse(resolve)  
+                console.log(json)
+                addSets(json[0].lastID)
                 closeModal()       
             })
         }
@@ -189,14 +190,14 @@
 
     }
 
-    function addSets(edit){
+    function addSets(idAtv){
 
         const sets = mainData.newActivity.data.sets
         console.log(sets)
         for(let i=0; i<sets.length; i++){
             const params = new Object;
                 params.id = i
-                params.id_atividade = edit ? mainData.newActivity.data.id : '(SELECT MAX(id) FROM tb_atividades)'
+                params.id_atividade = idAtv
                 params.p1 = sets[i].p1
                 params.p2 = sets[i].p2
                 params.obs = sets[i].obs
