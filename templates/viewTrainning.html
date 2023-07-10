@@ -4,6 +4,7 @@
         #map{
             width: 100%;
             height: 200px;
+            max-width: 500px;
         }
 
         p{
@@ -21,16 +22,33 @@
             padding: 0 10px;
         }
 
+        .center{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+
+
     </style>
 
     <div class="form">
         <div class="line">
             <p id="atv-atleta"></p>
+
+        </div>
+        <div class="center" >
+            <h2 id="atv-titulo"></h2>
+            <div id="map"></div>
+        </div>
+        <div class="line">
+            <p id="atv-data"></p>
+            <p id="atv-hora"></p>
+            <p id="atv-tempo"></p>
+        </div>
+        <div class="center">
             <button id="btnEdit" class="btn btn-primary">EDIT</button>
         </div>
-        <h2 id="atv-titulo"></h2>
-        <div id="map"></div>
-        <p id="atv-parceiro"></p>
         
 
     </div>
@@ -45,9 +63,13 @@
     console.log(data)
 
     document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
-    document.querySelector('#atv-atleta').innerHTML = data.ATLETA
+    document.querySelector('#atv-atleta').innerHTML = `${data.nick} ${data.SETS_P1} vs ${data.SETS_P2} ${data.parceiro.split(' ')[0]}`
     document.querySelector('#atv-titulo').innerHTML = data.nome
-    document.querySelector('#atv-parceiro').innerHTML = data.parceiro
+    document.querySelector('#atv-data').innerHTML = `Date:${data.dia.showDate()}`
+    document.querySelector('#atv-hora').innerHTML = `Time:${data.dia.showTime()}`
+    document.querySelector('#atv-tempo').innerHTML = ` elapsed time:${parseInt(data.duracao/60).toString().padStart(2,'0')}:${parseInt(data.duracao%60).toString().padStart(2,'0')}`
+
+
 
     if(data.id_usuario != localStorage.getItem('idUser')){
         document.querySelector('#btnEdit').style.display = 'none'
@@ -60,6 +82,17 @@
     document.querySelector('#btnEdit').addEventListener('click',()=>{
         openHTML('newActivity.html','modal',data,400)
     })
+
+    function fillSets(ATV){
+        const params = new Object;
+            params.id_ATV = ATV
+
+        const myPromisse = queryDB(params,15);
+        myPromisse.then(()=>{
+            mainData.viewTrainning.data.sets = []
+            
+        })
+    }
 
 
 

@@ -1,4 +1,6 @@
+DELETE FROM tb_atividades WHERE id=12;
 
+CALL sp_insertAtividades("8","1","JOGO 8","1","1","Parça","2023-07-07 12:00:00","120","2");
 
 SELECT *, ROUND(6371 *
         acos(

@@ -1,9 +1,10 @@
 
 /* DELETE ATIVIDADES/SETS */
 
+-- DROP TRIGGER tr_delAllSets;
 DELIMITER $$
 
-	CREATE TRIGGER delAllSets AFTER DELETE 
+	CREATE TRIGGER tr_delAllSets AFTER DELETE 
     ON tb_atividades
     FOR EACH ROW 
 	BEGIN
@@ -11,3 +12,4 @@ DELIMITER $$
     END$$;
         
 DELIMITER ;    
+

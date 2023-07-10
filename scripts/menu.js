@@ -14,6 +14,6 @@ function hideMenu(hide=true){
         hide ? menu[i].classList.add('hide-menu') : menu[i].classList.remove('hide-menu')
     }
 
-    loadActivity(5,0,10)
+    loadActivity(100,0,10)
 
 }

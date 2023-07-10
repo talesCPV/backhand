@@ -85,6 +85,57 @@ button{
 
 /* ///////////..utility classes../////////// */
 
+
+.map-view{
+  position: relative;
+}
+
+.map-activity{
+  position: absolute;
+}
+
+.map-label{
+  position: absolute;
+  font-size: 1.5em;
+  left: 45px;
+  color: white;
+  text-shadow: 0.1em 0.1em 0.2em black;
+  max-width:  100%;
+  white-space: nowrap;
+}
+
+.right-panel{
+  position: relative;
+  left: 55%;
+}
+
+.base-panel{
+  position: relative;
+  top: 20px;
+}
+
+.panel{
+  display:flex;
+  gap:20px;
+}
+
+.panel a:hover{
+  color: #16a083;
+}
+
+.flex-line{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.flex-col{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .main-content{  
   display: flex;
   flex-direction: column;

@@ -1,12 +1,10 @@
 
-DROP FUNCTION calcDist;
+-- DROP FUNCTION fn_calcDist;
 DELIMITER $$
-
-	CREATE FUNCTION calcDist(lat1 DOUBLE, lng1 DOUBLE, lat2 DOUBLE,lng2 DOUBLE)
+	CREATE FUNCTION fn_calcDist(lat1 DOUBLE, lng1 DOUBLE, lat2 DOUBLE,lng2 DOUBLE)
     RETURNS DOUBLE 
     DETERMINISTIC
-	BEGIN
-    
+	BEGIN    
 		RETURN ROUND(6371 *
         acos(
             cos(radians(lat1)) *
@@ -14,8 +12,7 @@ DELIMITER $$
             cos(radians(lng1) - radians(lng2)) +
             sin(radians(lat1)) *
             sin(radians(lat2))
-        ),3);
-        			
+        ),3);        			
 	END $$
 DELIMITER ;
 

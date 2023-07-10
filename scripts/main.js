@@ -24,78 +24,118 @@ function checkLogin(){
 
 function loadActivity(D,S,L){
 
-    const screen = document.querySelector('#dashboard')
-    S == '0' ? screen.innerHTML = '' : 0
-    const params = new Object;
-        params.lat = localStorage.getItem('lat')
-        params.lng = localStorage.getItem('lng')
-        params.maxDistance = D
-        params.start = S
-        params.limit = L
+    navigator.geolocation.getCurrentPosition((latlng)=>{    
+        mainData.coords = new Object
+        mainData.coords.lat = latlng.coords.latitude
+        mainData.coords.lng = latlng.coords.longitude
 
-    const myPromisse = queryDB(params,9);
-    myPromisse.then((resolve)=>{
-        const json = JSON.parse(resolve)  
-console.log(json)        
-        for(let i=0; i<json.length; i++){
+        const screen = document.querySelector('#dashboard')
+        S == '0' ? screen.innerHTML = '' : 0
+        const params = new Object;
+            params.lat = latlng.coords.latitude
+            params.lng = latlng.coords.longitude
+            params.maxDistance = D
+            params.start = S
+            params.limit = L
+    
+        const myPromisse = queryDB(params,9);
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)       
+            for(let i=0; i<json.length; i++){
             
-            const div = document.createElement('div')
-            div.className = 'post-activity'
-
-            div.innerHTML = `<p>${json[i].ATLETA}</p>
-            <h2>${json[i].nome}</h2>
-            <h4>${json[i].dia.showDate()} ${json[i].dia.showTime()} - ${json[i].QUADRA}</h4>
-            <div style="display:flex; gap:20px;">
-                <div id="map-${i}" class="map-activity"></div>
-                <div>
-                    <h2></h2>
-                    <p>Partner - ${json[i].parceiro}</p>
-                    <p>Sport   - ${json[i].SPORT}</p>
-                    <p>Event   - ${json[i].EVENTO}</p>
-                    <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Kudos <i class="fas fa-thumbs-up"></i></a>
-                    <br>
-                    <a id="btnViewMore-${i}">view more...</a>
-                    <br>
-                    <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
-                        <!-- facebook -->
-                        <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
+                const div = document.createElement('div')
+                div.className = 'post-activity'
+                div.id = `atv-${i}`
+                div.innerHTML = `<p id="atleta">${json[i].ATLETA}</p>
+                <h2 id="nome">${json[i].nome}</h2>
+                <h4 id="placar">${json[i].nick} ${json[i].SETS_P1} vs ${json[i].SETS_P2} ${json[i].parceiro.split(' ')[0]}</h4>           
+                <div class="panel">
+                    <div class="map-view">
+                        <div id="map-${i}" class="map-activity"></div>
+                        <h4 class="map-label">${json[i].QUADRA}</h4>
+                    </div>
+                    <div class="right-panel">
+                        <p id="sport">Sport   - ${json[i].SPORT}</p>
+                        <p id="evento">Event   - ${json[i].EVENTO}</p>
+                        <a id="btnKudos-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Kudos   <i class="fas fa-thumbs-up"></i></a><br>
+                        <a id="btnComment-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Comments <i class="fas fa-comments"></i></a>
                         
-                        <!-- twitter -->
-                        <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
+                        <br>
+                        <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
+                            <!-- facebook -->
+                            <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
+                            
+                            <!-- twitter -->
+                            <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
+                            
+                            <!-- linkedin -->
+                            <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
+                            
+                            <!-- reddit -->
+                            <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
+    
+                            <!-- whatsapp-->
+                            <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
+    
+                            <!-- telegram-->
+                            <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
+                        </div> 
                         
-                        <!-- linkedin -->
-                        <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
-                        
-                        <!-- reddit -->
-                        <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
+                        <a id="btnViewMore-${i}">view more...</a>
 
-                        <!-- whatsapp-->
-                        <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
-
-                        <!-- telegram-->
-                        <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
-                    </div>                       
+                    </div>
                 </div>
-            </div>`
-//            console.log(json[i].distance)      
+                <div class="flex-line base-panel" >
+                    <div class="flex-col">
+                        <h4>Date</h4>
+                        <h4>${json[i].dia.showDate()}</h4>                    
+                    </div>
+                    <div class="flex-col">
+                    <h4>Time</h4>
+                        <h4>${json[i].dia.showTime()}</h4>                    
+                    </div>
+                    <div class="flex-col">
+                        <h4>Elapsed Time</h4>
+                        <h4>${parseInt(json[i].duracao/60).toString().padStart(2,'0')}:${parseInt(json[i].duracao%60).toString().padStart(2,'0')}</h4>                    
+                    </div>
+                </div>
+                `
+    
+                div.database = json[i]
+                screen.appendChild(div)
+                maps.push(createMap('map-'+i,[json[i].lat, json[i].lng],30))
+    
+                pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
+    
+                maps[maps.length-1].locate({setView: false, maxZoom: 30})
+                maps[maps.length-1].zoomControl = false
+                maps[maps.length-1].on('click',()=>{
+                    json[i].form = `atv-${i}`                    
+                    openHTML('viewTrainning.html','modal',json[i])
+                })
+    
+                document.querySelector('#btnViewMore-'+i).addEventListener('click',()=>{
+                    openHTML('viewTrainning.html','modal',json[i])
+                })
 
-            div.database = json[i]
-            screen.appendChild(div)
-            maps.push(createMap('map-'+i,[json[i].lat, json[i].lng],30))
+                document.querySelector('#btnKudos-'+i).addEventListener('click',()=>{
+                    alert('Kudos: '+i)
+                })
 
-            pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
+                document.querySelector('#btnComment-'+i).addEventListener('click',()=>{
+                    alert('Comment: '+i)
+                })
 
-            maps[maps.length-1].locate({setView: false, maxZoom: 30})
-            maps[maps.length-1].zoomControl = false
-            maps[maps.length-1].on('click',()=>{
-                openHTML('viewTrainning.html','modal',json[i])
-            })
+            }
+        })
 
-            document.querySelector('#btnViewMore-'+i).addEventListener('click',()=>{
-                openHTML('viewTrainning.html','modal',json[i])
-            })
-        }
+
+
+
     })
+
+
+
 }
 
 /* VALIDATION */

@@ -1,4 +1,3 @@
-
 /*  USUARIO  */
 
 -- DROP PROCEDURE sp_insertUsuario;
@@ -105,12 +104,12 @@ DELIMITER $$
 		INSERT INTO tb_atividades (id,id_usuario,nome,id_sport,id_evento,parceiro,dia,duracao,id_quadra)
         VALUES (Iid,Iid_usuario,Inome,Iid_sport,Iid_evento,Iparceiro,Idia,Iduracao,Iid_quadra)
 		ON DUPLICATE KEY 
-        UPDATE nome="x02", id_sport="x03", id_evento="x04", parceiro="x05", dia="x06", duracao="x07", id_quadra="x08";        
-        SELECT LAST_INSERT_ID() AS lastID;        
-        END $$
+        UPDATE nome=Inome, id_sport=Iid_sport, id_evento=Iid_evento, parceiro=Iparceiro, dia=Idia, duracao=Iduracao, id_quadra=Iid_quadra;        
+		SELECT IF("Iid"="DEFAULT",LAST_INSERT_ID(),Iid) AS lastID;        
+	END $$
 DELIMITER ;
 
-CALL sp_insertAtividades("DEFAULT","1","sql teste","1","1","parceiro teste","2023-07-07 12:00:00","80","2");
+CALL sp_insertAtividades("8","1","sql teste","1","1","parceiro teste","2023-07-07 12:00:00","80","2");
 
 -- DROP PROCEDURE sp_delAtividades;
 DELIMITER $$
@@ -135,9 +134,35 @@ DELIMITER $$
     )
 	BEGIN			            
 		INSERT INTO tb_sets (id,id_atividade,p1_score,p2_score,obs)
-        VALUES (Iid,Iid_Iatividade,Ip1_score,Ip2_score,Iobs)
+        VALUES (Iid,Iid_atividade,Ip1_score,Ip2_score,Iobs)
         ON DUPLICATE KEY
-        UPDATE p1_score=Ip1_score, p2_score=Io2_score, obs=Iobs;
+        UPDATE p1_score=Ip1_score, p2_score=Ip2_score, obs=Iobs;
 	END $$
 DELIMITER ;
 
+-- DROP PROCEDURE sp_delSets;
+DELIMITER $$
+	CREATE PROCEDURE sp_delSets(
+		IN Iid int(11), 
+        IN Iid_atividade int(11) 
+    )
+	BEGIN			            
+		DELETE FROM tb_sets WHERE id=Iid AND id_atividade = Iid_atividade;
+        CALL sp_orderSet(Iid,Iid_atividade);
+	END $$
+DELIMITER ;
+
+DROP PROCEDURE sp_orderSet;
+
+DELIMITER $$
+	CREATE PROCEDURE sp_orderSet (	
+		IN Iid int(11), 
+        IN Iid_atividade int(11) 
+		)
+	BEGIN
+		UPDATE tb_sets SET id = id - 1 WHERE id>Iid AND id_atividade = Iid_atividade;
+	END$$
+DELIMITER ;
+
+-- CALL sp_orderSet(2);
+CALL sp_insertSets("0","18","1","1","1");

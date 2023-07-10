@@ -143,9 +143,32 @@
             
     })
     
+    function refreshData(){
+        data.nome = document.querySelector('#edtDesc').value.toUpperCase().trim()
+        data.SPORT = document.querySelector('#cmbSport').options[document.querySelector('#cmbSport').selectedIndex].text
+        data.EVENTO = document.querySelector('#cmbTipo').options[document.querySelector('#cmbTipo').selectedIndex].text
+        data.parceiro = document.querySelector('#edtParceiro').value.toUpperCase().trim()
+        data.dia = document.querySelector('#edtData').value+' '+document.querySelector('#edtHora').value+':00'
+        data.duracao = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
+        data.QUADRA = document.querySelector('#cmbQuadra').options[document.querySelector('#cmbQuadra').selectedIndex].text
+    }
+
+    function updateData(data){
+        console.log(data)  
+
+        const form = document.getElementById(data.form)
+
+        form.querySelector('#atleta').innerHTML = data.ATLETA
+        form.querySelector('#nome').innerHTML = data.nome
+        form.querySelector('#placar').innerHTML = `${data.nick} ${data.SETS_P1} vs ${data.SETS_P2} ${data.parceiro.split(' ')[0]}`
+
+
+
+    }
 
     document.querySelector('#btnAdd').addEventListener('click',()=>{
-
+        refreshData()
+   
         if(goon('edtDesc,edtParceiro,edtData,edtHora,edtTempo')){
             const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
             const parc = document.querySelector('#edtParceiro').value.trim().toUpperCase()
@@ -165,11 +188,11 @@
                 params.data = data
                 params.duracao = temp
                 params.id_quadra = quad
-                
+           
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)  
-                console.log(json)
+                updateData(data)
                 addSets(json[0].lastID)
                 closeModal()       
             })
@@ -193,7 +216,7 @@
     function addSets(idAtv){
 
         const sets = mainData.newActivity.data.sets
-        console.log(sets)
+//        console.log(sets)
         for(let i=0; i<sets.length; i++){
             const params = new Object;
                 params.id = i
@@ -201,7 +224,7 @@
                 params.p1 = sets[i].p1
                 params.p2 = sets[i].p2
                 params.obs = sets[i].obs
-
+//console.log(params)
             queryDB(params,14)
         }
     }
@@ -213,7 +236,7 @@
             const myPromisse = queryDB(params,15);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)  
-                console.log(json)
+//                console.log(json)
                 mainData.newActivity.data.sets = []
                 for(let i=0; i<json.length; i++){
                     const set = new Object
