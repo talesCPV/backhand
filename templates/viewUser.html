@@ -1,0 +1,112 @@
+<title>
+    User Data
+</title>
+<template>
+    <style>
+        .line{
+            display: flex;
+            margin: 5px;
+        }
+
+        .line label{
+            width: 100px;
+        }
+        
+        .form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding-top: 50px;
+        }
+
+        #btnLogin, input{
+            width: 250px;
+            height: 30px;
+        }
+
+        #map { 
+            width: 100%;
+            height: 30vh;
+        }
+
+        #cnvImg{
+            border: solid 1px;
+        }
+
+    </style>
+
+    <div class="form">
+
+        Imagem
+        <canvas width="300" height="300" id="cnvImg"></canvas>
+        <input  name="up_file" id="up_file" type="file" accept=".jpg,.jpeg,.png">
+
+
+        <div class="line">
+            <input id="edtMail" type="email" maxlength="70" placeholder="* Email">
+        </div>
+
+        <div class="line">
+            <input id="edtPass" type="password" maxlength="12" placeholder="* Senha">
+        </div>
+
+        <div class="line">
+            <input id="edtName" type="text" maxlength="60" placeholder="* Nome">
+        </div>
+
+        <div class="line">
+            <input id="edtNick" type="text" maxlength="15" placeholder="Apelido">
+        </div>
+
+        <div class="line">
+            <input id="edtCel" type="text" maxlength="14" placeholder="Celular" onkeyup="phone(this)">
+        </div>
+
+        <div id="map"></div>
+
+
+        <button  class="btn btn-primary" id="btnAddUser">Salvar</button>
+    </div>
+
+</template>
+<script>
+
+    const back = backFunc({'filename':'assets/users/1.jpg', teste:3},1)
+
+    back.then((txt)=>{
+        console.log(txt)
+    })
+
+
+loadImg('assets/user.jpeg')
+
+    document.querySelector('#up_file').addEventListener('change',()=>{
+
+        if (document.querySelector('#up_file').files && document.querySelector('#up_file').files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+
+                var ctx = document.getElementById('cnvImg');
+                if (ctx.getContext) {
+
+                    ctx = ctx.getContext('2d');
+                    let preview = new Image();
+                    preview.onload = function () {
+                        ar = aspect_ratio(preview)
+                        ctx.drawImage(preview, 0, 0,preview.width,preview.height,ar[0],ar[1],ar[2],ar[3]);
+                    };
+
+                    preview.src = e.target.result
+            
+                }
+
+            }
+
+            reader.readAsDataURL(document.querySelector('#up_file').files[0]);
+        }
+
+    })
+
+</script>

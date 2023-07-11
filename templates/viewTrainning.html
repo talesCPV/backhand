@@ -88,6 +88,7 @@
 
     if(data.id_usuario != localStorage.getItem('idUser')){
         document.querySelector('#btnEdit').style.display = 'none'
+        document.querySelector('#btnDel').style.display = 'none'
     }
 
     map = createMap('map',[data.lat, data.lng])

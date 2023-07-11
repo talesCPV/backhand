@@ -23,13 +23,12 @@ function queryDB(params,cod){
     });      
 }
 
-function rowsAffect(params,cod){
+function backFunc(params,cod){
     const data = new URLSearchParams();        
         data.append("cod", cod);
-        data.append("params", JSON.stringify(params));
-        data.append("storage", localStorage.getItem("storage"));
+        data.append("params", JSON.stringify(params));        
 
-    const myRequest = new Request("backend/rowsaffect.php",{
+    const myRequest = new Request("backend/functions.php",{
         method : "POST",
         body : data
     });

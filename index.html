@@ -56,6 +56,10 @@
           display: none;
         }
         
+        #imgUser{
+          width: 30px;
+        }
+
 
     </style>      
     </head>
@@ -80,6 +84,7 @@
                 <li class="only-login hide-menu"><a onclick="social()">Social</a></li>
                 <li class="only-login hide-menu"><a href="#equip">Equip</a></li>
                 <li class="only-login hide-menu"><a onclick="addOne()">+Activity</a></li>
+                <li class="only-login hide-menu"><a onclick="viewUser()"><img id="imgUser" src="assets/user.jpeg"></a></li>
                 <li><a id="log-inout" onclick="login()">login</a></li> 
             </ul>
             <p></p>
@@ -120,6 +125,10 @@
 
       function addOne(){
         openHTML('newActivity.html','modal',null,400)
+      }
+
+      function viewUser(){
+        openHTML('viewUser.html','modal',null,400)
       }
 
       function social(){
