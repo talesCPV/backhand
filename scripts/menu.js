@@ -13,7 +13,4 @@ function hideMenu(hide=true){
     for(let i=0; i<menu.length; i++){
         hide ? menu[i].classList.add('hide-menu') : menu[i].classList.remove('hide-menu')
     }
-
-    loadActivity(100,0,10)
-
 }

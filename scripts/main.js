@@ -24,118 +24,111 @@ function checkLogin(){
 
 function loadActivity(D,S,L){
 
-    navigator.geolocation.getCurrentPosition((latlng)=>{    
-        mainData.coords = new Object
-        mainData.coords.lat = latlng.coords.latitude
-        mainData.coords.lng = latlng.coords.longitude
+    
+    mainData.coords = new Object
+    mainData.coords.lat = localStorage.getItem('lat')
+    mainData.coords.lng = localStorage.getItem('lng')
 
-        const screen = document.querySelector('#dashboard')
-        S == '0' ? screen.innerHTML = '' : 0
-        const params = new Object;
-            params.lat = latlng.coords.latitude
-            params.lng = latlng.coords.longitude
-            params.maxDistance = D
-            params.start = S
-            params.limit = L
-    
-        const myPromisse = queryDB(params,9);
-        myPromisse.then((resolve)=>{
-            const json = JSON.parse(resolve)       
-            for(let i=0; i<json.length; i++){
-            
-                const div = document.createElement('div')
-                div.className = 'post-activity'
-                div.id = `atv-${i}`
-                div.innerHTML = `<p id="atleta">${json[i].ATLETA}</p>
-                <h2 id="nome">${json[i].nome}</h2>
-                <h4 id="placar">${json[i].nick} ${json[i].SETS_P1} vs ${json[i].SETS_P2} ${json[i].parceiro.split(' ')[0]}</h4>           
-                <div class="panel">
-                    <div class="map-view">
-                        <div id="map-${i}" class="map-activity"></div>
-                        <h4 class="map-label">${json[i].QUADRA}</h4>
-                    </div>
-                    <div class="right-panel">
-                        <p id="sport">Sport   - ${json[i].SPORT}</p>
-                        <p id="evento">Event   - ${json[i].EVENTO}</p>
-                        <a id="btnKudos-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Kudos   <i class="fas fa-thumbs-up"></i></a><br>
-                        <a id="btnComment-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Comments <i class="fas fa-comments"></i></a>
-                        
-                        <br>
-                        <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
-                            <!-- facebook -->
-                            <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
-                            
-                            <!-- twitter -->
-                            <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
-                            
-                            <!-- linkedin -->
-                            <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
-                            
-                            <!-- reddit -->
-                            <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
-    
-                            <!-- whatsapp-->
-                            <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
-    
-                            <!-- telegram-->
-                            <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
-                        </div> 
-                        
-                        <a id="btnViewMore-${i}">view more...</a>
+    const screen = document.querySelector('#dashboard')
+    S == '0' ? screen.innerHTML = '' : 0
+    const params = new Object;
+        params.lat =  mainData.coords.lat
+        params.lng =  mainData.coords.lng
+        params.maxDistance = D
+        params.start = S
+        params.limit = L
 
-                    </div>
+    const myPromisse = queryDB(params,9);
+    myPromisse.then((resolve)=>{
+        const json = JSON.parse(resolve)   
+
+        for(let i=0; i<json.length; i++){
+        
+            const div = document.createElement('div')
+            div.className = 'post-activity'
+            div.id = `atv-${i}`
+            div.innerHTML = `<p id="atleta">${json[i].ATLETA}</p>
+            <h2 id="nome">${json[i].nome}</h2>
+            <h4 id="placar">${json[i].nick} ${json[i].SETS_P1} vs ${json[i].SETS_P2} ${json[i].parceiro.split(' ')[0]}</h4>           
+            <div class="panel">
+                <div class="map-view">
+                    <div id="map-${i}" class="map-activity"></div>
+                    <h4 class="map-label">${json[i].QUADRA}</h4>
                 </div>
-                <div class="flex-line base-panel" >
-                    <div class="flex-col">
-                        <h4>Date</h4>
-                        <h4>${json[i].dia.showDate()}</h4>                    
-                    </div>
-                    <div class="flex-col">
-                    <h4>Time</h4>
-                        <h4>${json[i].dia.showTime()}</h4>                    
-                    </div>
-                    <div class="flex-col">
-                        <h4>Elapsed Time</h4>
-                        <h4>${parseInt(json[i].duracao/60).toString().padStart(2,'0')}:${parseInt(json[i].duracao%60).toString().padStart(2,'0')}</h4>                    
-                    </div>
+                <div class="right-panel">
+                    <p id="sport">Sport   - ${json[i].SPORT}</p>
+                    <p id="evento">Event   - ${json[i].EVENTO}</p>
+                    <a id="btnKudos-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Kudos   <i class="fas fa-thumbs-up"></i></a><br>
+                    <a id="btnComment-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Comments <i class="fas fa-comments"></i></a>
+                    
+                    <br>
+                    <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
+                        <!-- facebook -->
+                        <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
+                        
+                        <!-- twitter -->
+                        <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
+                        
+                        <!-- linkedin -->
+                        <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
+                        
+                        <!-- reddit -->
+                        <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
+
+                        <!-- whatsapp-->
+                        <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
+
+                        <!-- telegram-->
+                        <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
+                    </div> 
+                    
+                    <a id="btnViewMore-${i}">view more...</a>
+
                 </div>
-                `
-    
-                div.database = json[i]
-                screen.appendChild(div)
-                maps.push(createMap('map-'+i,[json[i].lat, json[i].lng],30))
-    
-                pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
-    
-                maps[maps.length-1].locate({setView: false, maxZoom: 30})
-                maps[maps.length-1].zoomControl = false
-                maps[maps.length-1].on('click',()=>{
-                    json[i].form = `atv-${i}`                    
-                    openHTML('viewTrainning.html','modal',json[i])
-                })
-    
-                document.querySelector('#btnViewMore-'+i).addEventListener('click',()=>{
-                    openHTML('viewTrainning.html','modal',json[i])
-                })
+            </div>
+            <div class="flex-line base-panel" >
+                <div class="flex-col">
+                    <h4>Date</h4>
+                    <h4 id="data">${json[i].dia.showDate()}</h4>                    
+                </div>
+                <div class="flex-col">
+                <h4>Time</h4>
+                    <h4 id="hora">${json[i].dia.showTime()}</h4>                    
+                </div>
+                <div class="flex-col">
+                    <h4>Elapsed Time</h4>
+                    <h4 id="tempo">${parseInt(json[i].duracao/60).toString().padStart(2,'0')}:${parseInt(json[i].duracao%60).toString().padStart(2,'0')}</h4>                    
+                </div>
+            </div>
+            `
 
-                document.querySelector('#btnKudos-'+i).addEventListener('click',()=>{
-                    alert('Kudos: '+i)
-                })
+            div.database = json[i]
+            screen.appendChild(div)
+            maps.push(createMap('map-'+i,[json[i].lat, json[i].lng],30))
 
-                document.querySelector('#btnComment-'+i).addEventListener('click',()=>{
-                    alert('Comment: '+i)
-                })
+            pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
 
-            }
-        })
+            maps[maps.length-1].locate({setView: false, maxZoom: 30})
+//                maps[maps.length-1].zoomControl = false
+            disableMap(maps[maps.length-1])
+            maps[maps.length-1].on('click',()=>{
+                json[i].form = `atv-${i}`                    
+                openHTML('viewTrainning.html','modal',json[i])
+            })
 
+            document.querySelector('#btnViewMore-'+i).addEventListener('click',()=>{
+                openHTML('viewTrainning.html','modal',json[i])
+            })
 
+            document.querySelector('#btnKudos-'+i).addEventListener('click',()=>{
+                alert('Kudos: '+i)
+            })
 
-
+            document.querySelector('#btnComment-'+i).addEventListener('click',()=>{
+                alert('Comment: '+i)
+            })
+        }
     })
-
-
-
 }
 
 /* VALIDATION */

@@ -154,16 +154,18 @@
     }
 
     function updateData(data){
-        console.log(data)  
-
+//        console.log(data)  
         const form = document.getElementById(data.form)
 
         form.querySelector('#atleta').innerHTML = data.ATLETA
         form.querySelector('#nome').innerHTML = data.nome
         form.querySelector('#placar').innerHTML = `${data.nick} ${data.SETS_P1} vs ${data.SETS_P2} ${data.parceiro.split(' ')[0]}`
-
-
-
+//        form.querySelector('#map-label').innerHTML = data.QUADRA
+        form.querySelector('#sport').innerHTML = data.SPORT
+        form.querySelector('#evento').innerHTML = data.EVENTO
+        form.querySelector('#data').innerHTML = data.dia.showDate()
+        form.querySelector('#hora').innerHTML = data.dia.showTime()
+        form.querySelector('#tempo').innerHTML = Math.floor(data.duracao/60).toString().padStart(2,'0')+":"+ (data.duracao%60).toString().padStart(2,'0')
     }
 
     document.querySelector('#btnAdd').addEventListener('click',()=>{
@@ -172,7 +174,7 @@
         if(goon('edtDesc,edtParceiro,edtData,edtHora,edtTempo')){
             const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
             const parc = document.querySelector('#edtParceiro').value.trim().toUpperCase()
-            const data = document.querySelector('#edtData').value.trim()+" "+document.querySelector('#edtHora').value.trim()+':00'            
+            const dt = document.querySelector('#edtData').value.trim()+" "+document.querySelector('#edtHora').value.trim()+':00'            
             const temp = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
             const sport = document.querySelector('#cmbSport').value.trim()
             const tipo = document.querySelector('#cmbTipo').value.trim()
@@ -185,14 +187,14 @@
                 params.id_sport = sport
                 params.id_evento = tipo
                 params.parceiro = parc
-                params.data = data
+                params.data = dt
                 params.duracao = temp
                 params.id_quadra = quad
            
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)  
-                updateData(data)
+                edit ?  updateData(data) : 0
                 addSets(json[0].lastID)
                 closeModal()       
             })

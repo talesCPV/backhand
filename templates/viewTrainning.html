@@ -18,8 +18,9 @@
         .line{
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
+            justify-content: space-around;
             padding: 0 10px;
+            margin: 10px;
         }
 
         .center{
@@ -28,6 +29,16 @@
             align-items: center;
             margin: 10px;
         }
+
+
+        .view-sets{
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            font-weight: bold;
+            cursor: zoom-in;
+        }
+                
 
 
     </style>
@@ -46,8 +57,10 @@
             <p id="atv-hora"></p>
             <p id="atv-tempo"></p>
         </div>
-        <div class="center">
+        <div class="view-sets"></div>
+        <div class="line">
             <button id="btnEdit" class="btn btn-primary">EDIT</button>
+            <button id="btnDel" class="btn btn-primary">Delete</button>
         </div>
         
 
@@ -62,12 +75,14 @@
     const data = mainData.viewTrainning.data
     console.log(data)
 
+    fillSets() 
+
     document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
     document.querySelector('#atv-atleta').innerHTML = `${data.nick} ${data.SETS_P1} vs ${data.SETS_P2} ${data.parceiro.split(' ')[0]}`
     document.querySelector('#atv-titulo').innerHTML = data.nome
-    document.querySelector('#atv-data').innerHTML = `Date:${data.dia.showDate()}`
-    document.querySelector('#atv-hora').innerHTML = `Time:${data.dia.showTime()}`
-    document.querySelector('#atv-tempo').innerHTML = ` elapsed time:${parseInt(data.duracao/60).toString().padStart(2,'0')}:${parseInt(data.duracao%60).toString().padStart(2,'0')}`
+    document.querySelector('#atv-data').innerHTML = `date: ${data.dia.showDate()}`
+    document.querySelector('#atv-hora').innerHTML = `time: ${data.dia.showTime()}`
+    document.querySelector('#atv-tempo').innerHTML = `elapsed time: ${parseInt(data.duracao/60).toString().padStart(2,'0')}:${parseInt(data.duracao%60).toString().padStart(2,'0')}`
 
 
 
@@ -78,19 +93,45 @@
     map = createMap('map',[data.lat, data.lng])
     pinMap([data.lat, data.lng],map)
     map.locate({setView: false, maxZoom: 30})
-    
+    disableMap(map)
+
+
     document.querySelector('#btnEdit').addEventListener('click',()=>{
         openHTML('newActivity.html','modal',data,400)
     })
 
-    function fillSets(ATV){
+    document.querySelector('#btnDel').addEventListener('click',()=>{
+        if(confirm('Do you realy wanna delete this trainning?')){
+            const params = new Object;
+                params.id_ATV = mainData.viewTrainning.data.id
+
+            const myPromisse = queryDB(params,11);
+            myPromisse.then(()=>{
+                const form = document.getElementById(mainData.viewTrainning.data.form)
+                form.parentNode.removeChild( form )
+                closeModal('')
+            })
+
+
+
+        }
+    })
+
+
+
+    function fillSets(){
         const params = new Object;
-            params.id_ATV = ATV
+            params.id_ATV = data.id
 
         const myPromisse = queryDB(params,15);
-        myPromisse.then(()=>{
-            mainData.viewTrainning.data.sets = []
-            
+        myPromisse.then((result)=>{
+            data.sets = JSON.parse(result)
+            for(let i=0; i<data.sets.length; i++){
+                const p = document.createElement('p')
+                p.innerHTML = 'SET '+(i+1).toString().padStart(2,0) + ' - '+data.sets[i].p1_score.padStart(2,0)+' x '+data.sets[i].p2_score.padStart(2,0)
+                p.title = data.sets[i].obs
+                document.querySelector('.view-sets').appendChild(p)
+            }            
         })
     }
 
