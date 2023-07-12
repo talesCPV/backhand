@@ -42,6 +42,8 @@
         <canvas width="300" height="300" id="cnvImg"></canvas>
         <input  name="up_file" id="up_file" type="file" accept=".jpg,.jpeg,.png">
 
+        <button id="btnUpload">upload</button>
+
 
         <div class="line">
             <input id="edtMail" type="email" maxlength="70" placeholder="* Email">
@@ -72,14 +74,25 @@
 </template>
 <script>
 
-    const back = backFunc({'filename':'assets/users/1.jpg', teste:3},1)
+    const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
 
-    back.then((txt)=>{
-        console.log(txt)
+    back.then((resp)=>{
+        const imgExist = JSON.parse(resp)
+
+        let path = ''
+        path = imgExist ? `assets/users/${localStorage.getItem('idUser')}.jpg` : 'assets/user.jpeg'    
+        loadImg(path)
+        console.log(path)
     })
 
 
-loadImg('assets/user.jpeg')
+    document.querySelector('#btnUpload').addEventListener('click',()=>{
+        uploadImage('up_file','/../assets/users/',localStorage.getItem('idUser')+'.jpg')
+
+    })
+
+
+
 
     document.querySelector('#up_file').addEventListener('change',()=>{
 

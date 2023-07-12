@@ -242,11 +242,31 @@ function loadImg(filename, id='cnvImg') {
         img.onload = function () {
             ar = aspect_ratio(img)
             ctx.drawImage(img, 0, 0,img.width,img.height,ar[0],ar[1],ar[2],ar[3]);
-        };
-        
-        img.src = filename;
-
-        
-
+        };        
+        img.src = filename;        
+    
     }
+}
+
+function uploadImage(inputFile,path,filename){
+    const up_data = new FormData();        
+        up_data.append("up_file",  document.getElementById(inputFile).files[0]);
+        up_data.append("path", path);
+        up_data.append("filename", filename);
+
+    const myRequest = new Request("backend/upload.php",{
+        method : "POST",
+        body : up_data
+    });
+
+    const myPromisse = new Promise((resolve,reject) =>{
+        fetch(myRequest)
+        .then(function (response){
+            if (response.status === 200) { 
+                resolve(response.text());                
+            } else { 
+                reject(new Error("Houve algum erro na comunicação com o servidor"));                    
+            } 
+        });
+    }); 
 }
