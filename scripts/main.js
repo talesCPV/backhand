@@ -36,6 +36,13 @@ function showUserPic(){
 
 }
 
+function fillPerfil(usr){
+
+    console.log(usr)
+
+
+}
+
 
 function loadActivity(D,S,L){
 
@@ -79,23 +86,7 @@ function loadActivity(D,S,L){
                         <div id="map-${i}" class="map-activity"></div>
                         <h6 class="map-label">${json[i].QUADRA}</h6>
                     </div>
-<!-- 
-                    <div class="flex-line base-panel" >
-                   
-                        <div class="flex-col">
-                            <h4>Data</h4>
-                            <h4 id="data">${json[i].dia.showDate()}</h4>                    
-                        </div>
-                        <div class="flex-col">
-                            <h4>Hora</h4>
-                            <h4 id="hora">${json[i].dia.showTime()}</h4>                    
-                        </div>
-                        <div class="flex-col">
-                            <h4>Tempo de Treino</h4>
-                            <h4 id="tempo">${parseInt(json[i].duracao/60).toString().padStart(2,'0')}:${parseInt(json[i].duracao%60).toString().padStart(2,'0')}</h4>                    
-                        </div>
-                    </div>
--->                    
+
                 </div>
                 <div class="right-panel">
                     <p id="sport">${json[i].SPORT} (${json[i].EVENTO})</p>                    

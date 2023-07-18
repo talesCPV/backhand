@@ -126,7 +126,8 @@
                     localStorage.setItem('lng',mainData.data.lng)   
                     localizaUser(json[0])
                     document.querySelector('#log-inout').innerHTML = 'Sair'
-                    document.querySelector('#footer').style.display = 'block'                    
+                    document.querySelector('#footer').style.display = 'block'   
+                    document.querySelector('.dashboard').style.width = '70%'                 
                     openHTML('dashboard.html','screen')
                     loadActivity(100,0,10)
                     hideMenu(false) 

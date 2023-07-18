@@ -84,17 +84,8 @@ SELECT FW.id_host AS userID,US.id, US.nome
 	ON US.id = FW.id_guest;
     
 SELECT * FROM vw_friends WHERE nome LIKE "%A%" ;
-SELECT * FROM vw_friends WHERE userID = Tales;
-
-
-
-
-SELECT US.id, US.nome,
-	(SELECT COUNT(*) FROM tb_following WHERE id_host = 1 AND id_guest = US.id) AS FOLLOW
-	FROM tb_usuario AS US;
 
 -- *********************************
-
 
 
 
@@ -103,6 +94,8 @@ SELECT * FROM vw_dashboard;
 SELECT * FROM vw_placarAtiv;
 SELECT * FROM vw_noSets;
 SELECT * FROM vw_placar;
+SELECT * FROM vw_friends;
+
 -- ****************************************
 SELECT * FROM vw_placarAtiv UNION ALL SELECT * FROM vw_noSets ORDER BY id ASC;
 
@@ -113,4 +106,10 @@ FROM tb_usuario AS US;
 
 SELECT fn_calcDist(-23,-45,-23.5,-45.5);
 
+
+SELECT FD.* 
+FROM tb_usuario AS US 
+INNER JOIN tb_following) AS FW
+ON US.id = FW.id_host
+AND US.id=1;
 

@@ -194,6 +194,8 @@ button{
 
 .perfil{
   width: 30%;
+  justify-content: flex-start;
+  padding-top: 100px;
 }
 
 .dashboard{

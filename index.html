@@ -73,6 +73,14 @@
           display: none;
         }
         
+        .perfil-board{
+          width: 90%;
+          height: 300px;
+          background-color: rgb(255, 255, 255);
+          border-radius: 5px;
+        }
+
+
 
     </style>      
     </head>
@@ -114,7 +122,16 @@
       <div class="main-content"> 
 
         <section class="perfil hide">
-        
+          
+          <div class="perfil-board">
+            <div class="perfil-nome"></div>
+            <div class="perfil-seguindo"></div>
+            <div class="perfil-seguidores"></div>
+            <div class="perfil-atividades"></div>
+            <div class="perfil-pic"></div>
+          </div>
+
+
         </section>
 
         <section class="dashboard"></section>
@@ -145,12 +162,15 @@
     if(localStorage.getItem('idUser') == null){
       openHTML('noLogin.html','screen')
       document.querySelector('#footer').style.display = 'none'
+      document.querySelector('.dashboard').style.width = '100%'
       document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
       hideMenu(true) 
     }else{
       document.querySelector('#log-inout').innerHTML = 'Sair'
       document.querySelector('#footer').style.display = 'block'
+      document.querySelector('.dashboard').style.width = '70%'
       openHTML('dashboard.html','screen')
+      fillPerfil(localStorage.getItem('idUser'))
       loadActivity(100,0,10)
       hideMenu(false) 
     }
@@ -162,6 +182,7 @@
         }else{        
           localStorage.clear();
           document.querySelector('#footer').style.display = 'none'
+          document.querySelector('.dashboard').style.width = '100%'
           document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
           openHTML('noLogin.html','screen')
           hideMenu(true) 
