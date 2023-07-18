@@ -1,0 +1,291 @@
+<title id="title-pag">
+</title>
+<template>
+    <style>
+
+        .view-message{
+            padding-bottom: 10px;
+        }
+
+        .view-kudos{
+            display: flex;
+            flex-direction: row;
+        }
+
+        .view-kudos img{
+            margin: 10px;
+        }
+
+        .view-kudos p{
+            padding: 10px;
+        }
+
+        .view-kudos, .view-message{
+            border-bottom: solid 1px #ffffff;
+            border-top: solid 1px #ffffff;
+        }
+
+        .view-kudos:hover, .view-message:hover{
+            border-bottom: solid 1px #16a083;
+            border-top: solid 1px #16a083;
+        }
+
+        #comentarios{
+            width: 100%;
+            height: 100%;
+        }
+
+        .show-com{
+            width: 100%;
+            height: 80%;
+            padding: 10px;
+            overflow-y: scroll;
+        }
+
+        .new-com{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 20%;
+            position: relative;
+            background-color: whitesmoke;
+            padding: 5px 0;
+        }
+
+        .new-com img{
+            margin: 10px;
+            width: 40px;
+        }
+
+        .new-com textarea{
+            width: 100%;
+            height: 100%;
+            padding: 10px 60px 10px 10px;
+            resize: none;
+ 
+        }        
+
+        .new-com button{
+            padding: 10px;
+            margin: 5px;
+        }
+
+        .view-user{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0 10px;
+            margin: 10 0 0 0;
+        }
+
+        .nameUser{
+            font-weight: bold;
+            font-size: 0.8em;
+            padding-bottom: 0;
+            position: relative;
+                top: -10px;
+                left: -30px;
+        }
+
+        .scrap{
+            padding: 0 80px 0 25px;
+            position: relative;
+            top: -12;
+            font-weight: lighter;
+            overflow-wrap: break-word;
+        }
+
+        .msg-box{
+            display: flex;
+            width: 95%;
+            height: 50%;
+        }
+
+        .btnMessage{
+            right: 20px;
+            position: absolute;
+            margin-top: 10px;
+            padding: 5px;
+            background: white;
+            border: solid 1px white;
+            color: rgb(196, 196, 196);
+        }
+
+        .btnMessage:hover{
+            border: solid 1px #16a083;
+            border-radius: 5px;
+            color: #16a083;
+        }
+
+    </style>
+
+    <div class="tab-bar">
+        <div class="tab-item" id="tab-kudos"       onclick="pictab(this)">Kudos  </div>
+        <div class="tab-item" id="tab-comentarios" onclick="pictab(this)">Scraps </div>
+    </div>
+    <div class="tab-screen">        
+        <div id="kudos" class="tab"></div>
+        <div id="comentarios" class="tab">
+            <div class="show-com"></div>
+            <div class="new-com">
+                <div class="msg-box">
+                    <img id="imgUserMs" class="imgUser" src="">
+                    <textarea id="txtNewCom" cols="30" rows="10" maxlength="600"></textarea>    
+                </div>
+                <button id="btnPost" class="btnMessage">Post</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</template>
+<script>
+
+    const data = mainData.message.data
+    document.querySelector('.title-message').innerHTML = data.nome
+    document.querySelector('#tab-kudos').innerHTML = `Kudos (${data.KUDOS})`
+    document.querySelector('#tab-comentarios').innerHTML = `Scraps (${data.MESSAGES})`
+    document.querySelector('#imgUserMs').src = document.querySelector('#imgUser').src
+    pictab(document.querySelector('#tab-comentarios'))
+
+    const params = new Object;
+        params.id = localStorage.getItem('idUser')
+        params.id_atividade = data.id
+
+    const myPromisse_kudos = queryDB(params,21)
+
+    myPromisse_kudos.then((resolve)=>{
+        const kudos =  JSON.parse(resolve)
+        const div_kudos = document.querySelector('#kudos') 
+        for(let i=0; i<kudos.length; i++){      
+            const div = document.createElement('div')
+            div.className = 'view-kudos'
+
+            const img = document.createElement('img')
+            img.src = `assets/users/${kudos[i].userID}.jpg`
+            img.addEventListener('error',()=>{
+                img.src = 'assets/user.jpeg'
+            })
+            img.className = 'imgUser'
+            div.appendChild(img)
+
+            const p = document.createElement('p')
+            p.innerHTML = kudos[i].nome
+            div.appendChild(p)
+
+            if(kudos[i].FOLLOW=="0" && localStorage.getItem('idUser')!= kudos[i].userID ){
+                const btn = document.createElement('button')
+                btn.innerHTML = 'SEGUIR'
+                btn.className = 'btnMessage'
+
+                btn.addEventListener('click',()=>{
+                    const params = new Object;
+                        params.hash = localStorage.getItem('hash')
+                        params.id_host = kudos[i].userID
+                        queryDB(params,23).then((resolve)=>{
+                            console.log(resolve)
+                        })
+                        btn.style.display = 'none'     
+                })
+
+                div.appendChild(btn)
+            }
+
+            div_kudos.appendChild(div)
+        }
+                           
+    })
+
+    const params_message = new Object;
+        params_message.id_atividade = data.id
+
+    const myPromisse_message = queryDB(params_message,22)
+
+    myPromisse_message.then((resolve)=>{
+        const message =  JSON.parse(resolve)             
+        refreshMessage(message)
+    })
+
+    function refreshMessage(dt){
+        const div_message = document.querySelector('.show-com') 
+        div_message.innerHTML = ''
+        document.querySelector('#tab-comentarios').innerHTML = `Scraps (${dt.length})`
+        for(let i=0; i<dt.length; i++){
+           
+            const div = document.createElement('div')
+            div.className = 'view-message'
+
+                const user = document.createElement('div')
+                user.className='view-user'
+
+                    const img = document.createElement('img')
+                    img.src = `assets/users/${dt[i].userID}.jpg`
+                    img.addEventListener('error',()=>{
+                        img.src = 'assets/user.jpeg'
+                    })
+                    img.className = 'imgUser'
+                    user.appendChild(img)
+
+                    const nome = document.createElement('p')
+                    nome.innerHTML = dt[i].nome
+                    nome.className = 'nameUser'
+                    user.appendChild(nome)
+                div.appendChild(user)
+
+            const msg = document.createElement('p')
+            msg.innerText = dt[i].scrap
+            msg.className = 'scrap'           
+
+            if(localStorage.getItem('idUser')== dt[i].userID ){
+              
+                const btn = document.createElement('button')
+                btn.innerHTML = 'APAGAR'
+                btn.className = 'btnMessage'
+
+                btn.addEventListener('click',()=>{
+                    console.log(dt[i])
+                    
+                    const params = new Object;
+                        params.hash = localStorage.getItem('hash')
+                        params.id_message = dt[i].id
+                        queryDB(params,20).then((resolve)=>{
+                            console.log(resolve)
+                        })
+                        div.style.display = 'none'     
+                       
+                })
+
+                msg.appendChild(btn)
+            }
+            div.appendChild(msg)
+            div_message.appendChild(div)
+        }
+    }
+
+
+    document.querySelector('#btnPost').addEventListener('click',()=>{
+        if(localStorage.getItem('idUser') != null){
+            const params = new Object;
+                params.id = 'DEFAULT'
+                params.hash =  localStorage.getItem('hash')
+                params.id_atividade = data.id
+                params.scrap = document.querySelector('#txtNewCom').value.trim()
+
+            const myPromisse = queryDB(params,19)
+
+            myPromisse.then((resolve)=>{
+                const message =  JSON.parse(resolve)  
+                   
+                refreshMessage(message)
+                document.querySelector('#txtNewCom').value = ''         
+            })
+        }
+
+    })
+
+  
+
+</script>

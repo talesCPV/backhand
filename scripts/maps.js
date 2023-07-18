@@ -45,13 +45,13 @@ function pinMap(latlng,map){
     marker.addTo(map)
 }
 
-
+/*
     var successHandler = function(position) { 
 //        alert(position.coords.latitude); 
 //        alert(position.coords.longitude); 
         localStorage.setItem('lat',position.coords.latitude)
         localStorage.setItem('lng',position.coords.longitude)
-        loadActivity(100,0,10)
+//        loadActivity(100,0,10)
 
     }; 
     
@@ -61,7 +61,7 @@ function pinMap(latlng,map){
 //        alert("something wrong take this lng " -45.6866519); 
         localStorage.setItem('lat','-23.0996322')
         localStorage.setItem('lng','-45.6866519')
-        loadActivity(100,0,10)
+//        loadActivity(100,0,10)
 
         
     }; 
@@ -69,7 +69,7 @@ function pinMap(latlng,map){
     navigator.geolocation.getCurrentPosition( 
     successHandler, errorHandler, 
     {enableHighAccuracy: true, maximumAge: 10000});
-
+*/
 
 function initGeolocation(){
     return navigator.geolocation.getCurrentPosition((a)=>{console.log(a)})

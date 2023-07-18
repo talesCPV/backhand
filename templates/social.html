@@ -1,17 +1,15 @@
 <title>Social</title>
 <template>
     <style>
-        .form{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0px;
-            padding: 50px;
+
+        .tab-screen{
+            padding: 10px;
         }
 
-        #btnLogin, input, select, label, .edtbtn, #map{
-            width: 250px;
-            height: 30px;
+        .tab-screen input, .tab-screen select{
+
+            padding: 5px;
+
         }
 
         .edtbtn{
@@ -26,37 +24,158 @@
             width: 20%;
         }
 
+        .view-friends{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .view-friends img{
+            margin: 10px;
+        }
+
+        .view-friends p{
+            padding: 10px;
+        }
+
+        .view-friends{
+            border-bottom: solid 1px #ffffff;
+            border-top: solid 1px #ffffff;
+        }
+
+        .view-friends:hover{
+            border-bottom: solid 1px #16a083;
+            border-top: solid 1px #16a083;
+        }
+
+        .btnMessage{
+            right: 80px;
+            position: absolute;
+            margin-top: 10px;
+            padding: 5px;
+            background: white;
+            border: solid 1px white;
+            color: rgb(196, 196, 196);
+        }
+
+        .btnMessage:hover{
+            border: solid 1px #16a083;
+            border-radius: 5px;
+            color: #16a083;
+        }
+
+        .btn-add{
+            padding: 10px;
+            border-radius: 50%;
+            position: absolute;
+            right: 30px;
+        }
+
+        .btn-add:hover{
+            border: solid 2px #16a083;
+            color: #16a083;
+            background-color: #ffffff;
+        }
+
     </style>
 
-    <div class="form">
-        <label for="cmbCourts">My Courts</label>
-        <div class="edtbtn">
-            <select id="cmbCourts"></select>
-            <button id="btnMyCourts">+</button>
+    <div class="tab-bar">
+        <div class="tab-item" id="tab-seguindo" onclick="pictab(this)">Seguindo </div>
+        <div class="tab-item" id="tab-quadras"  onclick="pictab(this)">Quadras  </div>
+    </div>
+    <div class="tab-screen">        
+        <div id="seguindo" class="tab">
+
+            <label for="cmbFriends">Meus Amigos</label>
+            <button id="btnMyFriends" class="btn-add"><i class="fas fa-search"></i></button>
+            <div id="myFriends"></div>
+
+
         </div>
-                
-        <label for="cmbFriends">My Friends</label>
-        <div class="edtbtn">
-            <select id="cmbFriends"></select>
-            <button id="btnMyFriends">+</button>
+        <div id="quadras" class="tab">
+
+            <label for="cmbCourts">My Courts</label>
+            <div class="edtbtn">
+                <select id="cmbCourts"></select>
+                <button id="btnMyCourts">+</button>
+            </div>
+
         </div>
 
     </div>
 
 
+
+
 </template>
 <script>
     
+    pictab(document.querySelector('#tab-seguindo'))
+    viewFriends()
+
+
     mainData.social.courtParams = new Object;
     mainData.social.courtParams.idUser = localStorage.getItem('idUser')
 
     fillCombo('cmbCourts',mainData.social.courtParams,6,['id','nome'])
 
     document.querySelector('#btnMyCourts').addEventListener('click',()=>{
-        openHTML('myCourts.html', 'modal',null,500)
+        openHTML('myCourts.html', 'modal',null)
+    })
+    
+    document.querySelector('#btnMyFriends').addEventListener('click',()=>{
+        openHTML('newFriend.html','modal',null)
     })
 
+    function viewFriends(){
+        const params = new Object;
+            params.id = localStorage.getItem('idUser')            
+
+        const myPromisse = queryDB(params,25)
+
+        myPromisse.then((resolve)=>{
+            const friends =  JSON.parse(resolve)
+
+            const div_search = document.querySelector('#myFriends') 
+            div_search.innerHTML = ''
+            for(let i=0; i<friends.length; i++){      
+                const div = document.createElement('div')
+                div.className = 'view-friends'
+
+                const img = document.createElement('img')
+                img.src = `assets/users/${friends[i].id}.jpg`
+                img.addEventListener('error',()=>{
+                    img.src = 'assets/user.jpeg'
+                })
+                img.className = 'imgUser'
+                div.appendChild(img)
+
+                const p = document.createElement('p')
+                p.innerHTML = friends[i].nome
+                div.appendChild(p)
+
+                const btn = document.createElement('button')
+                btn.innerHTML = 'CANCELAR'
+                btn.className = 'btnMessage'
+
+                btn.addEventListener('click',()=>{
+                    const params = new Object;
+                        params.hash = localStorage.getItem('hash')
+                        params.id_guest = friends[i].id
+                        queryDB(params,23).then((resolve)=>{
+                            console.log(resolve)
+                        })
+                        div.style.display = 'none'     
+                })
+
+                div.appendChild(btn)
 
 
+                div_search.appendChild(div)
+            }
+
+
+        })
+    }
 
 </script>

@@ -1,5 +1,5 @@
 <title>
-    New Activity
+    Nova Atividade
 </title>
 <template>
     <style>
@@ -37,42 +37,42 @@
 
     <div class="form">
 
-        <label for="edtDesc">Description</label>
+        <label for="edtDesc">Descrição</label>
         <input type="text" id="edtDesc">
 
-        <label for="cmbSport">Sport</label>
+        <label for="cmbSport">Esporte</label>
         <select id="cmbSport"></select>
 
-        <label for="cmbTipo">Type</label>
+        <label for="cmbTipo">Tipo</label>
         <select id="cmbTipo"></select>
 
-        <label for="edtParceiro">Partner</label>
+        <label for="edtParceiro">Perceiro</label>
         <div class="edtbtn">
             <input type="text" id="edtParceiro">
-            <button>+</button>
+            <button id="btnBuscaAmigo"><i class="fas fa-search"></i></button>
         </div>
 
-        <label for="edtData">Date</label>
+        <label for="edtData">Data</label>
         <input type="date" id="edtData">
 
-        <label for="edtHora">Time</label>
+        <label for="edtHora">Hora</label>
         <input type="time" id="edtHora">
 
-        <label for="edtTempo">Duration</label>
+        <label for="edtTempo">Duração</label>
         <input type="time" id="edtTempo" value="01:00">
 
-        <label for="cmbQuadra">Court</label>
+        <label for="cmbQuadra">Quadra</label>
         <div class="edtbtn">
             <select id="cmbQuadra"></select>
-            <button id="btnAddCourt">+</button>
+            <button id="btnAddCourt"><i class="fas fa-plus-circle"></i></button>
         </div>
 
         <div class="sets">
             <label for="cmbSets">Sets</label>
             <div class="edtbtn">
                 <select id="cmbSets"></select>
-                <button id="btnEdtSet">EDT</button>
-                <button id="btnSetScore">+</button>
+                <button id="btnEdtSet"><i class="fas fa-edit"></i></button>
+                <button id="btnSetScore"><i class="fas fa-plus-circle"></i></button>
             </div>
             
 
@@ -120,6 +120,9 @@
     fillCombo('cmbSport',courtParams,12,['id','nome'], data != undefined ? data.id_sport : '')
     fillCombo('cmbTipo',courtParams,13,['id','nome'], data != undefined ? data.id_evento : '')
 
+    document.querySelector('#btnBuscaAmigo').addEventListener('click',()=>{
+        openHTML('newFriend.html','modal',null)
+    })
 
     document.querySelector('#btnAddCourt').addEventListener('click',()=>{
         openHTML('myCourts.html','modal',null,500)

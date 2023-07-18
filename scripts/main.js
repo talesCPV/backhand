@@ -9,18 +9,33 @@
 function checkLogin(){
     let out = false
     if(localStorage.getItem('idUser') == null){
+        document.querySelector('#log-inout').style.display = 'block'
         document.querySelector('#log-inout').innerHTML = 'login'
         document.querySelector('#usr').innerHTML = ''
         hideMenu()
     }else{
         document.querySelector('#log-inout').innerHTML = 'logout'
+        document.querySelector('#log-inout').style.display = 'none'
         document.querySelector('#usr').innerHTML = localStorage.getItem('atleta')
         hideMenu(false)
         out = true
+        showUserPic()
     }
     
     return out
 }
+
+function showUserPic(){
+    const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
+    back.then((resp)=>{
+        const imgExist = JSON.parse(resp)
+        document.querySelector('#imgUser').src = imgExist ? `assets/users/${localStorage.getItem('idUser')}.jpg` : 'assets/user.jpeg'
+    })
+
+
+
+}
+
 
 function loadActivity(D,S,L){
 
@@ -29,7 +44,7 @@ function loadActivity(D,S,L){
     mainData.coords.lat = localStorage.getItem('lat')
     mainData.coords.lng = localStorage.getItem('lng')
 
-    const screen = document.querySelector('#dashboard')
+    const screen = document.querySelector('.dashboard')
     S == '0' ? screen.innerHTML = '' : 0
     const params = new Object;
         params.lat =  mainData.coords.lat
@@ -47,19 +62,45 @@ function loadActivity(D,S,L){
             const div = document.createElement('div')
             div.className = 'post-activity'
             div.id = `atv-${i}`
-            div.innerHTML = `<p id="atleta">${json[i].ATLETA}</p>
+            div.innerHTML = `
+            <div class="head-activity">
+                <img class="imgUser head-activity-img" src="${`assets/users/${json[i].id_usuario}.jpg`}">
+                <div>
+                    <p class="head-activity-atleta">${json[i].ATLETA}</p>
+                    <p class="head-activity-data">${json[i].dia.showDate()} as ${json[i].dia.showTime()}</p>
+                </div>
+            </div>
             <h2 id="nome">${json[i].nome}</h2>
             <h4 id="placar">${json[i].nick} ${json[i].SETS_P1} vs ${json[i].SETS_P2} ${json[i].parceiro.split(' ')[0]}</h4>           
             <div class="panel">
-                <div class="map-view">
-                    <div id="map-${i}" class="map-activity"></div>
-                    <h4 class="map-label">${json[i].QUADRA}</h4>
+                <div class="left-panel">
+                
+                    <div class="map-view">
+                        <div id="map-${i}" class="map-activity"></div>
+                        <h6 class="map-label">${json[i].QUADRA}</h6>
+                    </div>
+<!-- 
+                    <div class="flex-line base-panel" >
+                   
+                        <div class="flex-col">
+                            <h4>Data</h4>
+                            <h4 id="data">${json[i].dia.showDate()}</h4>                    
+                        </div>
+                        <div class="flex-col">
+                            <h4>Hora</h4>
+                            <h4 id="hora">${json[i].dia.showTime()}</h4>                    
+                        </div>
+                        <div class="flex-col">
+                            <h4>Tempo de Treino</h4>
+                            <h4 id="tempo">${parseInt(json[i].duracao/60).toString().padStart(2,'0')}:${parseInt(json[i].duracao%60).toString().padStart(2,'0')}</h4>                    
+                        </div>
+                    </div>
+-->                    
                 </div>
                 <div class="right-panel">
-                    <p id="sport">Sport   - ${json[i].SPORT}</p>
-                    <p id="evento">Event   - ${json[i].EVENTO}</p>
-                    <a id="btnKudos-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Kudos   <i class="fas fa-thumbs-up"></i></a><br>
-                    <a id="btnComment-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}"> Comments <i class="fas fa-comments"></i></a>
+                    <p id="sport">${json[i].SPORT} (${json[i].EVENTO})</p>                    
+                    <a id="btnKudos-${i}"   class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Kudos   <i class="fas fa-thumbs-up"></i><span id="numKudos-${i}" class="badge">${parseInt(json[i].KUDOS)>0 ? json[i].KUDOS : ''}</span></a>
+                    <a id="btnComment-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Scraps <i class="fas fa-comments"></i><span id="numKudos-${i}" class="badge">${parseInt(json[i].MESSAGES)>0 ? json[i].MESSAGES : ''}</span></a>
                     
                     <br>
                     <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
@@ -82,25 +123,10 @@ function loadActivity(D,S,L){
                         <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
                     </div> 
                     
-                    <a id="btnViewMore-${i}">view more...</a>
+                    <a id="btnViewMore-${i}">veja mais...</a>
 
                 </div>
-            </div>
-            <div class="flex-line base-panel" >
-                <div class="flex-col">
-                    <h4>Date</h4>
-                    <h4 id="data">${json[i].dia.showDate()}</h4>                    
-                </div>
-                <div class="flex-col">
-                <h4>Time</h4>
-                    <h4 id="hora">${json[i].dia.showTime()}</h4>                    
-                </div>
-                <div class="flex-col">
-                    <h4>Elapsed Time</h4>
-                    <h4 id="tempo">${parseInt(json[i].duracao/60).toString().padStart(2,'0')}:${parseInt(json[i].duracao%60).toString().padStart(2,'0')}</h4>                    
-                </div>
-            </div>
-            `
+            </div>`
 
             div.database = json[i]
             screen.appendChild(div)
@@ -109,7 +135,6 @@ function loadActivity(D,S,L){
             pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
 
             maps[maps.length-1].locate({setView: false, maxZoom: 30})
-//                maps[maps.length-1].zoomControl = false
             disableMap(maps[maps.length-1])
             maps[maps.length-1].on('click',()=>{
                 json[i].form = `atv-${i}`                    
@@ -121,15 +146,64 @@ function loadActivity(D,S,L){
             })
 
             document.querySelector('#btnKudos-'+i).addEventListener('click',()=>{
-                alert('Kudos: '+i)
+
+                if(localStorage.getItem('idUser') != null){
+                    const params = new Object;
+                        params.hash =  localStorage.getItem('hash')
+                        params.id_atividade = json[i].id
+
+                    const myPromisse = queryDB(params,18)
+
+                    myPromisse.then((resolve)=>{
+                        const kudos =  parseInt(JSON.parse(resolve)[0].KUDOS)
+                        document.querySelector('#numKudos-'+i).innerHTML =  kudos > 0 ? kudos : ''                                     
+                    })
+                }
             })
 
             document.querySelector('#btnComment-'+i).addEventListener('click',()=>{
-                alert('Comment: '+i)
+                openHTML('message.html','modal',json[i])
+
+/*                
+                const params = new Object;
+                    params.id =  'DEFAULT'
+                    params.id_hash = localStorage.getItem('hash')
+                    params.id_atividade = json[i].id
+                    params.Iscrap = json[i].id
+
+                const myPromisse = queryDB(params,19)
+
+                myPromisse.then((resolve)=>{
+                    const kudos =  parseInt(JSON.parse(resolve)[0].KUDOS)
+                    document.querySelector('#numKudos-'+i).innerHTML =  kudos > 0 ? kudos : ''                                     
+                })
+*/
+
             })
         }
     })
 }
+
+/*  ABAS */
+
+function pictab(e){
+    const tab = e.id
+    const content = document.querySelectorAll(".tab");
+    for (let i = 0; i < content.length; i++) {
+        const sel_tab = document.querySelector('#tab-'+content[i].id)
+
+        if(content[i].id == tab.split('-')[1]){
+            content[i].style.display = "block"
+            sel_tab.style.background = "#16a083";
+            sel_tab.style.color = "#FFF8DC";
+        }else{
+            content[i].style.display = "none"
+            sel_tab.style.background = "#FFF8DC";
+            sel_tab.style.color = "#16a083";
+        }
+    }
+}
+
 
 /* VALIDATION */
 

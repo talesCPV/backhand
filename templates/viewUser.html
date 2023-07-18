@@ -62,7 +62,7 @@
         </div>
 
         <div class="line">
-            <input id="edtCel" type="text" maxlength="14" placeholder="Celular" onkeyup="phone(this)">
+            <input id="edtCel" type="text" maxlength="15" placeholder="Celular" onkeyup="phone(this)">
         </div>
 
         <div id="map"></div>
@@ -86,13 +86,17 @@
     })
 
 
+    document.querySelector('#edtMail').value = localStorage.getItem('email')
+    document.querySelector('#edtName').value = localStorage.getItem('nome')
+    document.querySelector('#edtNick').value = localStorage.getItem('nick')
+    document.querySelector('#edtCel').value = localStorage.getItem('cel')
+
+
+
     document.querySelector('#btnUpload').addEventListener('click',()=>{
         uploadImage('up_file','/../assets/users/',localStorage.getItem('idUser')+'.jpg')
 
     })
-
-
-
 
     document.querySelector('#up_file').addEventListener('change',()=>{
 
@@ -121,5 +125,32 @@
         }
 
     })
+
+    document.querySelector('#btnAddUser').addEventListener('click',()=>{
+
+        if(goon('edtMail,edtPass,edtName')){
+            const email = document.querySelector('#edtMail').value.trim().toLowerCase()
+            const pass = document.querySelector('#edtPass').value.trim()
+            const nome = document.querySelector('#edtName').value.trim().toUpperCase()
+
+            const params = new Object;
+                params.id = localStorage.getItem('idUser')
+                params.email = email
+                params.hash = pass=='' ? localStorage.getItem('hash') :(email+pass).getHash(77)
+                params.name = nome
+                params.nick = document.querySelector('#edtNick').value.trim()
+                params.cel = document.querySelector('#edtCel').value.trim()
+                params.class = 0
+                params.lat = localStorage.getItem('lat')
+                params.lng = localStorage.getItem('lng')
+              
+            const myPromisse = queryDB(params,1);
+            myPromisse.then((resolve)=>{
+                    alert('Usuário cadastrado com sucesso!')
+                    closeModal()       
+            })
+        }
+    })
+
 
 </script>

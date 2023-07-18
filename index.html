@@ -6,7 +6,8 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Backhand</title>
-
+      <link rel="icon" href="assets/ball.png">
+      
       <!--leafletjs-->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -34,10 +35,33 @@
       <script src="scripts/database.js"></script>
       <style>
 
+
+        .head-activity{
+          display:flex; 
+          gap:10px;
+        }
+
+
+        .head-activity-atleta{
+          font-weight: bold;
+          text-transform: capitalize;
+        }
+
+        .head-activity-data{
+          font-size: 0.9em;
+        }
+
+        .head-activity-img{
+          width: 40px;
+          height: 40px;
+        }
+
+
         .post-activity{
-            width: 90vw;
-            border-bottom: solid 1px;
-            padding-bottom: 25px;
+          width: 100%;
+          padding: 20px;
+          background-color: white;
+          border-radius: 5px;
         }
 
         .post-activity p{
@@ -45,21 +69,10 @@
           padding: 0;
         }
 
-        .map-activity{
-          cursor: pointer;
-          width: 50vw;
-          height: 150px;
-          z-index: 0;
-        }
-
         .map-activity .leaflet-control-zoom{
           display: none;
         }
         
-        #imgUser{
-          width: 30px;
-        }
-
 
     </style>      
     </head>
@@ -80,12 +93,19 @@
               <p id="usr"></p>
             </div>
             <ul class="menu-items">
-                <li class="only-login hide-menu"><a href="#dashboard">Home</a></li>
-                <li class="only-login hide-menu"><a onclick="social()">Social</a></li>
-                <li class="only-login hide-menu"><a href="#equip">Equip</a></li>
-                <li class="only-login hide-menu"><a onclick="addOne()">+Activity</a></li>
-                <li class="only-login hide-menu"><a onclick="viewUser()"><img id="imgUser" src="assets/user.jpeg"></a></li>
-                <li><a id="log-inout" onclick="login()">login</a></li> 
+                <li class="only-login hide-menu"><a href="#dashboard"><i class="fas fa-home"></i></a></li>
+                <li class="only-login hide-menu"><a onclick="social()"><i class="fas fa-user-friends"></i></a></li>
+                <li class="only-login hide-menu" style="font-size: 1.9em;"><a onclick="addOne()"> <i class="fas fa-plus-circle"></i> </a></li>
+                <li class="only-login hide-menu"><a class="parent-sub-menu"><img class="imgUser" id="imgUser" src="assets/user.jpeg"></a>
+                  <ul class="sub-menu">
+                    <li onclick="viewUser()">Meu Perfil</li>
+                    <li onclick="openHTML('myCourts.html', 'modal',null,500)">Minhas Quadras</li>
+                    <li><a>Meus Amigos</a></li>
+                    <li><a>Equipamento</a></li>
+                    <li onclick="login()">logout</a></li>
+                  </ul>
+                </li>
+                <li><a id="log-inout" onclick="login()">Inscreva-se</a></li> 
             </ul>
             <p></p>
         </div>
@@ -93,7 +113,11 @@
 
       <div class="main-content"> 
 
-        <section id="dashboard"></section>
+        <section class="perfil hide">
+        
+        </section>
+
+        <section class="dashboard"></section>
     
       </div>
 
@@ -111,15 +135,36 @@
     <script src="scripts/main.js"></script>
     <script>
 
+    navigator.geolocation.getCurrentPosition((latlng)=>{
+        mainData.data = new Object
+        mainData.data.lat = latlng.coords.latitude
+        mainData.data.lng = latlng.coords.longitude
+    })
 
-      checkLogin()
+//      checkLogin()
+    if(localStorage.getItem('idUser') == null){
+      openHTML('noLogin.html','screen')
+      document.querySelector('#footer').style.display = 'none'
+      document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
+      hideMenu(true) 
+    }else{
+      document.querySelector('#log-inout').innerHTML = 'Sair'
+      document.querySelector('#footer').style.display = 'block'
+      openHTML('dashboard.html','screen')
+      loadActivity(100,0,10)
+      hideMenu(false) 
+    }
+
 
       function login(){
-        if(checkLogin()){
-            localStorage.clear();
-            checkLogin()
+        if(localStorage.getItem('idUser') == null){
+          openHTML('novoUser.html','modal')           
         }else{        
-          openHTML('login.html','modal',null,400)
+          localStorage.clear();
+          document.querySelector('#footer').style.display = 'none'
+          document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
+          openHTML('noLogin.html','screen')
+          hideMenu(true) 
         }
       }
 
@@ -135,7 +180,7 @@
         openHTML('social.html','modal')
       }
 
-      openHTML('dashboard.html','screen')
+
 
 
 

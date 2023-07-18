@@ -16,5 +16,5 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
-SELECT calcDist(-23,-45,-23.5,-45.5);
+SELECT fn_calcDist(-23,-45,-23.5,-45.5);
 

@@ -24,7 +24,7 @@
             $i++;
         }
 
-//    echo $query; 
+//   echo $query; 
 
             $result = mysqli_query($conexao, $query);
 //  echo $result->affected_rows;         

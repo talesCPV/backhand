@@ -39,10 +39,6 @@
     width: 100%;
   }
 
-  #dashboard{
-    padding-top: 30px;
-  }
-
   /* Add Animation */
   @-webkit-keyframes animatetop {
     from {top:-400px; opacity:0} 

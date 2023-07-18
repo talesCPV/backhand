@@ -75,6 +75,17 @@ CREATE TABLE tb_kudos (
     PRIMARY KEY (id_usuario,id_atividade)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
+-- DROP TABLE tb_message;
+CREATE TABLE tb_message (
+	id int(11) NOT NULL AUTO_INCREMENT,
+    id_usuario int(11) NOT NULL,
+    id_atividade int(11) NOT NULL, 
+    scrap varchar(600) DEFAULT NULL,
+	FOREIGN KEY (id_usuario) REFERENCES tb_usuario(id),
+	FOREIGN KEY (id_atividade) REFERENCES tb_atividades(id),
+    PRIMARY KEY (id)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
 -- DROP TABLE tb_sets;
 CREATE TABLE tb_sets (
 	id int(11) NOT NULL,
@@ -85,3 +96,15 @@ CREATE TABLE tb_sets (
 	FOREIGN KEY (id_atividade) REFERENCES tb_atividades(id),
     PRIMARY KEY (id,id_atividade)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+-- DROP TABLE tb_following;
+CREATE TABLE tb_following (
+	id_host int(11) NOT NULL,
+    id_guest int(11) NOT NULL,
+	FOREIGN KEY (id_host) REFERENCES tb_usuario(id),
+	FOREIGN KEY (id_guest) REFERENCES tb_usuario(id),
+    PRIMARY KEY (id_host,id_guest)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+INSERT INTO tb_following VALUES (3,1);
+

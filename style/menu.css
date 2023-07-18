@@ -47,10 +47,9 @@
     margin-left: 1.5rem;
     margin-bottom: 0.5rem;
     font-size: 1rem;
+    align-self: center;
   }
 
-
-  
   .menu-items a {
     text-decoration: none;
     color: #444;
@@ -73,6 +72,38 @@
     width: 80px;
   }
 
+  .sub-menu{
+    position: absolute;
+    border: 1px solid;
+    right: 30px;
+    background: rgb(255, 255, 255);
+    border-radius: 5px;
+    display: none;
+    min-width: 100px;
+    text-align: right;
+  }
+
+  li:hover  .sub-menu{
+    display: block;
+  }
+
+  .sub-menu li{
+    margin: 0;
+    padding: 5px 15px;
+    cursor: pointer;
+  }
+
+  .sub-menu li:hover{
+    background-color: #444;
+    color: aliceblue;
+  }
+
+  .parent-sub-menu{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
 /* ......../ media query /.......... */
 
 @media (max-width: 768px) {
@@ -82,6 +113,10 @@
       text-align: center;
     }
   
+    .sub-menu{
+      position: relative;
+    }
+
     .navbar {
       opacity: 0.95;
     }

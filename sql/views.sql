@@ -1,24 +1,23 @@
 -- ********************************
--- DROP VIEW vw_dashboard;
+--  DROP VIEW vw_dashboard;
 CREATE VIEW vw_dashboard AS	
-    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2
+    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA,US.nick AS nick, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2,
+    (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
+    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES
             FROM tb_atividades AS ATV 
             INNER JOIN tb_sport AS SP
             INNER JOIN tb_evento AS EV
             INNER JOIN tb_usuario AS US
             INNER JOIN tb_quadra AS QD
-            INNER JOIN vw_placar AS PC
+            INNER JOIN vw_placar AS PC            
             ON SP.id = ATV.id_sport
-            AND PC.id = ATV.id
+            AND PC.id = ATV.id          
             AND EV.id = ATV.id_evento
             AND US.id = ATV.id_usuario
             AND QD.id = ATV.id_quadra    
             ORDER BY ATV.dia DESC;
 
-SELECT DB.*, (SELECT calcDist(DB.lat,DB.lng,-23.1112704,-45.71136)) AS distance 
-	FROM vw_dashboard AS DB
-    WHERE (SELECT calcDist(DB.lat,DB.lng,-23.1112704,-45.71136))<= 2
-    LIMIT 0,10;
+SELECT * FROM vw_dashboard LIMIT 0,10;
     
 -- ********************************
 
@@ -57,6 +56,48 @@ CREATE VIEW vw_placar AS
     ORDER BY id ASC;
 
 -- ****************************************
+-- DROP VIEW vw_kudos;
+CREATE VIEW vw_kudos AS    
+SELECT KD.id_atividade AS id, US.id AS userID, US.nome, US.nick 
+	FROM tb_kudos AS KD
+	INNER JOIN tb_usuario AS US
+	ON KD.id_usuario = US.id;
+    
+SELECT * FROM vw_kudos WHERE id = 22;
+
+-- *********************************
+-- DROP VIEW vw_message;
+CREATE VIEW vw_message AS    
+SELECT MS.id, MS.id_atividade, US.id AS userID, US.nome, US.nick, MS.scrap 
+	FROM tb_message AS MS
+	INNER JOIN tb_usuario AS US
+	ON MS.id_usuario = US.id;
+    
+SELECT * FROM vw_message WHERE id_atividade = 22;
+
+-- *********************************
+-- DROP VIEW vw_friends;
+CREATE VIEW vw_friends AS    
+SELECT FW.id_host AS userID,US.id, US.nome 
+	FROM tb_following AS FW
+	INNER JOIN tb_usuario AS US
+	ON US.id = FW.id_guest;
+    
+SELECT * FROM vw_friends WHERE nome LIKE "%A%" ;
+SELECT * FROM vw_friends WHERE userID = Tales;
+
+
+
+
+SELECT US.id, US.nome,
+	(SELECT COUNT(*) FROM tb_following WHERE id_host = 1 AND id_guest = US.id) AS FOLLOW
+	FROM tb_usuario AS US;
+
+-- *********************************
+
+
+
+
 SELECT * FROM vw_placarAtiv;
 SELECT * FROM vw_dashboard;
 SELECT * FROM vw_placarAtiv;
@@ -64,3 +105,12 @@ SELECT * FROM vw_noSets;
 SELECT * FROM vw_placar;
 -- ****************************************
 SELECT * FROM vw_placarAtiv UNION ALL SELECT * FROM vw_noSets ORDER BY id ASC;
+
+SELECT * from vw_message WHERE id_atividade = 22;
+
+SELECT US.nome, US.lat, US.lng, (SELECT fn_calcDist(-23,-45,US.lat,US.lng)) AS DISTANCE 
+FROM tb_usuario AS US;
+
+SELECT fn_calcDist(-23,-45,-23.5,-45.5);
+
+

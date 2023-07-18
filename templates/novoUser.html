@@ -12,7 +12,7 @@
             width: 100px;
         }
         
-        .form{
+        .form-newUser{
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -25,14 +25,26 @@
             height: 30px;
         }
 
-        #map { 
-            width: 100%;
-            height: 30vh;
+        .btnMessage{
+            border-radius: 5px;
+            padding: 5px;
+            background: #16a083;
+            border: solid 1px #16a083;
+            color: #ffffff;
+            margin: 20px;
+            min-width: 100px;
+        }
+
+        .btnMessage:hover{
+            border: solid 1px #16a083;
+            border-radius: 5px;
+            background: #e0e6e4;
+            color: #16a083;
         }
 
     </style>
 
-    <div class="form">
+    <div class="form-newUser">
         <div class="line">
             <input id="edtMail" type="email" maxlength="70" placeholder="* Email">
         </div>
@@ -53,10 +65,7 @@
             <input id="edtCel" type="text" maxlength="14" placeholder="Celular" onkeyup="phone(this)">
         </div>
 
-        <div id="map"></div>
-
-
-        <button  class="btn btn-primary" id="btnAddUser">Salvar</button>
+        <button  class="btnMessage" id="btnAddUser">Salvar</button>
     </div>
 
 </template>
@@ -78,8 +87,8 @@
                 params.nick = document.querySelector('#edtNick').value.trim()
                 params.cel = document.querySelector('#edtCel').value.trim()
                 params.class = 0
-                params.lat = mainData.login.coords.lat
-                params.lng = mainData.login.coords.lng
+                params.lat = mainData.data.lat
+                params.lng = mainData.data.lng
             const myPromisse = queryDB(params,1);
             myPromisse.then((resolve)=>{
                     alert('Usuário cadastrado com sucesso!')

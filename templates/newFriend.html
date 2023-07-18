@@ -1,0 +1,166 @@
+<title>Pesquisa de Atletas</title>
+<template>
+    <style>
+
+
+        .edtbtn{
+            display: flex;
+        }
+
+        .edtbtn input, .edtbtn select{
+            width: 80%;
+        }
+
+        .edtbtn button{
+            width: 20%;
+        }
+
+        .view-friends{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .view-friends img{
+            margin: 10px;
+        }
+
+        .view-friends p{
+            padding: 10px;
+        }
+
+        .view-friends{
+            border-bottom: solid 1px #ffffff;
+            border-top: solid 1px #ffffff;
+        }
+
+        .view-friends:hover{
+            border-bottom: solid 1px #16a083;
+            border-top: solid 1px #16a083;
+        }
+
+        .btnMessage{
+            right: 80px;
+            position: absolute;
+            margin-top: 10px;
+            padding: 5px;
+            background: white;
+            border: solid 1px white;
+            color: rgb(196, 196, 196);
+        }
+
+        .btnMessage:hover{
+            border: solid 1px #16a083;
+            border-radius: 5px;
+            color: #16a083;
+        }
+
+        .form-viewList{
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-viewList input, .form-viewList select{
+
+padding: 5px;
+
+}
+
+    </style>
+
+    <div class="form-viewList">
+
+        <label for="edtNomeAtleta">Name do Atleta</label>
+        <div class="edtbtn">
+            <input type="text" id="edtNomeAtleta">
+            <button id="btnSearchAtleta"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="searchFriends"></div>
+
+       
+    </div>
+
+
+</template>
+<script>
+    
+
+
+    friendsDistance(100)
+
+
+    function friendsDistance(radius){
+        const params = new Object;
+            params.hash = localStorage.getItem('hash')
+            params.distance = radius
+
+        const myPromisse = queryDB(params,24)
+
+        myPromisse.then((resolve)=>{
+            const friends =  JSON.parse(resolve)
+            showFriends(friends)                   
+        })
+    }
+
+
+    document.querySelector('#btnSearchAtleta').addEventListener('click',()=>{
+
+        const params = new Object;
+            params.id = localStorage.getItem('idUser')            
+            params.nome = document.querySelector('#edtNomeAtleta').value.trim()            
+
+        const myPromisse = queryDB(params,26)
+
+        myPromisse.then((resolve)=>{
+            const friends =  JSON.parse(resolve)
+            showFriends(friends)
+        })
+
+
+
+    })
+
+    function showFriends(friends){
+        const div_search = document.querySelector('#searchFriends') 
+        div_search.innerHTML = ''
+        for(let i=0; i<friends.length; i++){      
+            const div = document.createElement('div')
+            div.className = 'view-friends'
+
+            const img = document.createElement('img')
+            img.src = `assets/users/${friends[i].userID}.jpg`
+            img.className = 'imgUser'
+            img.addEventListener('error',()=>{
+                img.src = 'assets/user.jpeg'
+            })
+            div.appendChild(img)
+
+            const p = document.createElement('p')
+            p.innerHTML = friends[i].nome
+            div.appendChild(p)
+
+            if(friends[i].FOLLOW=="0" && localStorage.getItem('idUser')!= friends[i].userID ){
+                const btn = document.createElement('button')
+                btn.innerHTML = 'SEGUIR'
+                btn.className = 'btnMessage'
+
+                btn.addEventListener('click',()=>{
+                    const params = new Object;
+                        params.hash = localStorage.getItem('hash')
+                        params.id_guest = friends[i].userID
+                        queryDB(params,23).then((resolve)=>{
+                            console.log(resolve)
+                        })
+                        btn.style.display = 'none'     
+                })
+
+                div.appendChild(btn)
+            }
+
+            div_search.appendChild(div)
+        }
+    }
+
+</script>

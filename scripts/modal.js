@@ -22,7 +22,7 @@ async function openHTML(  template="",where="modal", data=null, max='',){
                     mainData[template.split('.')[0]].data = data != null ? data : new Object
                     newModal(temp,max)
                 }else{
-                    document.querySelector('#dashboard').innerHTML = temp.getElementsByTagName('template')[0].innerHTML
+                    document.querySelector('.dashboard').innerHTML = temp.getElementsByTagName('template')[0].innerHTML
                     eval(temp.getElementsByTagName('script')[0].innerHTML);                                  
                 }
                 

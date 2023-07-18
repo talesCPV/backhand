@@ -166,3 +166,162 @@ DELIMITER ;
 
 -- CALL sp_orderSet(2);
 CALL sp_insertSets("0","18","1","1","1");
+
+/* KUDOS */
+
+-- DROP PROCEDURE sp_kudos;
+DELIMITER $$
+	CREATE PROCEDURE sp_kudos(
+		IN Ihash varchar(77),
+		IN Iid_atividade int(11)
+    )
+	BEGIN	
+		DECLARE Iid_usuario INT(11);
+		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+        
+		IF ((SELECT COUNT(*) FROM tb_kudos WHERE id_usuario = Iid_usuario AND id_atividade = Iid_atividade)>0) THEN
+		   DELETE FROM tb_kudos WHERE id_usuario = Iid_usuario AND id_atividade = Iid_atividade ;           
+		ELSE
+		   INSERT INTO tb_kudos (id_usuario,id_atividade) VALUES (Iid_usuario,Iid_atividade);
+		END IF;    	
+        SELECT COUNT(*) AS KUDOS FROM tb_kudos WHERE id_atividade = Iid_atividade;
+
+	END $$
+DELIMITER ;
+
+
+SELECT * FROM tb_kudos;
+CALL sp_kudos("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",22);
+
+	
+
+/* MESSAGE */
+
+-- DROP PROCEDURE sp_message;
+DELIMITER $$
+	CREATE PROCEDURE sp_message (	
+		IN Iid int(11), 
+		IN Ihash varchar(77),
+        IN Iid_atividade int(11),
+        IN Iscrap varchar(600)
+		)
+	BEGIN
+		DECLARE Iid_usuario INT(11);
+		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+
+		INSERT INTO tb_message (id,id_usuario,id_atividade,scrap)
+        VALUES (Iid,Iid_usuario,Iid_atividade,Iscrap)
+        ON DUPLICATE KEY UPDATE scrap=Iscrap;
+        
+        SELECT * from vw_message WHERE id_atividade = Iid_atividade;
+        
+	END$$
+DELIMITER ;
+
+-- DROP PROCEDURE sp_delMessage;
+DELIMITER $$
+	CREATE PROCEDURE sp_delMessage(
+		IN Ihash varchar(77),
+		IN Iid int(11)
+    )
+	BEGIN			 
+		DECLARE Iid_usuario INT(11);
+		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+      
+		DELETE FROM tb_message WHERE id=Iid AND id_usuario = Iid_usuario;
+        
+	END $$
+DELIMITER ;
+
+CALL sp_delMessage("¨hL¨h1¨hL¨h=,<L-=,<L¨l|/?.>N^n~1A0@P`p#3­2BRbr%5$4DTdt'7&6FVfv)9(8HXhx+;*:JZj",16);
+
+00:46:25	CALL sp_delMessage("¨hL¨h1¨hL¨h=,<L-=,<L¨l|/?.>N^n~1A0@P`p#3­2BRbr%5$4DTdt'7&6FVfv)9(8HXhx+;*:JZj",16)	Error Code: 1305. PROCEDURE d2soft98_backhand.sp_delMessage does not exist	0,135 sec
+
+
+/* FOLLOW */
+
+-- DROP PROCEDURE sp_follow;
+DELIMITER $$
+	CREATE PROCEDURE sp_follow(
+		IN Ihash varchar(77),
+		IN Iid_guest int(11)
+    )
+	BEGIN	
+		DECLARE Iid_host INT(11);
+		SET Iid_host = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+        
+		IF ((SELECT COUNT(*) FROM tb_following WHERE id_host = Iid_host AND id_guest = Iid_guest)>0) THEN
+		   DELETE FROM tb_following WHERE id_host = Iid_host AND id_guest = Iid_guest ;           
+		ELSE
+		   INSERT INTO tb_following (id_host,id_guest) VALUES (Iid_host,Iid_guest);
+		END IF;    	
+        SELECT COUNT(*) AS FOLLOW FROM tb_following WHERE id_guest = Iid_guest;
+
+	END $$
+DELIMITER ;
+
+-- DROP PROCEDURE sp_viewKudos;
+DELIMITER $$
+	CREATE PROCEDURE sp_viewKudos(
+		IN Iid int(11),
+		IN Iid_atividade int(11)
+    )
+	BEGIN	         
+		SELECT KD.id_atividade, US.id AS userID, US.nome, US.nick,
+        (SELECT COUNT(*) FROM tb_following WHERE id_host=Iid AND id_guest=US.id)AS FOLLOW
+		FROM tb_kudos AS KD
+		INNER JOIN tb_usuario AS US
+		ON KD.id_usuario = US.id
+        AND KD.id_atividade=Iid_atividade;
+	END $$
+DELIMITER ;
+
+CALL sp_viewKudos(3,22);
+
+/* USER BY DISTANCE */
+
+ DROP PROCEDURE sp_searchFriends;
+DELIMITER $$
+	CREATE PROCEDURE sp_searchFriends(
+        IN Ihash varchar(77),
+		IN Idistance int(11)
+    )
+	BEGIN	      
+		DECLARE Iid_host INT(11);
+        DECLARE Ilat DOUBLE;
+		DECLARE Ilng DOUBLE;
+		SET Iid_host = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+		SET Ilat = (SELECT lat FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+		SET Ilng = (SELECT lng FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+
+		SELECT US.id AS userID, US.nome, US.lat, US.lng,Ilat,Ilng,
+        (SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,US.lat,US.lng)),0)) AS DISTANCE,
+        (SELECT COUNT(*) FROM tb_following WHERE id_host=Iid_host AND id_guest=US.id)AS FOLLOW
+		FROM tb_usuario AS US
+        WHERE (SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,US.lat,US.lng)),0)) < Idistance
+        AND US.id != Iid_host
+        ORDER BY DISTANCE,US.nome;
+        
+	END $$
+DELIMITER ;
+
+CALL sp_searchFriends("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",100);
+
+-- DROP PROCEDURE sp_usersByName;
+DELIMITER $$
+	CREATE PROCEDURE sp_usersByName(
+		IN ImyId int(11),
+		IN Inome varchar(60),
+        IN Istart int(11),
+        IN IshowLimit int(11)
+    )
+	BEGIN	         
+		SELECT US.id AS userID, US.nome,
+			(SELECT COUNT(*) FROM tb_following WHERE id_host = ImyId AND id_guest = US.id) AS FOLLOW
+			FROM tb_usuario AS US
+            WHERE US.NOME COLLATE utf8_general_ci LIKE Inome COLLATE utf8_general_ci
+            LIMIT Istart,IshowLimit;
+	END $$
+DELIMITER ;
+
+CALL sp_usersByName(4,"%%",0,10);
