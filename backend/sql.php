@@ -4,7 +4,7 @@
         "0" => 'SELECT * FROM tb_usuario WHERE email="x00" AND hash="x01";',
         "1" => 'CALL sp_insertUsuario("x00","x01","x02","x03","x04","x05","x06","x07","x08");',
         "2" => 'CALL sp_delUsuario("x00")',
-        "3" => 'SELECT * FROM tb_quadra WHERE y00="x00" AND y01="x01";',
+        "3" => 'CALL sp_findQuadra("x00",x01);',
         "4" => 'CALL sp_insertQuadra("x00","x01","x02","x03","x04")',
         "5" => 'CALL sp_delQuadra("x00")',
         "6" => 'SELECT * FROM vw_minhasQuadras WHERE id_usuario = "x00";',

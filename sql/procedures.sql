@@ -1,4 +1,4 @@
-/*  USUARIO  */
+q/*  USUARIO  */
 
 -- DROP PROCEDURE sp_insertUsuario;
 DELIMITER $$
@@ -74,6 +74,8 @@ DELIMITER $$
 
 		INSERT INTO tb_minhasquadras (id_usuario,id_quadra)
         VALUES (Iid_usuario,Iid_quadra);
+        
+        SELECT TRUE AS MYCOURT;
 	END $$
 DELIMITER ;
 
@@ -88,8 +90,39 @@ DELIMITER $$
 		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
 
 		DELETE FROM tb_minhasquadras WHERE id_usuario=Iid_usuario AND id_quadra=Iid_quadra;
+        
+		SELECT FALSE AS MYCOURT;
+
 	END $$
 DELIMITER ;
+
+
+-- DROP PROCEDURE sp_findQuadra;
+DELIMITER $$
+		CREATE PROCEDURE sp_findQuadra(
+        IN Ihash varchar(77),
+		IN Idistance int(11)
+    )
+	BEGIN	      
+		DECLARE Iid_host INT(11);
+        DECLARE Ilat DOUBLE;
+		DECLARE Ilng DOUBLE;
+		SET Iid_host = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+		SET Ilat = (SELECT lat FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+		SET Ilng = (SELECT lng FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+	            
+		SELECT QD.*, 
+			(SELECT COUNT(*) FROM tb_minhasquadras WHERE id_quadra = QD.id AND id_usuario = Iid_host) AS MYCOURT,
+			(SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,QD.lat,QD.lng)),0)) AS DISTANCE
+			FROM tb_quadra AS QD
+            WHERE (SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,QD.lat,QD.lng)),0)) < Idistance
+            ORDER BY DISTANCE,QD.nome;
+    		
+	END $$
+DELIMITER ;
+
+CALL sp_findQuadra("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",100);
+
 
 /* ATIVIDADES */
 

@@ -92,8 +92,7 @@ function loadActivity(D,S,L){
     myPromisse.then((resolve)=>{
         const json = JSON.parse(resolve)   
 
-        for(let i=0; i<json.length; i++){
-console.log(json[i])        
+        for(let i=0; i<json.length; i++){      
             const div = document.createElement('div')
             div.className = 'post-activity'
             div.id = `atv-${i}`

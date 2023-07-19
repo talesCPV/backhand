@@ -1,0 +1,91 @@
+<title>Quadras por perto</title>
+<template>
+    <style>
+        #map { 
+            width: 100%;
+            height: 30vh;
+        }
+        
+        .courtForm > *{
+            width: 100%;
+            padding: 10px;
+        }
+
+        #cmbViewMyCourts{
+            height: auto;
+        }
+
+    </style>
+
+    <div class="form courtForm">
+
+        <div>
+            <div class="edtbtn">
+                <input id="edtSearch" type="text">
+                <button id="btnSearch">  <i class="fas fa-search"></i></button>
+                <button id="btnNewCourt"><i class="fas fa-plus-circle"></i></button>
+            </div>
+        </div>
+        <div id="view-courts"></div>  
+
+    </div>
+
+
+</template>
+<script>
+
+    viewCourts()
+
+    document.querySelector('#btnNewCourt').addEventListener('click',()=>{
+        openHTML('newCourt.html','modal',null,500)
+    })
+
+    function viewCourts(){
+        const params = new Object;
+            params.hash = localStorage.getItem('hash')
+            params.distance = 100
+
+        const myPromisse = queryDB(params,3)
+
+        myPromisse.then((resolve)=>{
+            const courts =  JSON.parse(resolve)
+
+            const div_search = document.querySelector('#view-courts') 
+            div_search.innerHTML = ''
+            for(let i=0; i<courts.length; i++){      
+                const div = document.createElement('div')
+                div.className = 'view-inline'
+
+                const leftdiv = document.createElement('div')
+                leftdiv.style.display = 'flex'
+
+                const p = document.createElement('p')
+                p.innerHTML = courts[i].nome
+                leftdiv.appendChild(p)
+                div.appendChild(leftdiv)
+
+                const btn = document.createElement('button')
+                btn.innerHTML = parseInt(courts[i].MYCOURT) ? 'REMOVER' : 'ADICIONAR'
+                btn.className = 'btn btn-primary'
+                btn.id = 'btnAddDel-'+i
+
+                btn.addEventListener('click',()=>{
+                    const params = new Object;
+                        params.hash = localStorage.getItem('hash')
+                        params.id_court = courts[i].id
+                        queryDB(params,parseInt(courts[i].MYCOURT) ? 8 : 7).then((resolve)=>{
+                            viewCourts()
+                            mainData.viewUser.fillCourts()
+                        })
+
+                })
+
+                div.appendChild(btn)
+                div_search.appendChild(div)
+            }
+        })
+    }
+
+
+
+</script>

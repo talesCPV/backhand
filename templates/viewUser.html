@@ -22,10 +22,6 @@
             border: solid 1px;
         }
 
-
-
-
-
     </style>
 
     <div class="tab-bar">
@@ -80,7 +76,7 @@
         </div>
         <div id="quadras" class="tab">
             <label>Minhas Quadras</label>
-            <button id="btnMyCourts" class="btn-round"><i class="fas fa-search"></i></button>
+            <button id="btnFindCourt" class="btn-round"><i class="fas fa-search"></i></button>
 
             <div id="myCourts"></div>
 
@@ -94,17 +90,14 @@
 
     pictab(document.querySelector('#tab-perfil'))
 
-    fillCourts()
-
-    function fillCourts(){
+    
+    mainData.viewUser.fillCourts = ()=>{
         const params = new Object;
             params.idUser = localStorage.getItem('idUser')
 
-            const myPromisse = queryDB(params,6);
-            myPromisse.then((resolve)=>{
-                const courts = JSON.parse(resolve)
-
-console.log(courts)                
+        const myPromisse = queryDB(params,6);
+        myPromisse.then((resolve)=>{
+            const courts = JSON.parse(resolve)
 
             const div_search = document.querySelector('#myCourts') 
             div_search.innerHTML = ''
@@ -124,28 +117,19 @@ console.log(courts)
                     const params = new Object;
                         params.hash = localStorage.getItem('hash')
                         params.id = courts[i].id
-                        queryDB(params,8).then((resolve)=>{
-                            console.log(resolve)
-                        })
-                        div.style.display = 'none'     
+                    queryDB(params,8).then((resolve)=>{
+//                        console.log(resolve)
+                    })
+                    div.style.display = 'none'     
                 })
 
                 div.appendChild(btn)
-
-
                 div_search.appendChild(div)
             }
-
-
-
-
-
-
-            })
-
+        })
     }
 
-
+    mainData.viewUser.fillCourts()
 
     const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
 
@@ -158,17 +142,12 @@ console.log(courts)
         console.log(path)
     })
 
-
     document.querySelector('#edtMail').value = localStorage.getItem('email')
     document.querySelector('#edtName').value = localStorage.getItem('nome')
     document.querySelector('#edtNick').value = localStorage.getItem('nick')
     document.querySelector('#edtCel').value = localStorage.getItem('cel')
-
-
-
     document.querySelector('#btnUpload').addEventListener('click',()=>{
         uploadImage('up_file','/../assets/users/',localStorage.getItem('idUser')+'.jpg')
-
     })
 
     document.querySelector('#up_file').addEventListener('change',()=>{
@@ -177,26 +156,19 @@ console.log(courts)
             var reader = new FileReader();
 
             reader.onload = function (e) {
-
                 var ctx = document.getElementById('cnvImg');
                 if (ctx.getContext) {
-
                     ctx = ctx.getContext('2d');
                     let preview = new Image();
                     preview.onload = function () {
                         ar = aspect_ratio(preview)
                         ctx.drawImage(preview, 0, 0,preview.width,preview.height,ar[0],ar[1],ar[2],ar[3]);
                     };
-
-                    preview.src = e.target.result
-            
+                    preview.src = e.target.result           
                 }
-
             }
-
             reader.readAsDataURL(document.querySelector('#up_file').files[0]);
         }
-
     })
 
     document.querySelector('#btnAddUser').addEventListener('click',()=>{
@@ -223,6 +195,10 @@ console.log(courts)
                     closeModal()       
             })
         }
+    })
+
+    document.querySelector('#btnFindCourt').addEventListener('click',()=>{
+        openHTML('findCourts.html', 'modal',null,500)
     })
 
 
