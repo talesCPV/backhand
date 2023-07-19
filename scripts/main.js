@@ -12,12 +12,14 @@ function checkLogin(){
         document.querySelector('#log-inout').style.display = 'block'
         document.querySelector('#log-inout').innerHTML = 'login'
         document.querySelector('#usr').innerHTML = ''
-        hideMenu()
+//        hideMenu()
+        openScreen()
     }else{
         document.querySelector('#log-inout').innerHTML = 'logout'
         document.querySelector('#log-inout').style.display = 'none'
         document.querySelector('#usr').innerHTML = localStorage.getItem('atleta')
-        hideMenu(false)
+//        hideMenu(false)
+        openScreen(false)
         out = true
         showUserPic()
     }
@@ -38,9 +40,35 @@ function showUserPic(){
 
 function fillPerfil(usr){
 
-    console.log(usr)
+    const params = new Object;
+        params.id =  usr
+
+    const myPromisse = queryDB(params,27);
+    myPromisse.then((resolve)=>{
+        const json = JSON.parse(resolve)  
+    
+        const img = document.querySelector('#perfil-img') 
+
+        img.src = `assets/users/${json[0].id}.jpg`
+        breakImg(img)
+
+        document.querySelector('#imgUser').src = img.src
+        breakImg(document.querySelector('#imgUser'))
+
+        document.querySelector('.perfil-seguindo').innerText = 'Seguindo '+json[0].SEGUINDO.padStart(2,0)
+        document.querySelector('.perfil-seguidores').innerText = 'Seguidores '+json[0].SEGUIDORES.padStart(2,0)
+        document.querySelector('.perfil-atividades').innerText = 'Atividades '+json[0].ATIVIDADES.padStart(2,0)
+        document.querySelector('.perfil-nome').innerText = json[0].nome
+
+    })
 
 
+}
+
+function breakImg(img){
+    img.addEventListener('error',()=>{
+        img.src = 'assets/user.jpeg'
+    })    
 }
 
 
@@ -65,7 +93,7 @@ function loadActivity(D,S,L){
         const json = JSON.parse(resolve)   
 
         for(let i=0; i<json.length; i++){
-        
+console.log(json[i])        
             const div = document.createElement('div')
             div.className = 'post-activity'
             div.id = `atv-${i}`
@@ -87,12 +115,15 @@ function loadActivity(D,S,L){
                         <h6 class="map-label">${json[i].QUADRA}</h6>
                     </div>
 
+
+
                 </div>
                 <div class="right-panel">
-                    <p id="sport">${json[i].SPORT} (${json[i].EVENTO})</p>                    
-                    <a id="btnKudos-${i}"   class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Kudos   <i class="fas fa-thumbs-up"></i><span id="numKudos-${i}" class="badge">${parseInt(json[i].KUDOS)>0 ? json[i].KUDOS : ''}</span></a>
-                    <a id="btnComment-${i}" class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Scraps <i class="fas fa-comments"></i><span id="numKudos-${i}" class="badge">${parseInt(json[i].MESSAGES)>0 ? json[i].MESSAGES : ''}</span></a>
-                    
+                    <p id="sport">${json[i].SPORT} (${json[i].EVENTO})</p>  
+<!--                                      
+                    <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Kudos   <i class="fas fa-thumbs-up"></i><span class="badge">${parseInt(json[i].KUDOS)>0 ? json[i].KUDOS : ''}</span></a>
+                    <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Scraps <i class="fas fa-comments"></i><span  class="badge">${parseInt(json[i].MESSAGES)>0 ? json[i].MESSAGES : ''}</span></a>
+-->                    
                     <br>
                     <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
                         <!-- facebook -->
@@ -117,7 +148,16 @@ function loadActivity(D,S,L){
                     <a id="btnViewMore-${i}">veja mais...</a>
 
                 </div>
-            </div>`
+            </div>
+            <div class="panel-social">
+                <div id="numKudos-${i}" class="social-kudos">${json[i].KUDOS.padStart(2,0)} kudos</div>
+                <div>
+                    <button id="btnKudos-${i}"   class="btn-backhand btn-social"><i class="fas fa-thumbs-up"></i></button>
+                    <button id="btnComment-${i}" class="btn-backhand btn-social"><i class="fas fa-comments"></i></button>
+                </div>
+            </div>            
+            
+            `
 
             div.database = json[i]
             screen.appendChild(div)
@@ -138,39 +178,49 @@ function loadActivity(D,S,L){
 
             document.querySelector('#btnKudos-'+i).addEventListener('click',()=>{
 
-                if(localStorage.getItem('idUser') != null){
+                if(localStorage.getItem('idUser') != null){             
                     const params = new Object;
                         params.hash =  localStorage.getItem('hash')
                         params.id_atividade = json[i].id
 
                     const myPromisse = queryDB(params,18)
 
-                    myPromisse.then((resolve)=>{
+                    myPromisse.then((resolve)=>{                       
                         const kudos =  parseInt(JSON.parse(resolve)[0].KUDOS)
-                        document.querySelector('#numKudos-'+i).innerHTML =  kudos > 0 ? kudos : ''                                     
+                        document.querySelector('#numKudos-'+i).innerHTML = kudos.toString().padStart(2,0)+ ' kudos'                                     
                     })
                 }
             })
 
             document.querySelector('#btnComment-'+i).addEventListener('click',()=>{
                 openHTML('message.html','modal',json[i])
+            })
+/*
+            const link = encodeURI(window.location.href);
+            const msg = encodeURIComponent('Hey, I found this article');
+            const title = encodeURIComponent('Article or Post Title Here');
 
-/*                
-                const params = new Object;
-                    params.id =  'DEFAULT'
-                    params.id_hash = localStorage.getItem('hash')
-                    params.id_atividade = json[i].id
-                    params.Iscrap = json[i].id
+            const fb = document.querySelector('.facebook');
+            fb.href = `https://www.facebook.com/share.php?u=${link}`;
 
-                const myPromisse = queryDB(params,19)
+            const twitter = document.querySelector('.twitter');
+            twitter.href = `http://twitter.com/share?&url=${link}&text=${msg}&hashtags=javascript,programming`;
 
-                myPromisse.then((resolve)=>{
-                    const kudos =  parseInt(JSON.parse(resolve)[0].KUDOS)
-                    document.querySelector('#numKudos-'+i).innerHTML =  kudos > 0 ? kudos : ''                                     
-                })
+            const linkedIn = document.querySelector('.linkedin');
+            linkedIn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${link}`;
+
+            const reddit = document.querySelector('.reddit');
+            reddit.href = `http://www.reddit.com/submit?url=${link}&title=${title}`;
+
+            const whatsapp = document.querySelector('.whatsapp');
+            whatsapp.href = `https://api.whatsapp.com/send?text=${msg}: ${link}`;
+
+            const telegram = document.querySelector('.telegram');
+            telegram.href = `https://telegram.me/share/url?url=${link}&text=${msg}`;
 */
 
-            })
+
+
         }
     })
 }

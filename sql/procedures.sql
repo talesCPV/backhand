@@ -65,10 +65,13 @@ DELIMITER ;
 -- DROP PROCEDURE sp_insertMinhasQuadras;
 DELIMITER $$
 	CREATE PROCEDURE sp_insertMinhasQuadras(
-		IN Iid_usuario int(11),
+		IN Ihash varchar(77),
 		IN Iid_quadra int(11)
     )
 	BEGIN			            
+		DECLARE Iid_usuario INT(11);
+		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+
 		INSERT INTO tb_minhasquadras (id_usuario,id_quadra)
         VALUES (Iid_usuario,Iid_quadra);
 	END $$
@@ -77,10 +80,13 @@ DELIMITER ;
 -- DROP PROCEDURE sp_delMinhasQuadras;
 DELIMITER $$
 	CREATE PROCEDURE sp_delMinhasQuadras(
-		IN Iid_usuario int(11),
+		IN Ihash varchar(77),
 		IN Iid_quadra int(11)
     )
-	BEGIN			            
+	BEGIN			        
+		DECLARE Iid_usuario INT(11);
+		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+
 		DELETE FROM tb_minhasquadras WHERE id_usuario=Iid_usuario AND id_quadra=Iid_quadra;
 	END $$
 DELIMITER ;

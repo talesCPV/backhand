@@ -29,8 +29,9 @@
         "22" => 'SELECT * from vw_message WHERE id_atividade = x00 ORDER BY id;',
         "23" => 'CALL sp_follow("x00",x01);',
         "24" => 'CALL sp_searchFriends("x00",x01);',
-        "25" => 'SELECT * FROM vw_friends WHERE userID = x00;',
+        "25" => 'SELECT * FROM vw_friends WHERE hostID = x00;',
         "26" => 'CALL sp_usersByName(x00,"%x01%",0,10);',
+        "27" => 'SELECT * FROM vw_perfil WHERE id = x00;',
     );
 
 ?>

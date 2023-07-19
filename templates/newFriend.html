@@ -2,59 +2,6 @@
 <template>
     <style>
 
-
-        .edtbtn{
-            display: flex;
-        }
-
-        .edtbtn input, .edtbtn select{
-            width: 80%;
-        }
-
-        .edtbtn button{
-            width: 20%;
-        }
-
-        .view-friends{
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-        }
-
-        .view-friends img{
-            margin: 10px;
-        }
-
-        .view-friends p{
-            padding: 10px;
-        }
-
-        .view-friends{
-            border-bottom: solid 1px #ffffff;
-            border-top: solid 1px #ffffff;
-        }
-
-        .view-friends:hover{
-            border-bottom: solid 1px #16a083;
-            border-top: solid 1px #16a083;
-        }
-
-        .btnMessage{
-            right: 80px;
-            position: absolute;
-            margin-top: 10px;
-            padding: 5px;
-            background: white;
-            border: solid 1px white;
-            color: rgb(196, 196, 196);
-        }
-
-        .btnMessage:hover{
-            border: solid 1px #16a083;
-            border-radius: 5px;
-            color: #16a083;
-        }
-
         .form-viewList{
             padding: 10px;
             display: flex;
@@ -63,10 +10,8 @@
         }
 
         .form-viewList input, .form-viewList select{
-
-padding: 5px;
-
-}
+            padding: 5px;
+        }
 
     </style>
 
@@ -127,7 +72,10 @@ padding: 5px;
         div_search.innerHTML = ''
         for(let i=0; i<friends.length; i++){      
             const div = document.createElement('div')
-            div.className = 'view-friends'
+            div.className = 'view-inline'
+
+            const leftdiv = document.createElement('div')
+            leftdiv.style.display = 'flex'
 
             const img = document.createElement('img')
             img.src = `assets/users/${friends[i].userID}.jpg`
@@ -135,16 +83,17 @@ padding: 5px;
             img.addEventListener('error',()=>{
                 img.src = 'assets/user.jpeg'
             })
-            div.appendChild(img)
+            leftdiv.appendChild(img)
 
             const p = document.createElement('p')
             p.innerHTML = friends[i].nome
-            div.appendChild(p)
+            leftdiv.appendChild(p)
+            div.appendChild(leftdiv)
 
             if(friends[i].FOLLOW=="0" && localStorage.getItem('idUser')!= friends[i].userID ){
                 const btn = document.createElement('button')
                 btn.innerHTML = 'SEGUIR'
-                btn.className = 'btnMessage'
+                btn.className = 'btn btn-primary'
 
                 btn.addEventListener('click',()=>{
                     const params = new Object;

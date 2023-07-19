@@ -4,10 +4,14 @@
     <head>
       <meta charset="UTF-8" />
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--      <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+      <meta name="viewport" 
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
       <title>Backhand</title>
       <link rel="icon" href="assets/ball.png">
       
+    
       <!--leafletjs-->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -74,13 +78,51 @@
         }
         
         .perfil-board{
-          width: 90%;
+          width: 100%;
           height: 300px;
           background-color: rgb(255, 255, 255);
           border-radius: 5px;
         }
 
+        .perfil-img{
+          display: flex;
+          width: 100%;
+          justify-content: center;
+          top: -35px;
+          position: relative;
+        }
 
+        .perfil-img img{
+          width: 70px;
+          height: 70px;
+        }
+
+        .perfil-nome{
+          font-weight: bold;
+          text-align: center;          
+        }
+
+        .perfil-dados{
+          display: flex;
+          justify-content: space-around;
+        }
+
+        .perfil-seguindo, .perfil-seguidores, .perfil-atividades{
+          width: 30%;
+          height: 100px;
+          text-align: center;
+          justify-content: center;
+          display: flex;
+          align-items: center;
+          font-size: 0.8em;
+          word-spacing: 30%;
+          text-indent: unset;
+        }
+
+/* BTN KUDOS E SCRAP */
+        .btn-social{
+          margin: 0 !important;
+        }
 
     </style>      
     </head>
@@ -103,14 +145,11 @@
             <ul class="menu-items">
                 <li class="only-login hide-menu"><a href="#dashboard"><i class="fas fa-home"></i></a></li>
                 <li class="only-login hide-menu"><a onclick="social()"><i class="fas fa-user-friends"></i></a></li>
-                <li class="only-login hide-menu" style="font-size: 1.9em;"><a onclick="addOne()"> <i class="fas fa-plus-circle"></i> </a></li>
+                <li class="only-login hide-menu" style="font-size: 1.8em;"><a onclick="addOne()"> <i class="fas fa-plus-circle"></i> </a></li>
                 <li class="only-login hide-menu"><a class="parent-sub-menu"><img class="imgUser" id="imgUser" src="assets/user.jpeg"></a>
                   <ul class="sub-menu">
                     <li onclick="viewUser()">Meu Perfil</li>
                     <li onclick="openHTML('myCourts.html', 'modal',null,500)">Minhas Quadras</li>
-                    <li><a>Meus Amigos</a></li>
-                    <li><a>Equipamento</a></li>
-                    <li onclick="login()">logout</a></li>
                   </ul>
                 </li>
                 <li><a id="log-inout" onclick="login()">Inscreva-se</a></li> 
@@ -124,13 +163,19 @@
         <section class="perfil hide">
           
           <div class="perfil-board">
+            <div class="perfil-img">
+              <img id="perfil-img" class="imgUser" src="">
+            </div>            
             <div class="perfil-nome"></div>
-            <div class="perfil-seguindo"></div>
-            <div class="perfil-seguidores"></div>
-            <div class="perfil-atividades"></div>
-            <div class="perfil-pic"></div>
-          </div>
 
+            <div class="perfil-dados">
+              <p class="perfil-seguindo"></p>
+              <p class="perfil-seguidores"></p>
+              <p class="perfil-atividades"></p>
+            </div>
+
+
+          </div>
 
         </section>
 
@@ -152,28 +197,43 @@
     <script src="scripts/main.js"></script>
     <script>
 
-    navigator.geolocation.getCurrentPosition((latlng)=>{
-        mainData.data = new Object
-        mainData.data.lat = latlng.coords.latitude
-        mainData.data.lng = latlng.coords.longitude
-    })
+      function openScreen(hide = true){
 
-//      checkLogin()
-    if(localStorage.getItem('idUser') == null){
-      openHTML('noLogin.html','screen')
-      document.querySelector('#footer').style.display = 'none'
-      document.querySelector('.dashboard').style.width = '100%'
-      document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
-      hideMenu(true) 
-    }else{
-      document.querySelector('#log-inout').innerHTML = 'Sair'
-      document.querySelector('#footer').style.display = 'block'
-      document.querySelector('.dashboard').style.width = '70%'
-      openHTML('dashboard.html','screen')
-      fillPerfil(localStorage.getItem('idUser'))
-      loadActivity(100,0,10)
-      hideMenu(false) 
-    }
+        if(hide){
+          document.querySelector('#footer').style.display = 'none'
+          document.querySelector('.perfil').style.display = 'none'
+          document.querySelector('.dashboard').style.width = '100%'
+          document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
+        }else{
+          document.querySelector('#footer').style.display = 'block'
+          document.querySelector('.perfil').style.display = 'block'
+          document.querySelector('.dashboard').style.width = 'calc(100vw - 320px)'
+          document.querySelector('#log-inout').innerHTML = 'Sair'
+        }
+
+        const menu = document.querySelectorAll('.only-login')
+        for(let i=0; i<menu.length; i++){
+            hide ? menu[i].classList.add('hide-menu') : menu[i].classList.remove('hide-menu')
+        }
+
+      }
+
+      navigator.geolocation.getCurrentPosition((latlng)=>{
+          mainData.data = new Object
+          mainData.data.lat = latlng.coords.latitude
+          mainData.data.lng = latlng.coords.longitude
+      })
+
+      if(localStorage.getItem('idUser') == null){
+        openHTML('noLogin.html','screen')
+        openScreen()      
+      }else{
+
+        openHTML('dashboard.html','screen')
+        fillPerfil(localStorage.getItem('idUser'))
+        loadActivity(100,0,10)
+        openScreen(false)
+      }
 
 
       function login(){
@@ -185,7 +245,7 @@
           document.querySelector('.dashboard').style.width = '100%'
           document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
           openHTML('noLogin.html','screen')
-          hideMenu(true) 
+          openScreen()
         }
       }
 
@@ -200,10 +260,6 @@
       function social(){
         openHTML('social.html','modal')
       }
-
-
-
-
 
     </script>
   </html>

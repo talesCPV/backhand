@@ -78,7 +78,7 @@ SELECT * FROM vw_message WHERE id_atividade = 22;
 -- *********************************
 -- DROP VIEW vw_friends;
 CREATE VIEW vw_friends AS    
-SELECT FW.id_host AS userID,US.id, US.nome 
+SELECT FW.id_host AS hostID,(SELECT nome FROM tb_usuario WHERE id=FW.id_host) AS hostname,US.id AS guestID, US.nome AS guestname 
 	FROM tb_following AS FW
 	INNER JOIN tb_usuario AS US
 	ON US.id = FW.id_guest;
@@ -87,7 +87,17 @@ SELECT * FROM vw_friends WHERE nome LIKE "%A%" ;
 
 -- *********************************
 
+-- DROP VIEW vw_perfil;
+CREATE VIEW vw_perfil AS    
+SELECT US.id, US.nome,
+	(SELECT COUNT(*) FROM vw_friends WHERE hostID = US.id ) AS SEGUINDO, 
+    (SELECT COUNT(*) FROM vw_friends WHERE guestID = US.id ) AS SEGUIDORES,
+    (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id) AS ATIVIDADES
+    FROM tb_usuario AS US;
+    
+SELECT * FROM vw_perfil ;
 
+-- *********************************
 
 SELECT * FROM vw_placarAtiv;
 SELECT * FROM vw_dashboard;
@@ -95,6 +105,7 @@ SELECT * FROM vw_placarAtiv;
 SELECT * FROM vw_noSets;
 SELECT * FROM vw_placar;
 SELECT * FROM vw_friends;
+SELECT * FROM vw_perfil;
 
 -- ****************************************
 SELECT * FROM vw_placarAtiv UNION ALL SELECT * FROM vw_noSets ORDER BY id ASC;
@@ -105,11 +116,4 @@ SELECT US.nome, US.lat, US.lng, (SELECT fn_calcDist(-23,-45,US.lat,US.lng)) AS D
 FROM tb_usuario AS US;
 
 SELECT fn_calcDist(-23,-45,-23.5,-45.5);
-
-
-SELECT FD.* 
-FROM tb_usuario AS US 
-INNER JOIN tb_following) AS FW
-ON US.id = FW.id_host
-AND US.id=1;
-
+       

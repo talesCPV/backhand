@@ -115,6 +115,9 @@
   
     .sub-menu{
       position: relative;
+      display: block;
+      border: none;
+      font-size: 1em;
     }
 
     .navbar {
@@ -197,8 +200,8 @@
     }
   
     .navbar .menu-items li {
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
+      margin-bottom: 1em;
+      font-size: 1em;
       font-weight: 500;
     }
 

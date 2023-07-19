@@ -130,12 +130,13 @@
                     document.querySelector('.dashboard').style.width = '70%'                 
                     openHTML('dashboard.html','screen')
                     loadActivity(100,0,10)
-                    hideMenu(false) 
+                    fillPerfil(json[0].id)
+                    openScreen(false)
                 }else{
                     alert('Usuário ou senha inválido!')
                     localStorage.clear();
                     checkLogin()
-                    hideMenu(true) 
+                    openScreen(true)
                 }
 
             })
