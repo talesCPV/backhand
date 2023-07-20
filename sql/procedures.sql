@@ -134,21 +134,35 @@ DELIMITER $$
 		IN Inome varchar(30),
 		IN Iid_sport int(11),
 		IN Iid_evento int(11),
-		IN Iparceiro varchar(30),
 		IN Idia datetime,
 		IN Iduracao DOUBLE,
 		IN Iid_quadra int(11)
     )
-	BEGIN			            
-		INSERT INTO tb_atividades (id,id_usuario,nome,id_sport,id_evento,parceiro,dia,duracao,id_quadra)
-        VALUES (Iid,Iid_usuario,Inome,Iid_sport,Iid_evento,Iparceiro,Idia,Iduracao,Iid_quadra)
+	BEGIN			       
+    
+		DECLARE lastID INT(11);
+    
+		INSERT INTO tb_atividades (id,id_usuario,nome,id_sport,id_evento,dia,duracao,id_quadra)
+        VALUES (Iid,Iid_usuario,Inome,Iid_sport,Iid_evento,Idia,Iduracao,Iid_quadra)
 		ON DUPLICATE KEY 
-        UPDATE nome=Inome, id_sport=Iid_sport, id_evento=Iid_evento, parceiro=Iparceiro, dia=Idia, duracao=Iduracao, id_quadra=Iid_quadra;        
-		SELECT IF("Iid"="DEFAULT",LAST_INSERT_ID(),Iid) AS lastID;        
+        UPDATE nome=Inome, id_sport=Iid_sport, id_evento=Iid_evento, dia=Idia, duracao=Iduracao, id_quadra=Iid_quadra;        
+		
+        SET lastID = (SELECT IF(Iid="DEFAULT",LAST_INSERT_ID(),Iid));
+        
+		INSERT INTO tb_ativ_atleta (id_ativ,id_atleta,ativ_owner,confirm,ask)
+        VALUES (lastID,Iid_usuario,TRUE,TRUE, FALSE)
+		ON DUPLICATE KEY 
+        UPDATE id_ativ=id_ativ;
+        
+        SELECT * FROM tb_atividades WHERE id = lastID;
+        
 	END $$
 DELIMITER ;
 
-CALL sp_insertAtividades("8","1","sql teste","1","1","parceiro teste","2023-07-07 12:00:00","80","2");
+CALL sp_insertAtividades("DEFAULT","1","TESTE ATIVIDADE 1","1","1","2023-07-07 17:25:00","95","1");
+
+SELECT * FROM tb_atividades;
+SELECT * FROM tb_ativ_atleta;
 
 -- DROP PROCEDURE sp_delAtividades;
 DELIMITER $$

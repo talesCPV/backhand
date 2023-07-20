@@ -1,3 +1,4 @@
+
 -- ********************************
 --  DROP VIEW vw_dashboard;
 CREATE VIEW vw_dashboard AS	
@@ -27,7 +28,7 @@ SELECT AQ.*, MQ.id_usuario
 	INNER JOIN tb_minhasquadras AS MQ
 	ON AQ.id = MQ.id_quadra;    
     
-SELECT * FROM vw_minhasQuadras WHERE id_usuario = 2;
+SELECT * FROM vw_minhasQuadras;
 
 -- *********************************
 

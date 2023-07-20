@@ -52,18 +52,30 @@ CREATE TABLE tb_minhasquadras (
 CREATE TABLE tb_atividades (
   id int(11) NOT NULL AUTO_INCREMENT,
   id_usuario int(11) NOT NULL,
-  nome varchar(30) NOT NULL,
+  id_quadra int(11) NOT NULL,
   id_sport int(11) NOT NULL,
   id_evento int(11) NOT NULL,
-  parceiro varchar(30) NOT NULL,
+  nome varchar(30) NOT NULL,
   dia datetime NOT NULL,
   duracao DOUBLE NOT NULL,
-  id_quadra int(11) NOT NULL,
+  ranking BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (id_usuario) REFERENCES tb_usuario(id),
   FOREIGN KEY (id_quadra) REFERENCES tb_quadra(id),
   FOREIGN KEY (id_sport) REFERENCES tb_sport(id),
   FOREIGN KEY (id_evento) REFERENCES tb_evento(id),
   PRIMARY KEY (id)
+)ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+-- DROP TABLE tb_ativ_atleta;
+CREATE TABLE tb_ativ_atleta (
+  id_ativ int(11) NOT NULL,
+  id_atleta int(11) NOT NULL,
+  ativ_owner BOOLEAN DEFAULT FALSE,
+  confirm BOOLEAN DEFAULT FALSE,
+  ask BOOLEAN DEFAULT TRUE,
+  FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),
+  FOREIGN KEY (id_ativ) REFERENCES tb_atividades(id),
+  PRIMARY KEY (id_ativ,id_atleta)
 )ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- DROP TABLE tb_kudos;

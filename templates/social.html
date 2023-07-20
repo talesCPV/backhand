@@ -6,7 +6,7 @@
 
     <div class="tab-bar">
         <div class="tab-item" id="tab-seguindo" onclick="pictab(this)">Seguindo </div>
-        <div class="tab-item" id="tab-quadras"  onclick="pictab(this)">Quadras  </div>
+        <div class="tab-item" id="tab-seguidores"  onclick="pictab(this)">Seguidores  </div>
     </div>
     <div class="tab-screen">        
         <div id="seguindo" class="tab">
@@ -17,14 +17,8 @@
 
 
         </div>
-        <div id="quadras" class="tab">
-
-            <label for="cmbCourts">My Courts</label>
-            <div class="edtbtn">
-                <select id="cmbCourts"></select>
-                <button id="btnMyCourts">+</button>
-            </div>
-
+        <div id="seguidores" class="tab">
+            <div id="iFriend"></div>
         </div>
 
     </div>
@@ -34,32 +28,23 @@
 <script>
     
     pictab(document.querySelector('#tab-seguindo'))
-    viewFriends()
-
-
-    mainData.social.courtParams = new Object;
-    mainData.social.courtParams.idUser = localStorage.getItem('idUser')
-
-    fillCombo('cmbCourts',mainData.social.courtParams,6,['id','nome'])
-
-    document.querySelector('#btnMyCourts').addEventListener('click',()=>{
-        openHTML('myCourts.html', 'modal',null)
-    })
+    viewFriends('hostID','#myFriends','guestname','guestID',true)
+    viewFriends('guestID','#iFriend','hostname','hostID',false)
     
     document.querySelector('#btnMyFriends').addEventListener('click',()=>{
         openHTML('newFriend.html','modal',null)
     })
 
-    function viewFriends(){
+    function viewFriends(field,docDiv,showName,pic,showButton){
         const params = new Object;
-            params.id = localStorage.getItem('idUser')            
+            params[field] = localStorage.getItem('idUser')            
 
         const myPromisse = queryDB(params,25)
 
         myPromisse.then((resolve)=>{
             const friends =  JSON.parse(resolve)
 
-            const div_search = document.querySelector('#myFriends') 
+            const div_search = document.querySelector(docDiv) 
             div_search.innerHTML = ''
             for(let i=0; i<friends.length; i++){      
                 const div = document.createElement('div')
@@ -68,34 +53,36 @@
                 const leftdiv = document.createElement('div')
                 leftdiv.style.display = 'flex'
                 const img = document.createElement('img')
-                img.src = `assets/users/${friends[i].guestID}.jpg`
+                img.src = `assets/users/${friends[i][pic]}.jpg`
+                breakImg(img)
+/*                               
                 img.addEventListener('error',()=>{
                     img.src = 'assets/user.jpeg'
                 })
+*/                
                 img.className = 'imgUser'
                 leftdiv.appendChild(img)
 
                 const p = document.createElement('p')
-                p.innerHTML = friends[i].guestname
+                p.innerHTML = friends[i][showName]
                 leftdiv.appendChild(p)
                 div.appendChild(leftdiv)
+                if(showButton){
+                    const btn = document.createElement('button')
+                    btn.innerHTML = 'CANCELAR'
+                    btn.className = 'btn btn-primary'
 
-                const btn = document.createElement('button')
-                btn.innerHTML = 'CANCELAR'
-                btn.className = 'btn btn-primary'
-
-                btn.addEventListener('click',()=>{
-                    const params = new Object;
-                        params.hash = localStorage.getItem('hash')
-                        params.id_guest = friends[i].id
-                        queryDB(params,23).then((resolve)=>{
-                            console.log(resolve)
-                        })
-                        div.style.display = 'none'     
-                })
-
-                div.appendChild(btn)
-
+                    btn.addEventListener('click',()=>{
+                        const params = new Object;
+                            params.hash = localStorage.getItem('hash')
+                            params.id_guest = friends[i].id
+                            queryDB(params,23).then((resolve)=>{
+                                console.log(resolve)
+                            })
+                            div.style.display = 'none'     
+                    })
+                    div.appendChild(btn)
+                }
 
                 div_search.appendChild(div)
             }

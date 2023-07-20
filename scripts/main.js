@@ -68,7 +68,7 @@ function fillPerfil(usr){
 function breakImg(img){
     img.addEventListener('error',()=>{
         img.src = 'assets/user.jpeg'
-    })    
+    })   
 }
 
 
@@ -91,7 +91,7 @@ function loadActivity(D,S,L){
     const myPromisse = queryDB(params,9);
     myPromisse.then((resolve)=>{
         const json = JSON.parse(resolve)   
-
+console.log(json)
         for(let i=0; i<json.length; i++){      
             const div = document.createElement('div')
             div.className = 'post-activity'
@@ -105,13 +105,13 @@ function loadActivity(D,S,L){
                 </div>
             </div>
             <h2 id="nome">${json[i].nome}</h2>
-            <h4 id="placar">${json[i].nick} ${json[i].SETS_P1} vs ${json[i].SETS_P2} ${json[i].parceiro.split(' ')[0]}</h4>           
+            <h4 id="placar">${json[i].SETS_P1} x ${json[i].SETS_P2}</h4>           
             <div class="panel">
                 <div class="left-panel">
                 
                     <div class="map-view">
-                        <div id="map-${i}" class="map-activity"></div>
-                        <h6 class="map-label">${json[i].QUADRA}</h6>
+                    <div id="map-${i}" class="map-activity"></div>
+                    <h6 class="map-label">${json[i].QUADRA}</h6>
                     </div>
 
 
@@ -123,7 +123,7 @@ function loadActivity(D,S,L){
                     <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Kudos   <i class="fas fa-thumbs-up"></i><span class="badge">${parseInt(json[i].KUDOS)>0 ? json[i].KUDOS : ''}</span></a>
                     <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Scraps <i class="fas fa-comments"></i><span  class="badge">${parseInt(json[i].MESSAGES)>0 ? json[i].MESSAGES : ''}</span></a>
 -->                    
-                    <br>
+                 
                     <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
                         <!-- facebook -->
                         <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
@@ -144,8 +144,6 @@ function loadActivity(D,S,L){
                         <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
                     </div> 
                     
-                    <a id="btnViewMore-${i}">veja mais...</a>
-
                 </div>
             </div>
             <div class="panel-social">
@@ -168,10 +166,6 @@ function loadActivity(D,S,L){
             disableMap(maps[maps.length-1])
             maps[maps.length-1].on('click',()=>{
                 json[i].form = `atv-${i}`                    
-                openHTML('viewTrainning.html','modal',json[i])
-            })
-
-            document.querySelector('#btnViewMore-'+i).addEventListener('click',()=>{
                 openHTML('viewTrainning.html','modal',json[i])
             })
 

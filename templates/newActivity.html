@@ -189,7 +189,6 @@
                 params.nome = nome
                 params.id_sport = sport
                 params.id_evento = tipo
-                params.parceiro = parc
                 params.data = dt
                 params.duracao = temp
                 params.id_quadra = quad
@@ -197,8 +196,9 @@
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)  
+console.log(json)                
                 edit ?  updateData(data) : 0
-                addSets(json[0].lastID)
+                addSets(json[0].id)
                 closeModal()       
             })
         }

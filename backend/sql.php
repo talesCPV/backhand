@@ -14,7 +14,7 @@
             FROM vw_dashboard AS DB
             WHERE (SELECT fn_calcDist(DB.lat,DB.lng,x00,x01))<= x02
             LIMIT x03,x04;',
-        "10" => 'CALL sp_insertAtividades("x00","x01","x02","x03","x04","x05","x06","x07","x08");',
+        "10" => 'CALL sp_insertAtividades("x00","x01","x02","x03","x04","x05","x06","x07");',
         "11" => 'CALL sp_delAtividades("x00");',
         "12" => 'SELECT * FROM tb_sport',
         "13" => 'SELECT * FROM tb_evento',
@@ -29,9 +29,10 @@
         "22" => 'SELECT * from vw_message WHERE id_atividade = x00 ORDER BY id;',
         "23" => 'CALL sp_follow("x00",x01);',
         "24" => 'CALL sp_searchFriends("x00",x01);',
-        "25" => 'SELECT * FROM vw_friends WHERE hostID = x00;',
+        "25" => 'SELECT * FROM vw_friends WHERE y00 = x00;',
         "26" => 'CALL sp_usersByName(x00,"%x01%",0,10);',
         "27" => 'SELECT * FROM vw_perfil WHERE id = x00;',
+
     );
 
 ?>

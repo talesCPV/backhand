@@ -55,7 +55,8 @@ function closeModal(id='all'){
 function newModal(content, max=0){
     const mod_main = document.querySelector('#myModal')
     const index = mod_main.querySelectorAll('.modal-content').length        
-    const offset = 15
+    const offset_x = 0
+    const offset_y = 15
 
     const backModal = document.createElement('div')
         backModal.classList = 'modal'
@@ -70,9 +71,9 @@ function newModal(content, max=0){
         mod_card.style.position = 'absolute'
         mod_card.style.zIndex = 13+index
         mod_card.style.margin = '0 auto'
-        mod_card.style.top =  50 + index*offset+'px'
-        mod_card.style.left =  index*offset+'px'
-        mod_card.style.right =  index*offset+'px'
+        mod_card.style.top =  50 + index*offset_y+'px'
+        mod_card.style.left =  index*offset_x+'px'
+        mod_card.style.right =  index*offset_x+'px'
 //        mod_card.style['max-width'] = max==0 ? '80%' : max
     
     const mod_title = document.createElement('div')
