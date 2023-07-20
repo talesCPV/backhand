@@ -78,7 +78,7 @@
     fillSets() 
 
     document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
-    document.querySelector('#atv-atleta').innerHTML = `${data.nick} ${data.SETS_P1} vs ${data.SETS_P2} ${data.parceiro.split(' ')[0]}`
+    document.querySelector('#atv-atleta').innerHTML = `${data.SETS_P1} x ${data.SETS_P2}`
     document.querySelector('#atv-titulo').innerHTML = data.nome
     document.querySelector('#atv-data').innerHTML = `date: ${data.dia.showDate()}`
     document.querySelector('#atv-hora').innerHTML = `time: ${data.dia.showTime()}`
@@ -112,13 +112,8 @@
                 form.parentNode.removeChild( form )
                 closeModal('')
             })
-
-
-
         }
     })
-
-
 
     function fillSets(){
         const params = new Object;
@@ -135,7 +130,5 @@
             }            
         })
     }
-
-
 
 </script>

@@ -192,14 +192,14 @@
                 params.data = dt
                 params.duracao = temp
                 params.id_quadra = quad
-           
+
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
-                const json = JSON.parse(resolve)  
-console.log(json)                
+                const json = JSON.parse(resolve)
+console.log(json)
                 edit ?  updateData(data) : 0
                 addSets(json[0].id)
-                closeModal()       
+                closeModal()
             })
         }
     })
@@ -215,13 +215,12 @@ console.log(json)
             opt.innerHTML = `SET ${i+1}`
             cmb.appendChild(opt)
         }
-
     }
 
     function addSets(idAtv){
 
         const sets = mainData.newActivity.data.sets
-//        console.log(sets)
+
         for(let i=0; i<sets.length; i++){
             const params = new Object;
                 params.id = i
@@ -229,7 +228,6 @@ console.log(json)
                 params.p1 = sets[i].p1
                 params.p2 = sets[i].p2
                 params.obs = sets[i].obs
-//console.log(params)
             queryDB(params,14)
         }
     }
