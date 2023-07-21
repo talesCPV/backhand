@@ -333,7 +333,7 @@ CALL sp_viewKudos(3,22);
 
 /* USER BY DISTANCE */
 
- DROP PROCEDURE sp_searchFriends;
+-- DROP PROCEDURE sp_searchFriends;
 DELIMITER $$
 	CREATE PROCEDURE sp_searchFriends(
         IN Ihash varchar(77),
@@ -353,7 +353,7 @@ DELIMITER $$
 		FROM tb_usuario AS US
         WHERE (SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,US.lat,US.lng)),0)) < Idistance
         AND US.id != Iid_host
-        ORDER BY DISTANCE,US.nome;
+        ORDER BY FOLLOW,DISTANCE,US.nome;
         
 	END $$
 DELIMITER ;

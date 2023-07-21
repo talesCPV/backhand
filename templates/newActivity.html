@@ -20,7 +20,7 @@
         input[type="date"], input[type="time"]{
             text-align: center;
         }
-
+/*
         .edtbtn{
             display: flex;
         }
@@ -31,6 +31,10 @@
 
         .edtbtn button{
             width: 20%;
+        }
+*/
+        .edtbtn select{
+            max-width: 60%;
         }
 
     </style>
@@ -48,7 +52,8 @@
 
         <label for="edtParceiro">Perceiro</label>
         <div class="edtbtn">
-            <input type="text" id="edtParceiro">
+            <select id="cmbPartner"></select>
+            <button id="btnDelAmigo"><i class="fas fa-eraser"></i></button>
             <button id="btnBuscaAmigo"><i class="fas fa-search"></i></button>
         </div>
 
@@ -91,16 +96,17 @@
 <script>
 
     mainData.newActivity.data.sets = []
+    mainData.newActivity.data.partners = []
     const data = mainData.newActivity.data
     const today =  new Date
-    const edit = Object.keys(data).length > 1
+    const edit = Object.keys(data).length > 2
     let id = 'DEFAULT'
 
     if(edit){
         const dur = Math.floor(parseFloat(data.duracao)/60).toString().padStart(2,'0') +':'+(parseFloat(data.duracao)%60).toString().padStart(2,'0')
         id = data.id
         document.querySelector('#edtDesc').value = data.nome
-        document.querySelector('#edtParceiro').value = data.parceiro
+//        document.querySelector('#edtParceiro').value = data.parceiro
         document.querySelector('#edtData').value = data.dia.substr(0,10)
         document.querySelector('#edtHora').value = data.dia.showTime()
         document.querySelector('#edtTempo').value = dur
@@ -121,7 +127,7 @@
     fillCombo('cmbTipo',courtParams,13,['id','nome'], data != undefined ? data.id_evento : '')
 
     document.querySelector('#btnBuscaAmigo').addEventListener('click',()=>{
-        openHTML('newFriend.html','modal',null)
+        openHTML('newFriend.html','modal',{source:'newActivity'},500)
     })
 
     document.querySelector('#btnAddCourt').addEventListener('click',()=>{
@@ -213,6 +219,19 @@ console.log(json)
             opt.value = i
             sets[i].index = i
             opt.innerHTML = `SET ${i+1}`
+            cmb.appendChild(opt)
+        }
+    }
+
+    mainData.newActivity.func.fillPartners = ()=>{
+        const partners = mainData.newActivity.data.partners
+        const cmb = document.querySelector('#cmbPartner')
+        cmb.innerHTML = ''
+        for(let i=0; i< partners.length; i++){
+            const opt = document.createElement('option')
+            opt.value = i
+            partners[i].index = i
+            opt.innerHTML = partners[i].nome
             cmb.appendChild(opt)
         }
     }

@@ -13,6 +13,11 @@
             padding: 5px;
         }
 
+        .form-viewList .edtbtn{
+            width: 100%;
+        }
+
+
     </style>
 
     <div class="form-viewList">
@@ -68,9 +73,17 @@
     })
 
     function showFriends(friends){
+        const newActivity = mainData.newFriend.data.source == 'newActivity'
         const div_search = document.querySelector('#searchFriends') 
         div_search.innerHTML = ''
         for(let i=0; i<friends.length; i++){      
+            let repeatUser = newActivity ? '1' : '0'
+
+            while(repeatUser == '1'){
+                repeatUser = mainData.newActivity.data.partners.filter(e => e.userID === friends[i].userID).length 
+                repeatUser == '1' ?  i++ : null
+            }
+
             const div = document.createElement('div')
             div.className = 'view-inline'
 
@@ -90,22 +103,42 @@
             leftdiv.appendChild(p)
             div.appendChild(leftdiv)
 
-            if(friends[i].FOLLOW=="0" && localStorage.getItem('idUser')!= friends[i].userID ){
-                const btn = document.createElement('button')
-                btn.innerHTML = 'SEGUIR'
-                btn.className = 'btn btn-primary'
+            if(newActivity){
 
+
+                const btn = document.createElement('button')
+                btn.innerHTML = 'ADICIONAR'
+                btn.className = 'btn btn-primary'
                 btn.addEventListener('click',()=>{
-                    const params = new Object;
-                        params.hash = localStorage.getItem('hash')
-                        params.id_guest = friends[i].userID
-                        queryDB(params,23).then((resolve)=>{
-                            console.log(resolve)
-                        })
-                        btn.style.display = 'none'     
+                    mainData.newActivity.data.partners.push(friends[i])
+                    mainData.newActivity.func.fillPartners()
+                    closeModal(0)
+
                 })
 
                 div.appendChild(btn)
+                    
+
+
+            }else{
+
+                if(friends[i].FOLLOW=="0" && localStorage.getItem('idUser')!= friends[i].userID ){
+                const btn = document.createElement('button')
+                    btn.innerHTML = 'SEGUIR'
+                    btn.className = 'btn btn-primary'
+
+                    btn.addEventListener('click',()=>{
+                        const params = new Object;
+                            params.hash = localStorage.getItem('hash')
+                            params.id_guest = friends[i].userID
+                            queryDB(params,23).then((resolve)=>{
+                                console.log(resolve)
+                            })
+                            btn.style.display = 'none'     
+                    })
+
+                    div.appendChild(btn)
+                }
             }
 
             div_search.appendChild(div)
