@@ -72,16 +72,25 @@
 
     })
 
+    function repeatUser(id){
+
+        const A = mainData.newActivity.data.timeA.filter(e => e.userID === id).length
+        const B = mainData.newActivity.data.timeB.filter(e => e.userID === id).length
+        return  A || B
+
+    }
+
+
     function showFriends(friends){
         const newActivity = mainData.newFriend.data.source == 'newActivity'
         const div_search = document.querySelector('#searchFriends') 
         div_search.innerHTML = ''
         for(let i=0; i<friends.length; i++){      
-            let repeatUser = newActivity ? '1' : '0'
 
-            while(repeatUser == '1'){
-                repeatUser = mainData.newActivity.data.partners.filter(e => e.userID === friends[i].userID).length 
-                repeatUser == '1' ?  i++ : null
+            if(newActivity){
+                while(repeatUser(friends[i].userID)){
+                    i++
+                }
             }
 
             const div = document.createElement('div')
@@ -110,15 +119,13 @@
                 btn.innerHTML = 'ADICIONAR'
                 btn.className = 'btn btn-primary'
                 btn.addEventListener('click',()=>{
-                    mainData.newActivity.data.partners.push(friends[i])
-                    mainData.newActivity.func.fillPartners()
+                    mainData.newActivity.data[mainData.newFriend.data.time].push(friends[i])
+                    mainData.newActivity.func.fillTime(mainData.newFriend.data.time)
                     closeModal(0)
-
                 })
 
                 div.appendChild(btn)
                     
-
 
             }else{
 

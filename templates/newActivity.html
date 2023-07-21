@@ -20,19 +20,7 @@
         input[type="date"], input[type="time"]{
             text-align: center;
         }
-/*
-        .edtbtn{
-            display: flex;
-        }
 
-        .edtbtn input, .edtbtn select{
-            width: 80%;
-        }
-
-        .edtbtn button{
-            width: 20%;
-        }
-*/
         .edtbtn select{
             max-width: 60%;
         }
@@ -50,12 +38,19 @@
         <label for="cmbTipo">Tipo</label>
         <select id="cmbTipo"></select>
 
-        <label for="edtParceiro">Perceiro</label>
+        <label for="cmbTimeA">Time A</label>
         <div class="edtbtn">
-            <select id="cmbPartner"></select>
-            <button id="btnDelAmigo"><i class="fas fa-eraser"></i></button>
-            <button id="btnBuscaAmigo"><i class="fas fa-search"></i></button>
+            <select id="cmb-timeA"></select>
+            <button id="btnDelTimeA"><i class="fas fa-eraser"></i></button>
+            <button id="btnTimeA" ><i class="fas fa-search"></i></button>
         </div>
+        <label for="cmbTimeB">Time B</label>
+        <div class="edtbtn">
+            <select id="cmb-timeB"></select>
+            <button id="btnDelTimeB"><i class="fas fa-eraser"></i></button>
+            <button id="btnTimeB"><i class="fas fa-search"></i></button>
+        </div>
+
 
         <label for="edtData">Data</label>
         <input type="date" id="edtData">
@@ -96,11 +91,28 @@
 <script>
 
     mainData.newActivity.data.sets = []
-    mainData.newActivity.data.partners = []
+    mainData.newActivity.data.timeA = []
+    mainData.newActivity.data.timeB = []
     const data = mainData.newActivity.data
     const today =  new Date
-    const edit = Object.keys(data).length > 2
+    const edit = mainData.newActivity.data.id != undefined
     let id = 'DEFAULT'
+
+    mainData.newActivity.func.fillTime = (time)=>{
+        const partners = mainData.newActivity.data[time]
+        const cmb = document.querySelector('#cmb-'+time)
+        let offset = 0
+        cmb.innerHTML = ''
+        for(let i=0; i< partners.length; i++){
+            const opt = document.createElement('option')
+            opt.value = i+offset
+            partners[i].index = i
+            opt.innerHTML = partners[i].nome
+            opt.data = partners[i]
+            cmb.appendChild(opt)
+        }
+    }
+
 
     if(edit){
         const dur = Math.floor(parseFloat(data.duracao)/60).toString().padStart(2,'0') +':'+(parseFloat(data.duracao)%60).toString().padStart(2,'0')
@@ -117,6 +129,7 @@
     }else{
         document.querySelector('#edtData').value = today.getFormatDate()
         document.querySelector('#edtHora').value = today.getFullTime()
+        mainData.newActivity.data.timeA.push({id:localStorage.getItem('idUser'), nome:localStorage.getItem('nome')})
     }
 
     const courtParams = new Object;
@@ -125,10 +138,28 @@
     fillCombo('cmbQuadra',courtParams,6,['id','nome'], data != undefined ? data.id_quadra : '')
     fillCombo('cmbSport',courtParams,12,['id','nome'], data != undefined ? data.id_sport : '')
     fillCombo('cmbTipo',courtParams,13,['id','nome'], data != undefined ? data.id_evento : '')
+    mainData.newActivity.func.fillTime('timeA')
+    mainData.newActivity.func.fillTime('timeB')
 
-    document.querySelector('#btnBuscaAmigo').addEventListener('click',()=>{
-        openHTML('newFriend.html','modal',{source:'newActivity'},500)
+    document.querySelector('#btnTimeA').addEventListener('click',()=>{
+        buscaAmigo('timeA')
     })
+
+    document.querySelector('#btnTimeB').addEventListener('click',()=>{
+        buscaAmigo('timeB')
+    })
+
+    document.querySelector('#btnDelTimeA').addEventListener('click',()=>{
+        delTime('timeA')
+    })
+
+    document.querySelector('#btnDelTimeB').addEventListener('click',()=>{
+        delTime('timeB')
+    })
+
+    function buscaAmigo(time){
+        openHTML('newFriend.html','modal',{source:'newActivity',time:time},500)
+    }
 
     document.querySelector('#btnAddCourt').addEventListener('click',()=>{
         openHTML('myCourts.html','modal',null,500)
@@ -149,9 +180,24 @@
             set.index = index
             openHTML('addSets.html','modal',{sets : set},500)
         }
-            
     })
     
+    function delTime(time){
+        const size = mainData.newActivity.data[time].length
+        const cmb = document.querySelector('#cmb-'+time)
+        if(size > 0 && ((time=='timeA' && cmb.selectedIndex > 0)|| time=='timeB')){
+            const index = cmb.selectedIndex
+            const nome = cmb[index].text
+
+            if(confirm(`Remover ${nome} do Time ${time.substr(4)}?`)){
+//                console.log(cmb[index].data)
+                mainData.newActivity.data[time].splice(index,1)
+                mainData.newActivity.func.fillTime(time)
+            }
+        }
+
+    }
+
     function refreshData(){
         data.nome = document.querySelector('#edtDesc').value.toUpperCase().trim()
         data.SPORT = document.querySelector('#cmbSport').options[document.querySelector('#cmbSport').selectedIndex].text
@@ -219,19 +265,6 @@ console.log(json)
             opt.value = i
             sets[i].index = i
             opt.innerHTML = `SET ${i+1}`
-            cmb.appendChild(opt)
-        }
-    }
-
-    mainData.newActivity.func.fillPartners = ()=>{
-        const partners = mainData.newActivity.data.partners
-        const cmb = document.querySelector('#cmbPartner')
-        cmb.innerHTML = ''
-        for(let i=0; i< partners.length; i++){
-            const opt = document.createElement('option')
-            opt.value = i
-            partners[i].index = i
-            opt.innerHTML = partners[i].nome
             cmb.appendChild(opt)
         }
     }

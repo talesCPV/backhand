@@ -353,7 +353,7 @@ DELIMITER $$
 		FROM tb_usuario AS US
         WHERE (SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,US.lat,US.lng)),0)) < Idistance
         AND US.id != Iid_host
-        ORDER BY FOLLOW,DISTANCE,US.nome;
+        ORDER BY FOLLOW DESC,DISTANCE,US.nome;
         
 	END $$
 DELIMITER ;
