@@ -188,7 +188,6 @@
             const nome = cmb[index].text
 
             if(confirm(`Remover ${nome} do Time ${time.substr(4)}?`)){
-//                console.log(cmb[index].data)
                 mainData.newActivity.data[time].splice(index,1)
                 mainData.newActivity.func.fillTime(time)
             }
@@ -207,7 +206,6 @@
     }
 
     function updateData(data){
-//        console.log(data)  
         const form = document.getElementById(data.form)
 
         form.querySelector('#atleta').innerHTML = data.ATLETA
@@ -245,7 +243,6 @@
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)
-console.log(json)
                 edit ?  updateData(data) : 0
                 addSets(json[0].id)
                 addPlayers(json[0].id)
@@ -266,6 +263,28 @@ console.log(json)
             cmb.appendChild(opt)
         }
     }
+
+    mainData.newActivity.func.fillPlayers = ()=>{
+        
+        const timeA = mainData.newActivity.data.timeA
+        const timeB = mainData.newActivity.data.timeB
+        const cmbA = document.querySelector('#cmb-timeA')
+        const cmbB = document.querySelector('#cmb-timeB')
+
+        function fillCmb(arr,cmb){
+            cmb.innerHTML = ''
+            for(let i=0; i< arr.length; i++){
+                const opt = document.createElement('option')
+                opt.value = arr[i].userID
+                opt.innerHTML = arr[i].nome
+                opt.data = arr[i]
+                cmb.appendChild(opt)
+            }
+        }
+        fillCmb(timeA,cmbA)
+        fillCmb(timeB,cmbB)
+    }
+
 
     function addSets(idAtv){
 
@@ -318,7 +337,6 @@ console.log(json)
             const myPromisse = queryDB(params,15);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)  
-//                console.log(json)
                 mainData.newActivity.data.sets = []
                 for(let i=0; i<json.length; i++){
                     const set = new Object
@@ -336,25 +354,25 @@ console.log(json)
     function queryPlayers(){
         const params = new Object;
                 params.id_ativ = mainData.newActivity.data.id
-console.log(params)                
             const myPromisse = queryDB(params,14);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)  
-                console.log(json)
                 
                 mainData.newActivity.data.timeA = []
                 mainData.newActivity.data.timeB = []
-/*
-                for(let i=0; i<json.length; i++){
-                    const set = new Object
-                        set.p1 = parseInt(json[i].p1_score)
-                        set.p2 = parseInt(json[i].p2_score)
-                        set.obs = json[i].obs
-                        set.id = json[i].id
-                    mainData.newActivity.data.sets.push(set)
+
+                for(let i=0; i<json.length; i++){                    
+                    const player = json[i]
+                        player.userID = parseInt(json[i].id_atleta)
+
+                        if(json[i].team == "A"){
+                            mainData.newActivity.data.timeA.push(player)
+                        }else{
+                            mainData.newActivity.data.timeB.push(player)
+                        }                    
                 }
-*/
-//                mainData.newActivity.func.fillSets()
+
+                mainData.newActivity.func.fillPlayers()
   
             })
     }

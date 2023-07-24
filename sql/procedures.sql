@@ -230,9 +230,9 @@ DELIMITER $$
 DELIMITER ;
 */
 
- DROP PROCEDURE sp_insertSets;
+-- DROP PROCEDURE sp_sets;
 DELIMITER $$
-	CREATE PROCEDURE sp_insertSets(
+	CREATE PROCEDURE sp_sets(
 		IN Ihash varchar(77),
 		IN IidAtv int(11), 
 		IN Ifields VARCHAR(3000),
@@ -260,7 +260,9 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
+CALL sp_sets('p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M',8,'(id,id_atividade,p1_score,p2_score,obs)','("0","8","2","6",""),("1","8","3","6","")');
 
+SELECT * FROM tb_sets;
 
 -- DROP PROCEDURE sp_delSets;
 DELIMITER $$

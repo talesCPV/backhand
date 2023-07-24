@@ -18,7 +18,7 @@
         "11" => 'CALL sp_delAtividades("x00");',
         "12" => 'SELECT * FROM tb_sport',
         "13" => 'SELECT * FROM tb_evento',
-        "14" => 'SELECT * FROM tb_ativ_atleta WHERE id_ativ="x00" ORDER BY team ASC;',
+        "14" => 'SELECT * FROM vw_atv_atleta WHERE id_ativ="x00";',
         "15" => 'SELECT * FROM tb_sets WHERE id_atividade="x00" ORDER BY id ASC;',
         "16" => 'DELETE FROM tb_sets WHERE AND id_atividade="x01"',
         "17" => 'CALL sp_delSets("x00","x01");',
