@@ -82,9 +82,6 @@
 
         <button id="btnAdd" class="btn btn-primary">Add Activity</button>
 
-
-
-
     </div>
 
 </template>
@@ -125,11 +122,12 @@
         document.querySelector('.title-newActivity').innerHTML = 'Edit Activity'
         document.querySelector('#btnAdd').innerHTML = "SAVE"
         querySets()
+        queryPlayers()
 
     }else{
         document.querySelector('#edtData').value = today.getFormatDate()
         document.querySelector('#edtHora').value = today.getFullTime()
-        mainData.newActivity.data.timeA.push({id:localStorage.getItem('idUser'), nome:localStorage.getItem('nome')})
+        mainData.newActivity.data.timeA.push({userID:localStorage.getItem('idUser'), nome:localStorage.getItem('nome')})
     }
 
     const courtParams = new Object;
@@ -202,7 +200,7 @@
         data.nome = document.querySelector('#edtDesc').value.toUpperCase().trim()
         data.SPORT = document.querySelector('#cmbSport').options[document.querySelector('#cmbSport').selectedIndex].text
         data.EVENTO = document.querySelector('#cmbTipo').options[document.querySelector('#cmbTipo').selectedIndex].text
-        data.parceiro = document.querySelector('#edtParceiro').value.toUpperCase().trim()
+//        data.parceiro = document.querySelector('#edtParceiro').value.toUpperCase().trim()
         data.dia = document.querySelector('#edtData').value+' '+document.querySelector('#edtHora').value+':00'
         data.duracao = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
         data.QUADRA = document.querySelector('#cmbQuadra').options[document.querySelector('#cmbQuadra').selectedIndex].text
@@ -224,11 +222,10 @@
     }
 
     document.querySelector('#btnAdd').addEventListener('click',()=>{
-        refreshData()
+//        refreshData()
    
-        if(goon('edtDesc,edtParceiro,edtData,edtHora,edtTempo')){
+        if(goon('edtDesc,edtData,edtHora,edtTempo')){
             const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
-            const parc = document.querySelector('#edtParceiro').value.trim().toUpperCase()
             const dt = document.querySelector('#edtData').value.trim()+" "+document.querySelector('#edtHora').value.trim()+':00'            
             const temp = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
             const sport = document.querySelector('#cmbSport').value.trim()
@@ -251,6 +248,7 @@
 console.log(json)
                 edit ?  updateData(data) : 0
                 addSets(json[0].id)
+                addPlayers(json[0].id)
                 closeModal()
             })
         }
@@ -272,16 +270,45 @@ console.log(json)
     function addSets(idAtv){
 
         const sets = mainData.newActivity.data.sets
+        const setsize = mainData.newActivity.data.timeA.length
+        const params = []
 
-        for(let i=0; i<sets.length; i++){
-            const params = new Object;
-                params.id = i
-                params.id_atividade = idAtv
-                params.p1 = sets[i].p1
-                params.p2 = sets[i].p2
-                params.obs = sets[i].obs
-            queryDB(params,14)
+        for(let i=0; i<sets.length; i++){         
+            const pr = new Object;
+                pr.id = i
+                pr.id_atividade = idAtv
+                pr.p1_score = sets[i].p1
+                pr.p2_score = sets[i].p2
+                pr.obs = sets[i].obs
+            params.push(pr)
         }
+
+        queryJson(params,2,idAtv).then((txt)=>{
+            console.log(txt)
+        })
+
+    }
+
+    function addPlayers(idAtv){
+
+        const players = mainData.newActivity.data.timeA.concat(mainData.newActivity.data.timeB)
+        const teamAsize = mainData.newActivity.data.timeA.length
+        const params = []
+
+        for(let i=0; i<players.length; i++){
+         
+            const pr = new Object;
+                pr.id_ativ = idAtv
+                pr.id_atleta = players[i].userID
+                pr.team = i<teamAsize ? 'A':'B'
+                pr.ativ_owner = i==0?1:0
+            params.push(pr)
+        }
+
+        queryJson(params,1,idAtv).then((txt)=>{
+            console.log(txt)
+        })
+
     }
 
     function querySets(){
@@ -305,6 +332,33 @@ console.log(json)
              
             })
     }
+
+    function queryPlayers(){
+        const params = new Object;
+                params.id_ativ = mainData.newActivity.data.id
+console.log(params)                
+            const myPromisse = queryDB(params,14);
+            myPromisse.then((resolve)=>{
+                const json = JSON.parse(resolve)  
+                console.log(json)
+                
+                mainData.newActivity.data.timeA = []
+                mainData.newActivity.data.timeB = []
+/*
+                for(let i=0; i<json.length; i++){
+                    const set = new Object
+                        set.p1 = parseInt(json[i].p1_score)
+                        set.p2 = parseInt(json[i].p2_score)
+                        set.obs = json[i].obs
+                        set.id = json[i].id
+                    mainData.newActivity.data.sets.push(set)
+                }
+*/
+//                mainData.newActivity.func.fillSets()
+  
+            })
+    }
+
 
 
 

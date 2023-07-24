@@ -71,6 +71,7 @@ CREATE TABLE tb_ativ_atleta (
   id_ativ int(11) NOT NULL,
   id_atleta int(11) NOT NULL,
   ativ_owner BOOLEAN DEFAULT FALSE,
+  team varchar(1) DEFAULT "A",
   confirm BOOLEAN DEFAULT FALSE,
   ask BOOLEAN DEFAULT TRUE,
   FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),

@@ -1,4 +1,3 @@
-
 -- ********************************
 --  DROP VIEW vw_dashboard;
 CREATE VIEW vw_dashboard AS	
@@ -84,7 +83,7 @@ SELECT FW.id_host AS hostID,(SELECT nome FROM tb_usuario WHERE id=FW.id_host) AS
 	INNER JOIN tb_usuario AS US
 	ON US.id = FW.id_guest;
     
-SELECT * FROM vw_friends WHERE nome LIKE "%A%" ;
+SELECT * FROM vw_friends;
 
 -- *********************************
 

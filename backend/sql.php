@@ -18,7 +18,7 @@
         "11" => 'CALL sp_delAtividades("x00");',
         "12" => 'SELECT * FROM tb_sport',
         "13" => 'SELECT * FROM tb_evento',
-        "14" => 'CALL sp_insertSets("x00","x01","x02","x03","x04");',
+        "14" => 'SELECT * FROM tb_ativ_atleta WHERE id_ativ="x00" ORDER BY team ASC;',
         "15" => 'SELECT * FROM tb_sets WHERE id_atividade="x00" ORDER BY id ASC;',
         "16" => 'DELETE FROM tb_sets WHERE AND id_atividade="x01"',
         "17" => 'CALL sp_delSets("x00","x01");',
@@ -34,5 +34,14 @@
         "27" => 'SELECT * FROM vw_perfil WHERE id = x00;',
 
     );
+
+    $query_json = array(
+        
+        "1" => "CALL sp_AtvAtl('@OWNER',@CLAUSE,'(@FIELDS)','(@VALUES)');",
+        "2" => "CALL sp_sets('@OWNER',@CLAUSE,'(@FIELDS)','(@VALUES)');",
+
+
+    );
+
 
 ?>

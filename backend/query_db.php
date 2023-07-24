@@ -13,7 +13,7 @@
 
 //echo $_POST["cod"];
         
-        $query = $query_db[$_POST["cod"]];
+        $query = $query_db[$cod];
         $i = 0;
         foreach($params as $key => $val ){
             $y = 'y'.str_pad(strval($i), 2, "0", STR_PAD_LEFT);
