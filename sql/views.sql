@@ -19,6 +19,37 @@ CREATE VIEW vw_dashboard AS
 
 SELECT * FROM vw_dashboard LIMIT 0,10;
     
+
+
+    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA,US.nick AS nick, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2,
+    (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
+    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES,
+    GROUP_CONCAT(US.nome SEPARATOR ', ') AS ATLETAS
+            FROM tb_atividades AS ATV 
+            INNER JOIN tb_sport AS SP
+            INNER JOIN tb_evento AS EV
+            INNER JOIN tb_usuario AS US
+            INNER JOIN tb_quadra AS QD
+            INNER JOIN vw_placar AS PC    
+            INNER JOIN tb_ativ_atleta AS ATL
+            ON SP.id = ATV.id_sport
+            AND PC.id = ATV.id          
+            AND EV.id = ATV.id_evento
+            AND US.id = ATV.id_usuario
+            AND QD.id = ATV.id_quadra  
+            AND US.id = ATL.id_atleta
+            ORDER BY ATV.dia DESC;
+
+
+    
+    
+    SELECT ATL.id_ativ, 
+		GROUP_CONCAT(US.nome SEPARATOR ', ') AS ATLETAS
+		FROM tb_ativ_atleta AS ATL
+        INNER JOIN tb_usuario AS US
+        ON US.id = ATL.id_atleta
+		GROUP BY ATL.id_ativ;
+    
 -- ********************************
 
 CREATE VIEW vw_minhasQuadras AS    
@@ -96,6 +127,18 @@ SELECT US.id, US.nome,
     FROM tb_usuario AS US;
     
 SELECT * FROM vw_perfil ;
+
+-- *********************************
+
+-- DROP VIEW vw_atv_atleta;
+CREATE VIEW vw_atv_atleta AS    
+	SELECT AA.*, US.nome 
+		FROM tb_ativ_atleta AS AA
+		INNER JOIN tb_usuario AS US
+		ON US.id = AA.id_atleta 
+		ORDER BY AA.team ASC;
+        
+SELECT * FROM vw_atv_atleta;        
 
 -- *********************************
 
