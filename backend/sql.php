@@ -32,7 +32,8 @@
         "25" => 'SELECT * FROM vw_friends WHERE y00 = x00;',
         "26" => 'CALL sp_usersByName(x00,"%x01%",0,10);',
         "27" => 'SELECT * FROM vw_perfil WHERE id = x00;',
-
+        "28" => 'SELECT * FROM vw_dashboard WHERE id=x00',
+        "29" => 'SELECT * FROM vw_dashboard WHERE id_usuario=x00 AND dia>(NOW() - INTERVAL 28 DAY);',
     );
 
     $query_json = array(

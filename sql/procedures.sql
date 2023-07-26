@@ -163,41 +163,25 @@ CALL sp_insertAtividades("DEFAULT","1","TESTE ATIVIDADE 1","1","1","2023-07-07 1
 
 SELECT * FROM tb_atividades;
 
- DROP PROCEDURE sp_AtvAtl;
+-- DROP PROCEDURE sp_AtvAtl;
 DELIMITER $$
 	CREATE PROCEDURE sp_AtvAtl(
-		IN Ihash varchar(77),
 		IN IidAtv int(11), 
-		IN Ifields VARCHAR(3000),
-		IN Ivalues VARCHAR(3000)
+		IN IidAtl JSON, 
+		IN IteamA int(11)
     )
-	BEGIN    
-    
-		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
-		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = IidAtv COLLATE utf8_general_ci);
-        	
-		IF (@call_owner = @atv_owner) THEN
-        
-			DELETE FROM tb_ativ_atleta WHERE id_ativ=IidAtv;
-			
-			SET @query = CONCAT('INSERT INTO tb_ativ_atleta ', Ifields, ' VALUES ', Ivalues);
-
-			PREPARE stmt1 FROM @query;
-			EXECUTE stmt1;
-			DEALLOCATE PREPARE stmt1;
-        
-		END IF; 
-    
-        
-        SELECT * FROM tb_ativ_atleta WHERE id_ativ=IidAtv;
-        
+	BEGIN			   		
+		IF ((SELECT COUNT(*) FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND id_atleta=IidAtl)>0) THEN
+			DELETE FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND id_atleta=IidAtl;
+		ELSE
+			INSERT INTO tb_ativ_atleta (id_ativ,id_atleta,team,ativ_owner)
+			VALUES (IidAtv,IidAtl,Iteam,Iowner); 
+		END IF;
+									 
 	END $$
 DELIMITER ;
 
--- CALL sp_AtvAtl(5,'(id_ativ,id_atleta,team,ativ_owner)','("5","2","A","1"),("5","5","A","0"),("5","1","B","0"),("5","4","B","0")');
-CALL sp_AtvAtl('p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M',3,'(id_ativ,id_atleta,team,ativ_owner)','("3","2","A","1"),("3","5","B","0")');
-
-
+CALL sp_AtvAtl(1,1,"A",TRUE);
 SELECT * FROM tb_ativ_atleta;
 
 -- DROP PROCEDURE sp_delAtividades;
@@ -210,8 +194,18 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
+-- DROP PROCEDURE sp_clearAtvAtl;
+DELIMITER $$
+	CREATE PROCEDURE sp_clearAtvAtl(
+		IN IidAtv int(11)
+    )
+	BEGIN			   		
+		DELETE FROM tb_ativ_atleta WHERE id_ativ=IidAtv;									 
+	END $$
+DELIMITER ;
+
 /* SETS */
-/**
+
 -- DROP PROCEDURE sp_insertSets;
 DELIMITER $$
 	CREATE PROCEDURE sp_insertSets(
@@ -228,41 +222,6 @@ DELIMITER $$
         UPDATE p1_score=Ip1_score, p2_score=Ip2_score, obs=Iobs;
 	END $$
 DELIMITER ;
-*/
-
--- DROP PROCEDURE sp_sets;
-DELIMITER $$
-	CREATE PROCEDURE sp_sets(
-		IN Ihash varchar(77),
-		IN IidAtv int(11), 
-		IN Ifields VARCHAR(3000),
-		IN Ivalues VARCHAR(3000)
-    )
-	BEGIN    
-            
-		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
-		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = IidAtv COLLATE utf8_general_ci);
-        	
-		IF (@call_owner = @atv_owner) THEN
-        
-			DELETE FROM tb_sets WHERE id_atividade=IidAtv;
-			
-			SET @query = CONCAT('INSERT INTO tb_sets ', Ifields, ' VALUES ', Ivalues);
-
-			PREPARE stmt1 FROM @query;
-			EXECUTE stmt1;
-			DEALLOCATE PREPARE stmt1;
-			
-		END IF; 
-
-        SELECT * FROM tb_sets WHERE id_atividade=IidAtv;
-        
-	END $$
-DELIMITER ;
-
-CALL sp_sets('p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M',8,'(id,id_atividade,p1_score,p2_score,obs)','("0","8","2","6",""),("1","8","3","6","")');
-
-SELECT * FROM tb_sets;
 
 -- DROP PROCEDURE sp_delSets;
 DELIMITER $$
@@ -462,14 +421,11 @@ DELIMITER $$
 
 		DECLARE counter INT DEFAULT 0;
 		DECLARE Ifield VARCHAR(50);
-		DECLARE Iout VARCHAR(255);
-
+		DECLARE Iout VARCHAR(255) DEFAULT "";
 
 		REPEAT
 			SET Ifield =  (SELECT SUBSTRING_INDEX(Idata,',', counter));
-
 			SET Iout =  (SELECT CONCAT(Iout, Ifield));
-
 			SET counter = counter + 1;
 		UNTIL counter >= Isize			
         END REPEAT;

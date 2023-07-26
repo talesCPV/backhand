@@ -1,5 +1,5 @@
 /* GLOBAL DATA */ 
-
+    const today = new Date
     var mainData = new Object
     const maps = []
 
@@ -33,9 +33,6 @@ function showUserPic(){
         const imgExist = JSON.parse(resp)
         document.querySelector('#imgUser').src = imgExist ? `assets/users/${localStorage.getItem('idUser')}.jpg` : 'assets/user.jpeg'
     })
-
-
-
 }
 
 function fillPerfil(usr){
@@ -59,10 +56,7 @@ function fillPerfil(usr){
         document.querySelector('.perfil-seguidores').innerText = 'Seguidores '+json[0].SEGUIDORES.padStart(2,0)
         document.querySelector('.perfil-atividades').innerText = 'Atividades '+json[0].ATIVIDADES.padStart(2,0)
         document.querySelector('.perfil-nome').innerText = json[0].nome
-
     })
-
-
 }
 
 function breakImg(img){
@@ -71,10 +65,141 @@ function breakImg(img){
     })   
 }
 
+function loadHash(){
+    const hash = window.location.hash
+    if(hash.length > 0){
+        const OP = hash.substring(1,2)
+        const address = hash.substring(2,99)
+    
+        switch (OP){
+            case 'P':                 
+                openHTML('perfil.html','modal',{address:address})
+            break
+            case 'G':
+                openHTML('viewTrainning.html','modal',{address:address})
+            break
+        }
+    }
+}
+
+function removeHash() { 
+    history.pushState("", document.title, window.location.pathname + window.location.search);
+}
+
+function makeActivity(ATV,i){
+
+    function makeElement(kind,html='',cn='',id='',src='',target=''){
+        const el = document.createElement(kind)
+        id.trim()!=''?el.id=id:0
+        cn.trim()!=''?el.className=cn:0
+        html.trim()!=''?el.innerHTML=html:0
+        target.trim()!=''?el.target=target:0
+
+        if(src.trim()!=''){
+            el.src=src
+            breakImg(el)
+        }
+
+        return el
+    }
+
+  
+        let timeA = ''
+        let timeB = ''
+        const players = ATV.ATLETAS.split(',')
+        const times = ATV.LADO.split(',')
+        for(let j=0; j<players.length; j++){
+            times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
+        }
+        timeA = timeA.substring(0,timeA.length-1)
+        timeB = timeB.substring(0,timeB.length-1)
+
+        const mainDiv = makeElement('div','','post-activity',`atv-${i}`)
+        const head = makeElement('div','','head-activity')
+        const img = makeElement('img','','imgUser head-activity-img','',`assets/users/${ATV.id_usuario}.jpg`)    
+        img.addEventListener('click',()=>{
+            window.location.hash = 'P'+ATV.id_usuario.padStart(10,0)
+            loadHash()
+        })
+        head.appendChild(img)
+
+        const div1 = makeElement('div')                        
+        const headAtl = makeElement('p',ATV.NOME_ATLETA,'head-activity-atleta')        
+        div1.appendChild(headAtl)
+
+        const headDat = makeElement('p',`${ATV.dia.showDate()} as ${ATV.dia.showTime()}`,'head-activity-data')        
+        div1.appendChild(headDat)
+        head.appendChild(div1)
+        mainDiv.appendChild(head)
+
+        const h2Nome = makeElement('h2',ATV.nome,'','nome')
+        mainDiv.appendChild(h2Nome)
+        const h4Placar = makeElement('h4',`${timeA}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB}`,'','placar')
+        mainDiv.appendChild(h4Placar)
+
+        const panel = makeElement('div','','panel')
+        const leftPanel = makeElement('div','','left-panel')
+        const map = makeElement('div','','map-view')
+        leftPanel.appendChild(map)
+        const mapAct = makeElement('div','','map-activity',`map-${i}`)
+        leftPanel.appendChild(mapAct)
+        const h6Map = makeElement('h6',ATV.QUADRA,'map-label')
+        leftPanel.appendChild(h6Map)
+        panel.appendChild(leftPanel)
+
+        const rigthPanel = makeElement('div','','right-panel')
+        const pSport = makeElement('p',`${ATV.SPORT} (${ATV.EVENTO})`,'','sport')
+        rigthPanel.appendChild(pSport)
+        const div2 = makeElement('div','',`only-login social-icon ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}`)
+        const facebook = makeElement('a','<i class="fab fa-facebook">','facebook','','','blank')
+        div2.appendChild(facebook)
+        const twitter = makeElement('a','<i class="fab fa-twitter"></i>','twitter','','','blank')
+        div2.appendChild(twitter)
+        const linkedin = makeElement('a','<i class="fab fa-linkedin"></i>','linkedin','','','blank')
+        div2.appendChild(linkedin)
+        const reddit = makeElement('a','<i class="fab fa-reddit"></i>','reddit','','','blank')
+        div2.appendChild(reddit)
+        const whatsapp = makeElement('a','<i class="fab fa-whatsapp"></i>','whatsapp','','','blank')
+        div2.appendChild(whatsapp)
+        const telegram = makeElement('a','<i class="fab fa-telegram"></i>','telegram','','','blank')
+        div2.appendChild(telegram)
+        rigthPanel.appendChild(div2)
+        panel.appendChild(rigthPanel)
+        mainDiv.appendChild(panel)
+
+//        mainDiv.appendChild(rigthPanel)
+
+        const socialPanel = makeElement('div','','panel-social')
+        const numKudos = makeElement('div',`${ATV.KUDOS.padStart(2,0)} kudos`,'social-kudos')
+        socialPanel.appendChild(numKudos)
+        const div3 = makeElement('div')
+        const btnKudos = makeElement('button','<i class="fas fa-thumbs-up"></i>','btn-backhand btn-social')
+        btnKudos.addEventListener('click',()=>{
+            if(localStorage.getItem('idUser') != null){             
+                const params = new Object;
+                    params.hash =  localStorage.getItem('hash')
+                    params.id_atividade = ATV.id
+                const myPromisse = queryDB(params,18)
+                myPromisse.then((resolve)=>{                       
+                    numKudos.innerHTML = JSON.parse(resolve)[0].KUDOS.padStart(2,0)+ ' kudos'                                     
+                })
+            }
+        })
+        div3.appendChild(btnKudos)
+        const btnScrap = makeElement('button','<i class="fas fa-comments"></i>','btn-backhand btn-social')
+        btnScrap.addEventListener('click',()=>{
+            openHTML('message.html','modal',ATV)
+        })
+        div3.appendChild(btnScrap)
+        socialPanel.appendChild(div3)
+        mainDiv.appendChild(socialPanel)
+        mainDiv.database = ATV
+
+        return(mainDiv)    
+}
 
 function loadActivity(D,S,L){
 
-    
     mainData.coords = new Object
     mainData.coords.lat = localStorage.getItem('lat')
     mainData.coords.lng = localStorage.getItem('lng')
@@ -91,21 +216,33 @@ function loadActivity(D,S,L){
     const myPromisse = queryDB(params,9);
     myPromisse.then((resolve)=>{
         const json = JSON.parse(resolve)   
-console.log(json)
-        for(let i=0; i<json.length; i++){      
+
+        for(let i=0; i<json.length; i++){
+
+/*
+            let timeA = ''
+            let timeB = ''
+            const players = json[i].ATLETAS.split(',')
+            const times = json[i].LADO.split(',')
+            for(let j=0; j<players.length; j++){
+                times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
+            }
+            timeA = timeA.substring(0,timeA.length-1)
+            timeB = timeB.substring(0,timeB.length-1)
             const div = document.createElement('div')
             div.className = 'post-activity'
             div.id = `atv-${i}`
+
             div.innerHTML = `
             <div class="head-activity">
-                <img class="imgUser head-activity-img" src="${`assets/users/${json[i].id_usuario}.jpg`}">
+                <a id="viewUser"><img class="imgUser head-activity-img" src="${`assets/users/${json[i].id_usuario}.jpg`}"></a>
                 <div>
-                    <p class="head-activity-atleta">${json[i].ATLETA}</p>
+                    <p class="head-activity-atleta">${json[i].NOME_ATLETA}</p>
                     <p class="head-activity-data">${json[i].dia.showDate()} as ${json[i].dia.showTime()}</p>
                 </div>
             </div>
             <h2 id="nome">${json[i].nome}</h2>
-            <h4 id="placar">${json[i].SETS_P1} x ${json[i].SETS_P2}</h4>           
+            <h4 id="placar">${timeA}  ${json[i].SETS_P1} x ${json[i].SETS_P2}  ${timeB}</h4>           
             <div class="panel">
                 <div class="left-panel">
                 
@@ -157,7 +294,14 @@ console.log(json)
             `
 
             div.database = json[i]
-            screen.appendChild(div)
+            div.querySelector('#viewUser').addEventListener('click',()=>{
+                window.location.hash = 'P'+json[i].id_usuario.padStart(10,0)
+                loadHash()
+            })
+*/
+//          screen.appendChild(div)
+            
+            screen.appendChild(makeActivity(json[i],i))
             maps.push(createMap('map-'+i,[json[i].lat, json[i].lng],30))
 
             pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
@@ -169,6 +313,7 @@ console.log(json)
                 openHTML('viewTrainning.html','modal',json[i])
             })
 
+/*            
             document.querySelector('#btnKudos-'+i).addEventListener('click',()=>{
 
                 if(localStorage.getItem('idUser') != null){             
@@ -188,7 +333,7 @@ console.log(json)
             document.querySelector('#btnComment-'+i).addEventListener('click',()=>{
                 openHTML('message.html','modal',json[i])
             })
-/*
+
             const link = encodeURI(window.location.href);
             const msg = encodeURIComponent('Hey, I found this article');
             const title = encodeURIComponent('Article or Post Title Here');

@@ -1,108 +1,193 @@
 <title>
-    Login de Usuário
+    
 </title>
 <template>
     <style>
 
-        .form{
+        .form-perfil{
+            padding: 20px ;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .top{
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: space-around;
+        }
+
+        .middle{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .box{
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding-top: 50px;
         }
 
-        #btnLogin, input[type="email"], input[type="password"]{
-            width: 250px;
-            height: 30px;
+        .box p{
+            padding: 0;
+            text-indent: 0;
         }
 
-        #local{
-            display: none;
+        #pic-perfil{
+            width: 100px;
+            height: 100px;
+        }
+
+        #last-4{
+            font-size: 3em;
+            font-weight: 600;
+        }
+
+        .calendar{
+            display: flex;
+            flex-direction: column;
+        }
+
+        .week{
+            display: flex;
+            flex-direction: row;
+        }
+
+        .day{
+            display: flex;
+            gap: 2px;
+            
+            width: 25px;
+            height: 25px;
+            justify-content: center;
+        }
+
+        .day:hover{
+            border-radius: 50%;
+            background-color: aquamarine;
+            cursor: pointer;
+        }
+
+        .day-trainning{
+            background-color: burlywood;
+            border-radius: 50%;
         }
 
     </style>
 
-    <div id="local"></div>
+    <div class="form-perfil">
 
-    <div class="form">
+        <div class="top">
+            <img id="pic-perfil" class="imgUser" src="assets/user.jpeg" alt="">
+            <div class="box">
+                <p>Seguindo</p>
+                <p id="seguindo"></p>
+            </div>
+            <div class="box">
+                <p>Seguidores</p>
+                <p id="seguidores"></p>
+            </div>
+            <div class="box">
+                <p>Atividades</p>
+                <p id="atividades"></p>
+            </div>
+        </div>
+
+        <div class="middle">
+            <div class="box">
+                <p>Últimas 4 semanas</p>
+                <p id="last-4"></p>
+            </div>
+            <div class="myDate"></div>
+        </div>
 
 
-        <input type="email" id="edtEmail" placeholder="* Email">
-        <input type="password" id="edtSenha" placeholder="* Senha">
-        <button id="btnLogin" class="btn btn-primary" >login</button>
-
-
-        <p>New User? <a onclick="javascript:openHTML('novoUser.html','modal',coords)" style="color: blue;">Sign up</a></p>
 
     </div>
+
 
 </template>
 <script>
 
-    mainData.login.coords = new Object
+    const perfil = mainData.perfil.data.address
+
+    document.querySelector('.myDate').appendChild(calendar())
+
+    function getPerfil(){
+        const params = new Object;
+        params.id =  parseInt(perfil)
+
+        const myPromisse = queryDB(params,27);
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+            const treinos = json[0].TREINOS.split(',')
+            const treinos_id = json[0].TREINO_ID.split(',')
+console.log(json)
+//console.log(treinos)
+//console.log(treinos_id)
+            for(let i=0; i<treinos.length; i++){
+                console.log(treinos[i])
+                document.getElementById(treinos[i].trim()).classList.add('day-trainning')
+            }
 
 
-    function novoUsuario(){        
-        openHTML('novoUser.html')
-    }
+            const pic = document.querySelector('#pic-perfil')
 
-    navigator.geolocation.getCurrentPosition((latlng)=>{
-        mainData.login.coords.lat = latlng.coords.latitude
-        mainData.login.coords.lng = latlng.coords.longitude
-    })
+            document.querySelector('.title-perfil').innerHTML = json[0].nome
+            document.querySelector('#seguindo').innerHTML = json[0].SEGUINDO
+            document.querySelector('#seguidores').innerHTML = json[0].SEGUIDORES
+            document.querySelector('#atividades').innerHTML = json[0].ATIVIDADES
+            document.querySelector('#last-4').innerHTML = json[0].LAST_28
+            
+            pic.src = `assets/users/${json[0].id}.jpg`
+            breakImg(pic)
 
-    document.querySelector('#btnLogin').addEventListener('click',()=>{
+            console.log(params)
+            queryDB(params,29).then((res_ATV)=>{
+                const jsonATV = JSON.parse(res_ATV)
 
-        function localizaUser(data){
-            const params = new Object;
-                params.id =  data.id
-                params.email =  data.email
-                params.hash = data.hash
-                params.nome = data.nome
-                params.nick = data.nick
-                params.cel = data.cel
-                params.class = data.class
-                params.lat = mainData.login.coords.lat
-                params.lng = mainData.login.coords.lng
-            queryDB(params,1)
-        }
+                console.log(jsonATV)
 
-        if(goon('edtEmail,edtSenha')){
-            const params = new Object;
-                params.email =  document.querySelector('#edtEmail').value.trim()
-                params.hash = (params.email+document.querySelector('#edtSenha').value.trim()).getHash(77)
-
-            const myPromisse = queryDB(params,0)
-
-            myPromisse.then((resolve)=>{
-                const json = JSON.parse(resolve)                
-                if(json.length > 0){
-           
-                    localStorage.setItem('idUser',json[0].id)
-                    localStorage.setItem('email',json[0].email)
-                    localStorage.setItem('hash',json[0].hash)
-                    localStorage.setItem('nome',json[0].nome)
-                    localStorage.setItem('nick',json[0].nick)
-                    localStorage.setItem('cel',json[0].cel)
-                    localStorage.setItem('class',json[0].class)   
-                    localStorage.setItem('lat',mainData.login.coords.lat)   
-                    localStorage.setItem('lng',mainData.login.coords.lng)   
-                    localizaUser(json[0])
-                    checkLogin()
-                    closeModal()
-                    
-                }else{
-                    alert('Usuário ou senha inválido!')
-                    localStorage.clear();
-                    checkLogin()
-
-                }
 
             })
+
+
+        })
+    }
+
+    function calendar(){
+        const dw = ['D','S','T','Q','Q','S','S']
+        const cal = document.createElement('div')
+        cal.className = 'calendar'
+        
+        const td = new Date
+        while(td.getDay()>0){
+            td.change(-1)
+        }                
+        td.change(-21)
+
+        for(let w=0; w<5; w++){
+            const week = document.createElement('div')
+            week.className = 'week'
+            for(let d=0; d<7; d++){
+                const day = document.createElement('div')
+                day.className = 'day'
+                day.id = td.getFormatDate()
+                day.innerHTML = w==0?dw[d]:td.getDate()
+                w>0?td.change(1):0
+                week.appendChild(day)
+            }
+            cal.appendChild(week)
         }
+        return cal
+    }
 
-    })
 
 
+    getPerfil()
+    removeHash()
+
+  
 </script>

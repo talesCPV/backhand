@@ -1,54 +1,38 @@
 -- ********************************
 --  DROP VIEW vw_dashboard;
 CREATE VIEW vw_dashboard AS	
-    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA,US.nick AS nick, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2,
+    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS NOME_ATLETA,US.nick AS nick, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2,ATL.ATLETAS,ATL.LADO,
     (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
-    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES
-            FROM tb_atividades AS ATV 
-            INNER JOIN tb_sport AS SP
-            INNER JOIN tb_evento AS EV
-            INNER JOIN tb_usuario AS US
-            INNER JOIN tb_quadra AS QD
-            INNER JOIN vw_placar AS PC            
-            ON SP.id = ATV.id_sport
-            AND PC.id = ATV.id          
-            AND EV.id = ATV.id_evento
-            AND US.id = ATV.id_usuario
-            AND QD.id = ATV.id_quadra    
-            ORDER BY ATV.dia DESC;
+    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES               
+	FROM tb_atividades AS ATV 
+	INNER JOIN tb_sport AS SP
+	INNER JOIN tb_evento AS EV
+	INNER JOIN tb_usuario AS US
+	INNER JOIN tb_quadra AS QD
+	INNER JOIN vw_placar AS PC    
+    INNER JOIN vw_atvAtl AS ATL
+	ON SP.id = ATV.id_sport
+	AND PC.id = ATV.id          
+	AND EV.id = ATV.id_evento
+	AND US.id = ATV.id_usuario
+	AND QD.id = ATV.id_quadra  
+	AND ATL.id_ativ = ATV.id          
+	ORDER BY ATV.dia DESC;
 
 SELECT * FROM vw_dashboard LIMIT 0,10;
     
-
-
-    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS ATLETA,US.nick AS nick, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2,
-    (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
-    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES,
-    GROUP_CONCAT(US.nome SEPARATOR ', ') AS ATLETAS
-            FROM tb_atividades AS ATV 
-            INNER JOIN tb_sport AS SP
-            INNER JOIN tb_evento AS EV
-            INNER JOIN tb_usuario AS US
-            INNER JOIN tb_quadra AS QD
-            INNER JOIN vw_placar AS PC    
-            INNER JOIN tb_ativ_atleta AS ATL
-            ON SP.id = ATV.id_sport
-            AND PC.id = ATV.id          
-            AND EV.id = ATV.id_evento
-            AND US.id = ATV.id_usuario
-            AND QD.id = ATV.id_quadra  
-            AND US.id = ATL.id_atleta
-            ORDER BY ATV.dia DESC;
-
-
-    
-    
+-- ********************************
+--  DROP VIEW vw_atvAtl;
+CREATE VIEW vw_atvAtl AS
     SELECT ATL.id_ativ, 
-		GROUP_CONCAT(US.nome SEPARATOR ', ') AS ATLETAS
+		GROUP_CONCAT(US.nome SEPARATOR ', ') AS ATLETAS,
+        GROUP_CONCAT(ATL.team SEPARATOR ', ') AS LADO
 		FROM tb_ativ_atleta AS ATL
         INNER JOIN tb_usuario AS US
         ON US.id = ATL.id_atleta
 		GROUP BY ATL.id_ativ;
+    
+SELECT * FROM vw_atvAtl;    
     
 -- ********************************
 
@@ -119,11 +103,20 @@ SELECT * FROM vw_friends;
 -- *********************************
 
 -- DROP VIEW vw_perfil;
-CREATE VIEW vw_perfil AS    
+CREATE VIEW vw_perfil AS
 SELECT US.id, US.nome,
 	(SELECT COUNT(*) FROM vw_friends WHERE hostID = US.id ) AS SEGUINDO, 
     (SELECT COUNT(*) FROM vw_friends WHERE guestID = US.id ) AS SEGUIDORES,
-    (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id) AS ATIVIDADES
+    (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id) AS ATIVIDADES,
+    (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id AND dia>(NOW() - INTERVAL 28 DAY)) AS LAST_28,
+    (SELECT GROUP_CONCAT(SUBSTRING(dia,1,10) SEPARATOR ', ')
+		FROM tb_atividades 
+        WHERE dia>(NOW() - INTERVAL 28 DAY) 
+        AND id_usuario = US.id) AS TREINOS,
+    (SELECT GROUP_CONCAT(id SEPARATOR ', ')
+		FROM tb_atividades 
+        WHERE dia>(NOW() - INTERVAL 28 DAY) 
+        AND id_usuario = US.id) AS TREINO_ID            
     FROM tb_usuario AS US;
     
 SELECT * FROM vw_perfil ;

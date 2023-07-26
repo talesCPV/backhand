@@ -45,7 +45,6 @@
           gap:10px;
         }
 
-
         .head-activity-atleta{
           font-weight: bold;
           text-transform: capitalize;
@@ -59,7 +58,6 @@
           width: 40px;
           height: 40px;
         }
-
 
         .post-activity{
           width: 100%;
@@ -117,6 +115,11 @@
           font-size: 0.8em;
           word-spacing: 30%;
           text-indent: unset;
+        }
+
+        .social-icon{
+          display: flex;
+          gap: 5px;
         }
 
 /* BTN KUDOS E SCRAP */
@@ -198,7 +201,7 @@
       if (location.protocol !== 'https:') {
           location.replace(`https:${location.href.substring(location.protocol.length)}`);
       }
-
+      loadHash()
       function openScreen(hide = true){
 
         if(hide){
@@ -210,7 +213,7 @@
           document.querySelector('#footer').style.display = 'block'
           document.querySelector('.perfil').style.display = 'block'
           document.querySelector('.dashboard').style.width = 'calc(100vw - 320px)'
-          document.querySelector('#log-inout').innerHTML = 'Sair'
+          document.querySelector('#log-inout').innerHTML = '<i class="fas fa-power-off"></i>'
         }
 
         const menu = document.querySelectorAll('.only-login')

@@ -44,14 +44,15 @@
     </style>
 
     <div class="form">
-        <div class="line">
-            <p id="atv-atleta"></p>
-
-        </div>
         <div class="center" >
             <h2 id="atv-titulo"></h2>
+            <div class="line">
+                <p id="atv-atleta"></p>
+            </div>
             <div id="map"></div>
         </div>
+
+
         <div class="line">
             <p id="atv-data"></p>
             <p id="atv-hora"></p>
@@ -73,29 +74,18 @@
 <script>
     
     const data = mainData.viewTrainning.data
-    console.log(data)
+    const address = data.address
+    
 
-    fillSets() 
-
-    document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
-    document.querySelector('#atv-atleta').innerHTML = `${data.SETS_P1} x ${data.SETS_P2}`
-    document.querySelector('#atv-titulo').innerHTML = data.nome
-    document.querySelector('#atv-data').innerHTML = `date: ${data.dia.showDate()}`
-    document.querySelector('#atv-hora').innerHTML = `time: ${data.dia.showTime()}`
-    document.querySelector('#atv-tempo').innerHTML = `elapsed time: ${parseInt(data.duracao/60).toString().padStart(2,'0')}:${parseInt(data.duracao%60).toString().padStart(2,'0')}`
-
-
-
-    if(data.id_usuario != localStorage.getItem('idUser')){
-        document.querySelector('#btnEdit').style.display = 'none'
-        document.querySelector('#btnDel').style.display = 'none'
+    if(address == undefined){
+        fillGame(data)
+    }else{
+        console.log(address)
+        getTrainning(address)
+        removeHash()
     }
 
-    map = createMap('map',[data.lat, data.lng])
-    pinMap([data.lat, data.lng],map)
-    map.locate({setView: false, maxZoom: 30})
-    disableMap(map)
-
+    console.log(data)
 
     document.querySelector('#btnEdit').addEventListener('click',()=>{
         openHTML('newActivity.html','modal',data,400)
@@ -115,7 +105,34 @@
         }
     })
 
-    function fillSets(){
+    function fillGame(data){
+        let timeA = ''
+        let timeB = ''
+        const players = data.ATLETAS.split(',')
+        const times = data.LADO.split(',')
+        for(let j=0; j<players.length; j++){
+            times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
+        }  
+        timeA = timeA.substring(0,timeA.length-1)
+        timeB = timeB.substring(0,timeB.length-1)
+
+        document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
+        document.querySelector('#atv-atleta').innerHTML = `${timeA}  ${data.SETS_P1} x ${data.SETS_P2}  ${timeB}`
+        document.querySelector('#atv-titulo').innerHTML = data.nome
+        document.querySelector('#atv-data').innerHTML = `date: ${data.dia.showDate()}`
+        document.querySelector('#atv-hora').innerHTML = `time: ${data.dia.showTime()}`
+        document.querySelector('#atv-tempo').innerHTML = `elapsed time: ${parseInt(data.duracao/60).toString().padStart(2,'0')}:${parseInt(data.duracao%60).toString().padStart(2,'0')}`
+
+        if(data.id_usuario != localStorage.getItem('idUser')){
+            document.querySelector('#btnEdit').style.display = 'none'
+            document.querySelector('#btnDel').style.display = 'none'
+        }
+
+        map = createMap('map',[data.lat, data.lng])
+        pinMap([data.lat, data.lng],map)
+        map.locate({setView: false, maxZoom: 30})
+        disableMap(map)
+
         const params = new Object;
             params.id_ATV = data.id
 
@@ -130,5 +147,20 @@
             }            
         })
     }
+
+    function getTrainning(id){
+       
+        const params = new Object;
+        params.id =  parseInt(id)
+
+        const myPromisse = queryDB(params,28);
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+            fillGame(json[0])
+        })
+    }
+
+    
+
 
 </script>
