@@ -103,6 +103,9 @@
             <div class="myDate"></div>
         </div>
 
+        <div class="botton">
+            <div class="activities"></div>
+        </div>
 
 
     </div>
@@ -112,6 +115,13 @@
 <script>
 
     const perfil = mainData.perfil.data.address
+    mainData.perfil.data.iniMap = maps.length
+    mainData.perfil.data.mapLength = 0
+
+    mainData.perfil.func.onClose = ()=>{
+        maps.splice(mainData.perfil.data.iniMap,mainData.perfil.data.mapLength)
+    }
+
 
     document.querySelector('.myDate').appendChild(calendar())
 
@@ -122,16 +132,13 @@
         const myPromisse = queryDB(params,27);
         myPromisse.then((resolve)=>{
             const json = JSON.parse(resolve)
-            const treinos = json[0].TREINOS.split(',')
-            const treinos_id = json[0].TREINO_ID.split(',')
+            const treinos = json[0].TREINOS!=null?json[0].TREINOS.split(','):0
+            const treinos_id = json[0].TREINO_ID!=null?json[0].TREINO_ID.split(','):0
 console.log(json)
-//console.log(treinos)
-//console.log(treinos_id)
-            for(let i=0; i<treinos.length; i++){
-                console.log(treinos[i])
+
+            for(let i=0; i<treinos.length; i++){                
                 document.getElementById(treinos[i].trim()).classList.add('day-trainning')
             }
-
 
             const pic = document.querySelector('#pic-perfil')
 
@@ -149,11 +156,11 @@ console.log(json)
                 const jsonATV = JSON.parse(res_ATV)
 
                 console.log(jsonATV)
-
-
+                for(let i=0; i<jsonATV.length; i++){
+                    makeActivity(jsonATV[i],'activities',false)
+                    mainData.perfil.data.mapLength++
+                }
             })
-
-
         })
     }
 

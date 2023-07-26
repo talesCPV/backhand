@@ -2,6 +2,7 @@
     const today = new Date
     var mainData = new Object
     const maps = []
+    
 
 
 /* FUNCTIONS */
@@ -86,7 +87,12 @@ function removeHash() {
     history.pushState("", document.title, window.location.pathname + window.location.search);
 }
 
-function makeActivity(ATV,i){
+function makeActivity(ATV,classScreen,showUser=true){
+    
+    const screen =  document.querySelector('.'+classScreen)
+    const mapDiv = 'map-'+classScreen
+    const i = maps.length
+
 
     function makeElement(kind,html='',cn='',id='',src='',target=''){
         const el = document.createElement(kind)
@@ -99,22 +105,22 @@ function makeActivity(ATV,i){
             el.src=src
             breakImg(el)
         }
-
         return el
     }
-
   
-        let timeA = ''
-        let timeB = ''
-        const players = ATV.ATLETAS.split(',')
-        const times = ATV.LADO.split(',')
-        for(let j=0; j<players.length; j++){
-            times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
-        }
-        timeA = timeA.substring(0,timeA.length-1)
-        timeB = timeB.substring(0,timeB.length-1)
+    let timeA = ''
+    let timeB = ''
+    const players = ATV.ATLETAS.split(',')
+    const times = ATV.LADO.split(',')
+    for(let j=0; j<players.length; j++){
+        times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
+    }
+    timeA = timeA.substring(0,timeA.length-1)
+    timeB = timeB.substring(0,timeB.length-1)
 
-        const mainDiv = makeElement('div','','post-activity',`atv-${i}`)
+    const mainDiv = makeElement('div','','post-activity',`atv-${i}`)
+
+    if(showUser){
         const head = makeElement('div','','head-activity')
         const img = makeElement('img','','imgUser head-activity-img','',`assets/users/${ATV.id_usuario}.jpg`)    
         img.addEventListener('click',()=>{
@@ -131,71 +137,91 @@ function makeActivity(ATV,i){
         div1.appendChild(headDat)
         head.appendChild(div1)
         mainDiv.appendChild(head)
+    }
 
-        const h2Nome = makeElement('h2',ATV.nome,'','nome')
-        mainDiv.appendChild(h2Nome)
-        const h4Placar = makeElement('h4',`${timeA}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB}`,'','placar')
-        mainDiv.appendChild(h4Placar)
+    const h2Nome = makeElement('h2',ATV.nome,'','nome')
+    mainDiv.appendChild(h2Nome)
+    const h4Placar = makeElement('h4',`${timeA}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB}`,'','placar')
+    mainDiv.appendChild(h4Placar)
 
-        const panel = makeElement('div','','panel')
-        const leftPanel = makeElement('div','','left-panel')
-        const map = makeElement('div','','map-view')
-        leftPanel.appendChild(map)
-        const mapAct = makeElement('div','','map-activity',`map-${i}`)
-        leftPanel.appendChild(mapAct)
-        const h6Map = makeElement('h6',ATV.QUADRA,'map-label')
-        leftPanel.appendChild(h6Map)
-        panel.appendChild(leftPanel)
+    const panel = makeElement('div','','panel')
+    const leftPanel = makeElement('div','','left-panel')
+    const map = makeElement('div','','map-view')
+    leftPanel.appendChild(map)
+    const mapAct = makeElement('div','','map-activity',mapDiv+i)
+    leftPanel.appendChild(mapAct)
+    const h6Map = makeElement('h6',ATV.QUADRA,'map-label')
+    leftPanel.appendChild(h6Map)
+    panel.appendChild(leftPanel)
 
-        const rigthPanel = makeElement('div','','right-panel')
-        const pSport = makeElement('p',`${ATV.SPORT} (${ATV.EVENTO})`,'','sport')
-        rigthPanel.appendChild(pSport)
-        const div2 = makeElement('div','',`only-login social-icon ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}`)
-        const facebook = makeElement('a','<i class="fab fa-facebook">','facebook','','','blank')
-        div2.appendChild(facebook)
-        const twitter = makeElement('a','<i class="fab fa-twitter"></i>','twitter','','','blank')
-        div2.appendChild(twitter)
-        const linkedin = makeElement('a','<i class="fab fa-linkedin"></i>','linkedin','','','blank')
-        div2.appendChild(linkedin)
-        const reddit = makeElement('a','<i class="fab fa-reddit"></i>','reddit','','','blank')
-        div2.appendChild(reddit)
-        const whatsapp = makeElement('a','<i class="fab fa-whatsapp"></i>','whatsapp','','','blank')
-        div2.appendChild(whatsapp)
-        const telegram = makeElement('a','<i class="fab fa-telegram"></i>','telegram','','','blank')
-        div2.appendChild(telegram)
-        rigthPanel.appendChild(div2)
-        panel.appendChild(rigthPanel)
-        mainDiv.appendChild(panel)
+    const rigthPanel = makeElement('div','','right-panel')
+    const pSport = makeElement('p',`${ATV.SPORT} (${ATV.EVENTO})`,'','sport')
+    rigthPanel.appendChild(pSport)
+    const div2 = makeElement('div','',`only-login social-icon ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}`)
+    
+    const link = encodeURI('https://www.d2soft.com.br/backhand#G'+ATV.id.padStart(10,0));
+    const msg = encodeURIComponent('Hey, olhe meu treino no backhand');
+    
+    const facebook = makeElement('a','<i class="fab fa-facebook">','facebook','','','blank')
+    facebook.href = `https://www.facebook.com/share.php?u=${link}`;
+    div2.appendChild(facebook)
+    const twitter = makeElement('a','<i class="fab fa-twitter"></i>','twitter','','','blank')
+    twitter.href = `http://twitter.com/share?&url=${link}&text=${msg}&hashtags=javascript,programming`;
+    div2.appendChild(twitter)
+    const linkedin = makeElement('a','<i class="fab fa-linkedin"></i>','linkedin','','','blank')
+    linkedin.href = `https://www.linkedin.com/sharing/share-offsite/?url=${link}`;
+    div2.appendChild(linkedin)
+    const reddit = makeElement('a','<i class="fab fa-reddit"></i>','reddit','','','blank')
+    reddit.href = `http://www.reddit.com/submit?url=${link}&title=${msg}`;
+    div2.appendChild(reddit)
+    const whatsapp = makeElement('a','<i class="fab fa-whatsapp"></i>','whatsapp','','','blank')
+    whatsapp.href = `https://api.whatsapp.com/send?text=${msg}: ${link}`;
+    div2.appendChild(whatsapp)
+    const telegram = makeElement('a','<i class="fab fa-telegram"></i>','telegram','','','blank')
+    telegram.href = `https://telegram.me/share/url?url=${link}&text=${msg}`;
+    div2.appendChild(telegram)
+    rigthPanel.appendChild(div2)
+    panel.appendChild(rigthPanel)
+    mainDiv.appendChild(panel)
 
-//        mainDiv.appendChild(rigthPanel)
+    const socialPanel = makeElement('div','','panel-social')
+    const numKudos = makeElement('div',`${ATV.KUDOS.padStart(2,0)} kudos`,'social-kudos')
+    socialPanel.appendChild(numKudos)
+    const div3 = makeElement('div')
+    const btnKudos = makeElement('button','<i class="fas fa-thumbs-up"></i>','btn-backhand btn-social')
+    btnKudos.addEventListener('click',()=>{
+        if(localStorage.getItem('idUser') != null){             
+            const params = new Object;
+                params.hash =  localStorage.getItem('hash')
+                params.id_atividade = ATV.id
+            const myPromisse = queryDB(params,18)
+            myPromisse.then((resolve)=>{                       
+                numKudos.innerHTML = JSON.parse(resolve)[0].KUDOS.padStart(2,0)+ ' kudos'                                     
+            })
+        }
+    })
+    div3.appendChild(btnKudos)
+    const btnScrap = makeElement('button','<i class="fas fa-comments"></i>','btn-backhand btn-social')
+    btnScrap.addEventListener('click',()=>{
+        openHTML('message.html','modal',ATV)
+    })
+    div3.appendChild(btnScrap)
+    socialPanel.appendChild(div3)
+    mainDiv.appendChild(socialPanel)
+    mainDiv.database = ATV
 
-        const socialPanel = makeElement('div','','panel-social')
-        const numKudos = makeElement('div',`${ATV.KUDOS.padStart(2,0)} kudos`,'social-kudos')
-        socialPanel.appendChild(numKudos)
-        const div3 = makeElement('div')
-        const btnKudos = makeElement('button','<i class="fas fa-thumbs-up"></i>','btn-backhand btn-social')
-        btnKudos.addEventListener('click',()=>{
-            if(localStorage.getItem('idUser') != null){             
-                const params = new Object;
-                    params.hash =  localStorage.getItem('hash')
-                    params.id_atividade = ATV.id
-                const myPromisse = queryDB(params,18)
-                myPromisse.then((resolve)=>{                       
-                    numKudos.innerHTML = JSON.parse(resolve)[0].KUDOS.padStart(2,0)+ ' kudos'                                     
-                })
-            }
-        })
-        div3.appendChild(btnKudos)
-        const btnScrap = makeElement('button','<i class="fas fa-comments"></i>','btn-backhand btn-social')
-        btnScrap.addEventListener('click',()=>{
-            openHTML('message.html','modal',ATV)
-        })
-        div3.appendChild(btnScrap)
-        socialPanel.appendChild(div3)
-        mainDiv.appendChild(socialPanel)
-        mainDiv.database = ATV
+    screen.appendChild(mainDiv)        
 
-        return(mainDiv)    
+    maps.push(createMap(mapDiv+i,[ATV.lat, ATV.lng],30))
+    pinMap([ATV.lat, ATV.lng],maps[maps.length-1])
+    maps[maps.length-1].locate({setView: false, maxZoom: 30})
+    disableMap(maps[maps.length-1])
+    maps[maps.length-1].on('click',()=>{
+        ATV.form = `atv-${i}`
+        window.location.hash = 'G'+ATV.id.padStart(10,0)
+        loadHash()
+    })
+
 }
 
 function loadActivity(D,S,L){
@@ -217,148 +243,8 @@ function loadActivity(D,S,L){
     myPromisse.then((resolve)=>{
         const json = JSON.parse(resolve)   
 
-        for(let i=0; i<json.length; i++){
-
-/*
-            let timeA = ''
-            let timeB = ''
-            const players = json[i].ATLETAS.split(',')
-            const times = json[i].LADO.split(',')
-            for(let j=0; j<players.length; j++){
-                times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
-            }
-            timeA = timeA.substring(0,timeA.length-1)
-            timeB = timeB.substring(0,timeB.length-1)
-            const div = document.createElement('div')
-            div.className = 'post-activity'
-            div.id = `atv-${i}`
-
-            div.innerHTML = `
-            <div class="head-activity">
-                <a id="viewUser"><img class="imgUser head-activity-img" src="${`assets/users/${json[i].id_usuario}.jpg`}"></a>
-                <div>
-                    <p class="head-activity-atleta">${json[i].NOME_ATLETA}</p>
-                    <p class="head-activity-data">${json[i].dia.showDate()} as ${json[i].dia.showTime()}</p>
-                </div>
-            </div>
-            <h2 id="nome">${json[i].nome}</h2>
-            <h4 id="placar">${timeA}  ${json[i].SETS_P1} x ${json[i].SETS_P2}  ${timeB}</h4>           
-            <div class="panel">
-                <div class="left-panel">
-                
-                    <div class="map-view">
-                    <div id="map-${i}" class="map-activity"></div>
-                    <h6 class="map-label">${json[i].QUADRA}</h6>
-                    </div>
-
-
-
-                </div>
-                <div class="right-panel">
-                    <p id="sport">${json[i].SPORT} (${json[i].EVENTO})</p>  
-<!--                                      
-                    <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Kudos   <i class="fas fa-thumbs-up"></i><span class="badge">${parseInt(json[i].KUDOS)>0 ? json[i].KUDOS : ''}</span></a>
-                    <a class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}" style="display:flex; gap: 5px;" > Scraps <i class="fas fa-comments"></i><span  class="badge">${parseInt(json[i].MESSAGES)>0 ? json[i].MESSAGES : ''}</span></a>
--->                    
-                 
-                    <div class="only-login ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}">
-                        <!-- facebook -->
-                        <a class="facebook" target="blank"><i class="fab fa-facebook"></i></a>
-                        
-                        <!-- twitter -->
-                        <a class="twitter" target="blank"><i class="fab fa-twitter"></i></a>
-                        
-                        <!-- linkedin -->
-                        <a class="linkedin" target="blank"><i class="fab fa-linkedin"></i></a>
-                        
-                        <!-- reddit -->
-                        <a class="reddit" target="blank"><i class="fab fa-reddit"></i></a>
-
-                        <!-- whatsapp-->
-                        <a class="whatsapp" target="blank"><i class="fab fa-whatsapp"></i></a>
-
-                        <!-- telegram-->
-                        <a class="telegram" target="blank"><i class="fab fa-telegram"></i></a> 
-                    </div> 
-                    
-                </div>
-            </div>
-            <div class="panel-social">
-                <div id="numKudos-${i}" class="social-kudos">${json[i].KUDOS.padStart(2,0)} kudos</div>
-                <div>
-                    <button id="btnKudos-${i}"   class="btn-backhand btn-social"><i class="fas fa-thumbs-up"></i></button>
-                    <button id="btnComment-${i}" class="btn-backhand btn-social"><i class="fas fa-comments"></i></button>
-                </div>
-            </div>            
-            
-            `
-
-            div.database = json[i]
-            div.querySelector('#viewUser').addEventListener('click',()=>{
-                window.location.hash = 'P'+json[i].id_usuario.padStart(10,0)
-                loadHash()
-            })
-*/
-//          screen.appendChild(div)
-            
-            screen.appendChild(makeActivity(json[i],i))
-            maps.push(createMap('map-'+i,[json[i].lat, json[i].lng],30))
-
-            pinMap([json[i].lat, json[i].lng],maps[maps.length-1])
-
-            maps[maps.length-1].locate({setView: false, maxZoom: 30})
-            disableMap(maps[maps.length-1])
-            maps[maps.length-1].on('click',()=>{
-                json[i].form = `atv-${i}`                    
-                openHTML('viewTrainning.html','modal',json[i])
-            })
-
-/*            
-            document.querySelector('#btnKudos-'+i).addEventListener('click',()=>{
-
-                if(localStorage.getItem('idUser') != null){             
-                    const params = new Object;
-                        params.hash =  localStorage.getItem('hash')
-                        params.id_atividade = json[i].id
-
-                    const myPromisse = queryDB(params,18)
-
-                    myPromisse.then((resolve)=>{                       
-                        const kudos =  parseInt(JSON.parse(resolve)[0].KUDOS)
-                        document.querySelector('#numKudos-'+i).innerHTML = kudos.toString().padStart(2,0)+ ' kudos'                                     
-                    })
-                }
-            })
-
-            document.querySelector('#btnComment-'+i).addEventListener('click',()=>{
-                openHTML('message.html','modal',json[i])
-            })
-
-            const link = encodeURI(window.location.href);
-            const msg = encodeURIComponent('Hey, I found this article');
-            const title = encodeURIComponent('Article or Post Title Here');
-
-            const fb = document.querySelector('.facebook');
-            fb.href = `https://www.facebook.com/share.php?u=${link}`;
-
-            const twitter = document.querySelector('.twitter');
-            twitter.href = `http://twitter.com/share?&url=${link}&text=${msg}&hashtags=javascript,programming`;
-
-            const linkedIn = document.querySelector('.linkedin');
-            linkedIn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${link}`;
-
-            const reddit = document.querySelector('.reddit');
-            reddit.href = `http://www.reddit.com/submit?url=${link}&title=${title}`;
-
-            const whatsapp = document.querySelector('.whatsapp');
-            whatsapp.href = `https://api.whatsapp.com/send?text=${msg}: ${link}`;
-
-            const telegram = document.querySelector('.telegram');
-            telegram.href = `https://telegram.me/share/url?url=${link}&text=${msg}`;
-*/
-
-
-
+        for(let i=0; i<json.length; i++){            
+            makeActivity(json[i],'dashboard')          
         }
     })
 }

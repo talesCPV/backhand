@@ -135,17 +135,7 @@ button{
   height: 150px;
   z-index: 0;  
 }
-/*
-.map-label{
-  position: absolute;
-  font-size: 1.5em;
-  left: 10px;
-  color: white;
-  text-shadow: 0.1em 0.1em 0.2em black;
-  max-width:  100%;
- white-space: nowrap;
-}
-*/
+
 .leaflet-control-container {
  display: none;
 }
@@ -214,7 +204,6 @@ button{
 .main-content{  
   background-color: #F7F7FA;
   display: flex;
-/*  flex-direction: column;*/
   flex-wrap: wrap;  
   min-height: 88vh;
 }
@@ -234,6 +223,7 @@ button{
   width: 30px;
   height: 30px;
   border-radius: 50%;
+  cursor: pointer;
 }
 
 .badge{
@@ -252,34 +242,6 @@ button{
 .badge:empty{
   display: none;
 }
-/*
-.btn {
-  display: inline-block;
-  padding: 0.5em 1.5em;
-  text-decoration: none;
-  border-radius: 50px;
-  cursor: pointer;
-  outline: none;
-  margin-top: 1em;
-  text-transform: uppercase;
-  font-weight: small;
-  min-width: 170px;
-  max-width: 200px;
-  text-align: center;
-  align-items: center;
-}
-
-
-.btn-primary {
-  color: #fff;
-  background: #16a083;
-}
-
-.btn-primary:hover {
-  background: #117964;
-  transition: background 0.3s ease-in-out;
-}
-*/
 
 .min{
   max-width: 10px;

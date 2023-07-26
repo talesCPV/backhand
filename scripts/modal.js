@@ -32,13 +32,25 @@ async function openHTML(  template="",where="modal", data=null, max='',){
 }
 
 function closeModal(id='all'){
+
+    function beforeClose(key){
+        try{
+            mainData[key].func.onClose()
+        }catch{
+            0
+        }finally{
+            delete mainData[key]
+        }
+    }
+
     const mod_main = document.querySelector('#myModal')
     if(id=='all'){
         while(mod_main.querySelectorAll('.modal').length > 0){
             mod_main.querySelectorAll('.modal')[0].remove()    
             Object.entries(mainData).forEach(entry => {
                 const [key, value] = entry;
-                delete mainData[key]
+                beforeClose(key)
+//                delete mainData[key]
               });
         }
     }else{
@@ -46,10 +58,12 @@ function closeModal(id='all'){
         const template = mod_main.querySelector('#modal-'+id).name.split('.')[0]
         delete mainData[mod_main.querySelector('#modal-'+id).name] 
         mod_main.querySelector('#modal-'+id).remove()
-        delete mainData[template.split('.')[0]]
+
+        const key = template.split('.')[0]
+        beforeClose(key)
+//        delete mainData[key]
     }
     mod_main.style.display = (mod_main.querySelectorAll('.modal').length < 1) ? "none" : 'block'
-//    checkMail()
 }
 
 function newModal(content, max=0){
@@ -67,14 +81,12 @@ function newModal(content, max=0){
 
     const mod_card = document.createElement('div')
         mod_card.classList = 'modal-content'
-//        mod_card.id = 'card-0'        
         mod_card.style.position = 'absolute'
         mod_card.style.zIndex = 13+index
         mod_card.style.margin = '0 auto'
         mod_card.style.top =  50 + index*offset_y+'px'
         mod_card.style.left =  index*offset_x+'px'
         mod_card.style.right =  index*offset_x+'px'
-//        mod_card.style['max-width'] = max==0 ? '80%' : max
     
     const mod_title = document.createElement('div')
     mod_title.className = 'modal-header'    
