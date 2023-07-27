@@ -49,7 +49,7 @@ function queryJson(json,cod,clause=''){
 
 
     const out = JSON.stringify(json)
-console.log(out)
+
     const data = new URLSearchParams();        
         data.append("cod",cod)
         data.append("json", out)

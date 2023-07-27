@@ -30,7 +30,6 @@
             margin: 10px;
         }
 
-
         .view-sets{
             align-items: center;
             display: flex;
@@ -39,7 +38,9 @@
             cursor: zoom-in;
         }
                 
-
+        .action-btn{
+            display: none;
+        }
 
     </style>
 
@@ -59,7 +60,7 @@
             <p id="atv-tempo"></p>
         </div>
         <div class="view-sets"></div>
-        <div class="line">
+        <div class="action-btn line">
             <button id="btnEdit" class="btn btn-primary">EDIT</button>
             <button id="btnDel" class="btn btn-primary">Delete</button>
         </div>
@@ -73,39 +74,44 @@
 </template>
 <script>
     
-    const data = mainData.viewTrainning.data
-    const address = data.address
-    
+    console.log(mainData.viewTrainning.data)
 
-    if(address == undefined){
-        fillGame(data)
-    }else{
-        console.log(address)
-        getTrainning(address)
-        removeHash()
+    getTrainning(mainData.viewTrainning.data.address)
+    removeHash()
+     
+
+    function getTrainning(id){
+       
+       const params = new Object;
+       params.id =  parseInt(id)
+
+       const myPromisse = queryDB(params,28);
+       myPromisse.then((resolve)=>{
+           const json = JSON.parse(resolve)
+           fillGame(json[0])
+       })
     }
 
-    console.log(data)
-
-    document.querySelector('#btnEdit').addEventListener('click',()=>{
-        openHTML('newActivity.html','modal',data,400)
-    })
-
-    document.querySelector('#btnDel').addEventListener('click',()=>{
-        if(confirm('Do you realy wanna delete this trainning?')){
-            const params = new Object;
-                params.id_ATV = mainData.viewTrainning.data.id
-
-            const myPromisse = queryDB(params,11);
-            myPromisse.then(()=>{
-                const form = document.getElementById(mainData.viewTrainning.data.form)
-                form.parentNode.removeChild( form )
-                closeModal('')
-            })
-        }
-    })
-
     function fillGame(data){
+
+        document.querySelector('#btnEdit').addEventListener('click',()=>{
+            openHTML('newActivity.html','modal',data,400)
+        })
+
+        document.querySelector('#btnDel').addEventListener('click',()=>{
+            if(confirm('Do you realy wanna delete this trainning?')){
+                const params = new Object;
+                    params.id_ATV = parseInt(mainData.viewTrainning.data.address)
+
+                const myPromisse = queryDB(params,11);
+                myPromisse.then(()=>{
+                    const form = document.getElementById(mainData.data.formID)
+                    form.parentNode.removeChild( form )
+                    closeModal('')
+                })
+            }
+        })
+
         let timeA = ''
         let timeB = ''
         const players = data.ATLETAS.split(',')
@@ -123,9 +129,8 @@
         document.querySelector('#atv-hora').innerHTML = `time: ${data.dia.showTime()}`
         document.querySelector('#atv-tempo').innerHTML = `elapsed time: ${parseInt(data.duracao/60).toString().padStart(2,'0')}:${parseInt(data.duracao%60).toString().padStart(2,'0')}`
 
-        if(data.id_usuario != localStorage.getItem('idUser')){
-            document.querySelector('#btnEdit').style.display = 'none'
-            document.querySelector('#btnDel').style.display = 'none'
+        if(data.id_usuario == localStorage.getItem('idUser')){
+            document.querySelector('.action-btn').style.display = 'flex'
         }
 
         map = createMap('map',[data.lat, data.lng])
@@ -147,19 +152,6 @@
             }            
         })
     }
-
-    function getTrainning(id){
-       
-        const params = new Object;
-        params.id =  parseInt(id)
-
-        const myPromisse = queryDB(params,28);
-        myPromisse.then((resolve)=>{
-            const json = JSON.parse(resolve)
-            fillGame(json[0])
-        })
-    }
-
     
 
 

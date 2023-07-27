@@ -38,8 +38,8 @@
 
     $query_json = array(
         
-        "1" => "CALL sp_AtvAtl('@OWNER',@CLAUSE,'(@FIELDS)','(@VALUES)');",
-        "2" => "CALL sp_sets('@OWNER',@CLAUSE,'(@FIELDS)','(@VALUES)');",
+        "1" => "CALL sp_AtvAtl(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
+        "2" => "CALL sp_sets(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
 
 
     );

@@ -152,7 +152,9 @@
                 <li class="only-login hide-menu"><a onclick="viewUser()" class="parent-sub-menu"><img class="imgUser" id="imgUser" src="assets/user.jpeg"></a>
 <!--                  <ul class="sub-menu"></ul>-->
                 </li>
-                <li class="only-login hide-menu" ><a style="display: flex; gap: 5px;"> <i class="fas fa-bell" style="margin-top: 10px;"></i><span id="alert" class="badge" style="margin-bottom: 10px;"></span>  </a></li>
+                <li class="only-login hide-menu" ><a style="display: flex; gap: 5px;" class="parent-sub-menu"> <i class="fas fa-bell" style="margin-top: 6px;"></i><span id="alert" class="badge" style="margin-bottom: 10px;position: relative; right: 10px;"></span>  </a>
+                  <ul class="sub-menu alert-badge"></ul>
+                </li>
                 <li><a id="log-inout" onclick="login()">Inscreva-se</a></li> 
             </ul>
             <p></p>
@@ -220,7 +222,6 @@
         for(let i=0; i<menu.length; i++){
             hide ? menu[i].classList.add('hide-menu') : menu[i].classList.remove('hide-menu')
         }
-
       }
 
       navigator.geolocation.getCurrentPosition((latlng)=>{

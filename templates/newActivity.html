@@ -206,21 +206,34 @@
     }
 
     function updateData(data){
-        const form = document.getElementById(data.form)
 
-        form.querySelector('#atleta').innerHTML = data.ATLETA
+        let timeA = ''
+        let timeB = ''
+        const players = data.ATLETAS.split(',')
+        const times = data.LADO.split(',')
+        for(let j=0; j<players.length; j++){
+            times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
+        }
+        timeA = timeA.substring(0,timeA.length-1)
+        timeB = timeB.substring(0,timeB.length-1)
+
+
+        const form = document.getElementById(mainData.data.formID)
+//console.log(data)
+//console.log(form)
+        form.querySelector('.head-activity-atleta').innerHTML = data.NOME_ATLETA
         form.querySelector('#nome').innerHTML = data.nome
-        form.querySelector('#placar').innerHTML = `${data.nick} ${data.SETS_P1} vs ${data.SETS_P2} ${data.parceiro.split(' ')[0]}`
-//        form.querySelector('#map-label').innerHTML = data.QUADRA
-        form.querySelector('#sport').innerHTML = data.SPORT
-        form.querySelector('#evento').innerHTML = data.EVENTO
-        form.querySelector('#data').innerHTML = data.dia.showDate()
-        form.querySelector('#hora').innerHTML = data.dia.showTime()
-        form.querySelector('#tempo').innerHTML = Math.floor(data.duracao/60).toString().padStart(2,'0')+":"+ (data.duracao%60).toString().padStart(2,'0')
+        form.querySelector('#placar').innerHTML = `${timeA} ${data.SETS_P1} vs ${data.SETS_P2} ${timeB}`
+        form.querySelector('.map-label').innerHTML = data.QUADRA
+        form.querySelector('#sport').innerHTML = `${data.SPORT} (${data.EVENTO})`
+//        form.querySelector('#evento').innerHTML = data.EVENTO
+        form.querySelector('.head-activity-data').innerHTML = `${data.dia.showDate()} as ${data.dia.showTime()}`
+//        form.querySelector('#hora').innerHTML = data.dia.showTime()
+//        form.querySelector('#tempo').innerHTML = Math.floor(data.duracao/60).toString().padStart(2,'0')+":"+ (data.duracao%60).toString().padStart(2,'0')
     }
 
     document.querySelector('#btnAdd').addEventListener('click',()=>{
-//        refreshData()
+        refreshData()
    
         if(goon('edtDesc,edtData,edtHora,edtTempo')){
             const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
@@ -243,10 +256,12 @@
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)
+//console.log(json[0])                
                 edit ?  updateData(data) : 0
                 addSets(json[0].id)
                 addPlayers(json[0].id)
-                closeModal()
+                closeModal(0)
+                closeModal(0)
             })
         }
     })
@@ -287,7 +302,7 @@
 
 
     function addSets(idAtv){
-
+console.log(idAtv)
         const sets = mainData.newActivity.data.sets
         const setsize = mainData.newActivity.data.timeA.length
         const params = []
@@ -301,10 +316,12 @@
                 pr.obs = sets[i].obs
             params.push(pr)
         }
-
-        queryJson(params,2,idAtv).then((txt)=>{
-            console.log(txt)
-        })
+console.log(params)
+        if(params.length>0){
+            queryJson(params,2,idAtv).then((txt)=>{
+                console.log(txt)
+            })
+        }        
 
     }
 
@@ -321,11 +338,12 @@
                 pr.id_atleta = players[i].userID
                 pr.team = i<teamAsize ? 'A':'B'
                 pr.ativ_owner = i==0?1:0
+                pr.confirm = i==0?1:0
             params.push(pr)
         }
 
         queryJson(params,1,idAtv).then((txt)=>{
-            console.log(txt)
+//            console.log(txt)
         })
 
     }

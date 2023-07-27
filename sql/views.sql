@@ -3,13 +3,13 @@
 CREATE VIEW vw_dashboard AS	
     SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS NOME_ATLETA,US.nick AS nick, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2,ATL.ATLETAS,ATL.LADO,
     (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
-    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES               
-	FROM tb_atividades AS ATV 
+    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES    
+	FROM tb_atividades AS ATV
 	INNER JOIN tb_sport AS SP
 	INNER JOIN tb_evento AS EV
 	INNER JOIN tb_usuario AS US
 	INNER JOIN tb_quadra AS QD
-	INNER JOIN vw_placar AS PC    
+	INNER JOIN vw_placar AS PC
     INNER JOIN vw_atvAtl AS ATL
 	ON SP.id = ATV.id_sport
 	AND PC.id = ATV.id          
@@ -19,7 +19,7 @@ CREATE VIEW vw_dashboard AS
 	AND ATL.id_ativ = ATV.id          
 	ORDER BY ATV.dia DESC;
 
-SELECT * FROM vw_dashboard LIMIT 0,10;
+SELECT * FROM vw_dashboard;    
     
 -- ********************************
 --  DROP VIEW vw_atvAtl;
@@ -109,6 +109,10 @@ SELECT US.id, US.nome,
     (SELECT COUNT(*) FROM vw_friends WHERE guestID = US.id ) AS SEGUIDORES,
     (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id) AS ATIVIDADES,
     (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id AND dia>(NOW() - INTERVAL 28 DAY)) AS LAST_28,
+    (SELECT ALERTAS FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_QTD,
+    (SELECT NOME FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_NOME,
+    (SELECT NOME_OWNER FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_OWNER,
+    (SELECT ATV FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_ATV,
     (SELECT GROUP_CONCAT(SUBSTRING(dia,1,10) SEPARATOR ', ')
 		FROM tb_atividades 
         WHERE dia>(NOW() - INTERVAL 28 DAY) 
@@ -120,6 +124,8 @@ SELECT US.id, US.nome,
     FROM tb_usuario AS US;
     
 SELECT * FROM vw_perfil ;
+
+-- SELECT * FROM vw_alerta WHERE id_atleta = 2;
 
 -- *********************************
 
@@ -135,6 +141,41 @@ SELECT * FROM vw_atv_atleta;
 
 -- *********************************
 
+-- DROP VIEW vw_alerta;
+CREATE VIEW vw_alerta AS    
+	SELECT AAT.id_atleta, COUNT(AAT.id_ativ)AS ALERTAS,
+		GROUP_CONCAT(AAT.id_ativ SEPARATOR ',') AS ATV,
+		GROUP_CONCAT(ATV.nome SEPARATOR ',') AS NOME,
+		GROUP_CONCAT(USR.nome SEPARATOR ',') AS NOME_OWNER
+		FROM tb_ativ_atleta AS AAT
+		INNER JOIN tb_atividades AS ATV
+		INNER JOIN tb_usuario AS USR
+		ON ATV.id = AAT.id_ativ
+		AND USR.id = ATV.id_usuario
+		AND confirm=0 
+		AND ask=1 
+		GROUP BY id_atleta;
+    
+SELECT * FROM vw_alerta;
+
+SELECT AAT.id_atleta, COUNT(AAT.id_ativ)AS ALERTAS,
+	GROUP_CONCAT(AAT.id_ativ SEPARATOR ', ') AS ATV,
+	GROUP_CONCAT(ATV.nome SEPARATOR ', ') AS NOME,
+	GROUP_CONCAT(USR.nome SEPARATOR ', ') AS NOME_OWNER
+	FROM tb_ativ_atleta AS AAT
+    INNER JOIN tb_atividades AS ATV
+    INNER JOIN tb_usuario AS USR
+    ON ATV.id = AAT.id_ativ
+    AND USR.id = ATV.id_usuario
+    AND confirm=0 
+    AND ask=1 
+    GROUP BY id_atleta;
+
+SELECT id_ativ from tb_ativ_atleta WHERE id_atleta = 2;
+
+
+-- *********************************
+
 SELECT * FROM vw_placarAtiv;
 SELECT * FROM vw_dashboard;
 SELECT * FROM vw_placarAtiv;
@@ -142,6 +183,7 @@ SELECT * FROM vw_noSets;
 SELECT * FROM vw_placar;
 SELECT * FROM vw_friends;
 SELECT * FROM vw_perfil;
+SELECT * FROM vw_alerta;
 
 -- ****************************************
 SELECT * FROM vw_placarAtiv UNION ALL SELECT * FROM vw_noSets ORDER BY id ASC;

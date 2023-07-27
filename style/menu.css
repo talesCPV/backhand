@@ -83,7 +83,7 @@
     text-align: right;
   }
 
-  li:hover  .sub-menu{
+  li:hover  .sub-menu:not(:empty){
     display: block;
   }
 

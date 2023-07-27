@@ -6,7 +6,7 @@
 
 
 /* FUNCTIONS */
-
+/*
 function checkLogin(){
     let out = false
     if(localStorage.getItem('idUser') == null){
@@ -27,6 +27,7 @@ function checkLogin(){
     
     return out
 }
+*/
 
 function showUserPic(){
     const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
@@ -37,6 +38,35 @@ function showUserPic(){
 }
 
 function fillPerfil(usr){
+
+    function alertas(PERFIL){
+        console.log(PERFIL)
+        const qtd = parseInt(PERFIL.ALERTA_QTD)
+        const atv = PERFIL.ALERTA_ATV.split(',')
+        const nome = PERFIL.ALERTA_NOME.split(',')
+        const owner = PERFIL.ALERTA_OWNER.split(',')
+        const container = document.querySelector('.alert-badge')
+        container.innerHTML = ''
+        for(let i=0; i<qtd; i++){
+
+            const li = document.createElement('li')
+                li.id = 'alert-'+atv[i]
+                li.innerHTML = `jogo oficial ? ${nome[i]}`
+
+            // fill container
+
+            console.log(atv[i])
+            console.log(nome[i])
+            console.log(owner[i])
+
+            container.appendChild(li)
+
+        }
+
+
+        document.querySelector('#alert').innerText = qtd
+    }
+
 
     const params = new Object;
         params.id =  usr
@@ -52,11 +82,12 @@ function fillPerfil(usr){
 
         document.querySelector('#imgUser').src = img.src
         breakImg(document.querySelector('#imgUser'))
-
         document.querySelector('.perfil-seguindo').innerText = 'Seguindo '+json[0].SEGUINDO.padStart(2,0)
         document.querySelector('.perfil-seguidores').innerText = 'Seguidores '+json[0].SEGUIDORES.padStart(2,0)
         document.querySelector('.perfil-atividades').innerText = 'Atividades '+json[0].ATIVIDADES.padStart(2,0)
         document.querySelector('.perfil-nome').innerText = json[0].nome
+        alertas(json[0])
+
     })
 }
 
@@ -141,8 +172,10 @@ function makeActivity(ATV,classScreen,showUser=true){
 
     const h2Nome = makeElement('h2',ATV.nome,'','nome')
     mainDiv.appendChild(h2Nome)
-    const h4Placar = makeElement('h4',`${timeA}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB}`,'','placar')
-    mainDiv.appendChild(h4Placar)
+    if(timeB.trim()!=''){
+        const h4Placar = makeElement('h4',`${timeA}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB}`,'','placar')    
+        mainDiv.appendChild(h4Placar)    
+    }
 
     const panel = makeElement('div','','panel')
     const leftPanel = makeElement('div','','left-panel')
@@ -217,7 +250,7 @@ function makeActivity(ATV,classScreen,showUser=true){
     maps[maps.length-1].locate({setView: false, maxZoom: 30})
     disableMap(maps[maps.length-1])
     maps[maps.length-1].on('click',()=>{
-        ATV.form = `atv-${i}`
+        mainData.data.formID = `atv-${i}`
         window.location.hash = 'G'+ATV.id.padStart(10,0)
         loadHash()
     })
