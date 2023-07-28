@@ -17,8 +17,7 @@ function showUserPic(){
 
 function fillPerfil(usr){
 
-    function alertas(PERFIL){
-        console.log(PERFIL)
+    function alertas(PERFIL){        
         const qtd = parseInt(PERFIL.ALERTA_QTD)
         const atv = PERFIL.ALERTA_ATV.split(',')
         const nome = PERFIL.ALERTA_NOME.split(',')

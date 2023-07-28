@@ -59,9 +59,10 @@ CREATE VIEW vw_placarAtiv AS
 		GROUP_CONCAT(ST.p1_score SEPARATOR ',') AS P1_SCORE,
 		GROUP_CONCAT(ST.p2_score SEPARATOR ',') AS P2_SCORE
 		FROM tb_atividades AS AT
-		INNER JOIN tb_sets AS ST
+		INNER JOIN (SELECT * FROM tb_sets ORDER BY id_atividade, id ASC) AS ST
 		ON ST.id_atividade = AT.id
-		GROUP BY AT.id;
+		GROUP BY AT.id
+        ORDER BY  AT.id;
 
 SELECT * FROM vw_placarAtiv;
 

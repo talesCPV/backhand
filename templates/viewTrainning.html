@@ -60,14 +60,9 @@
         
     </div>
 
-
-
-
 </template>
 <script>
-    
-    console.log(mainData.viewTrainning.data)
-
+        
     getTrainning(mainData.viewTrainning.data.address)
     removeHash()
      
@@ -151,11 +146,12 @@ console.log(data)
                             const params = new Object;
                                 params.id_ATV = parseInt(mainData.viewTrainning.data.address)
                                 params.hash = localStorage.getItem('hash')
-                                params.confirm = "TRUE"
-                                params.ask = "FALSE"
+                                params.confirm = 1
+                                params.ask = 0
                             const myPromisse = queryDB(params,30);
                             myPromisse.then(()=>{
                                 alert('Resultado confirmado!')
+                                fillPerfil(localStorage.getItem('idUser'))
                                 closeModal('')
                             })
                         }                       

@@ -206,12 +206,18 @@ DELIMITER $$
     )
 	BEGIN			   		
 		SET @IidAtl = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);        
-        UPDATE tb_ativ_atleta SET confirm=Iconfirm AND ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;
+        UPDATE tb_ativ_atleta SET confirm=Iconfirm, ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;    			        
         SELECT * FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;
 	END $$
 DELIMITER ;
 
-CALL sp_editAtvAtl("5","p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M","TRUE","FALSE");
+CALL sp_editAtvAtl("5","p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",1,0);
+
+	UPDATE tb_ativ_atleta SET confirm=0, ask=1 WHERE id_ativ=5 AND id_atleta=2;
+ 
+	SELECT * FROM tb_ativ_atleta WHERE id_ativ=5 AND id_atleta=2;
+
+
 
 -- DROP PROCEDURE sp_delAtividades;
 DELIMITER $$
