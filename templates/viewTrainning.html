@@ -38,10 +38,6 @@
             cursor: zoom-in;
         }
                 
-        .action-btn{
-            display: none;
-        }
-
     </style>
 
     <div class="form">
@@ -60,12 +56,8 @@
             <p id="atv-tempo"></p>
         </div>
         <div class="view-sets"></div>
-        <div class="action-btn line">
-            <button id="btnEdit" class="btn btn-primary">EDIT</button>
-            <button id="btnDel" class="btn btn-primary">Delete</button>
-        </div>
+        <div class="action-btn line"></div>
         
-
     </div>
 
 
@@ -93,24 +85,8 @@
     }
 
     function fillGame(data){
+console.log(data)
 
-        document.querySelector('#btnEdit').addEventListener('click',()=>{
-            openHTML('newActivity.html','modal',data,400)
-        })
-
-        document.querySelector('#btnDel').addEventListener('click',()=>{
-            if(confirm('Do you realy wanna delete this trainning?')){
-                const params = new Object;
-                    params.id_ATV = parseInt(mainData.viewTrainning.data.address)
-
-                const myPromisse = queryDB(params,11);
-                myPromisse.then(()=>{
-                    const form = document.getElementById(mainData.data.formID)
-                    form.parentNode.removeChild( form )
-                    closeModal('')
-                })
-            }
-        })
 
         let timeA = ''
         let timeB = ''
@@ -130,7 +106,63 @@
         document.querySelector('#atv-tempo').innerHTML = `elapsed time: ${parseInt(data.duracao/60).toString().padStart(2,'0')}:${parseInt(data.duracao%60).toString().padStart(2,'0')}`
 
         if(data.id_usuario == localStorage.getItem('idUser')){
-            document.querySelector('.action-btn').style.display = 'flex'
+            const actBtn = document.querySelector('.action-btn')
+
+            const btnEdit = document.createElement('button')
+            btnEdit.className = 'btn btn-primary'
+            btnEdit.innerHTML = 'EDIT'
+            btnEdit.addEventListener('click',()=>{
+                openHTML('newActivity.html','modal',data,400)
+            })
+            actBtn.appendChild(btnEdit)
+
+            const btnDel = document.createElement('button')
+            btnDel.className = 'btn btn-primary'
+            btnDel.innerHTML = 'DELETE'
+            btnDel.addEventListener('click',()=>{
+                if(confirm('Do you realy wanna delete this trainning?')){
+                const params = new Object;
+                    params.id_ATV = parseInt(mainData.viewTrainning.data.address)
+
+                const myPromisse = queryDB(params,11);
+                myPromisse.then(()=>{
+                    const form = document.getElementById(mainData.data.formID)
+                    form.parentNode.removeChild( form )
+                    closeModal('')
+                })
+            }            })
+            actBtn.appendChild(btnDel)            
+        }else{
+            const id_atletas = data.ID_ATLETAS.split(',')
+            if(id_atletas.includes(localStorage.getItem('idUser'))){
+                
+                const i = id_atletas.indexOf(localStorage.getItem('idUser'))
+                const ask = parseInt(data.ASK.split(',')[i])
+                const conf = parseInt(data.CONFIRM.split(',')[i])
+
+                if(ask && !conf){
+
+                    const actBtn = document.querySelector('.action-btn')
+                    const btnConfirm = document.createElement('button')
+                    btnConfirm.className = 'btn btn-primary'
+                    btnConfirm.innerHTML = 'CONFIRME'
+                    btnConfirm.addEventListener('click',()=>{
+                        if(confirm('Você confirma os dados do jogo acima como verdadeiro?')){
+                            const params = new Object;
+                                params.id_ATV = parseInt(mainData.viewTrainning.data.address)
+                                params.hash = localStorage.getItem('hash')
+                                params.confirm = "TRUE"
+                                params.ask = "FALSE"
+                            const myPromisse = queryDB(params,30);
+                            myPromisse.then(()=>{
+                                alert('Resultado confirmado!')
+                                closeModal('')
+                            })
+                        }                       
+                    })
+                    actBtn.appendChild(btnConfirm)
+                }
+            }
         }
 
         map = createMap('map',[data.lat, data.lng])

@@ -1,9 +1,11 @@
 -- ********************************
 --  DROP VIEW vw_dashboard;
 CREATE VIEW vw_dashboard AS	
-    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS NOME_ATLETA,US.nick AS nick, QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2,ATL.ATLETAS,ATL.LADO,
+    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS NOME_ATLETA,US.nick AS nick,
+    QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2, PC.P1_SCORE, PC.P2_SCORE,
+    ATL.ID_ATLETAS,ATL.ATLETAS,ATL.LADO,ATL.ASK,ATL.CONFIRM,
     (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
-    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES    
+    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES
 	FROM tb_atividades AS ATV
 	INNER JOIN tb_sport AS SP
 	INNER JOIN tb_evento AS EV
@@ -12,7 +14,7 @@ CREATE VIEW vw_dashboard AS
 	INNER JOIN vw_placar AS PC
     INNER JOIN vw_atvAtl AS ATL
 	ON SP.id = ATV.id_sport
-	AND PC.id = ATV.id          
+	AND PC.id = ATV.id    
 	AND EV.id = ATV.id_evento
 	AND US.id = ATV.id_usuario
 	AND QD.id = ATV.id_quadra  
@@ -25,8 +27,11 @@ SELECT * FROM vw_dashboard;
 --  DROP VIEW vw_atvAtl;
 CREATE VIEW vw_atvAtl AS
     SELECT ATL.id_ativ, 
-		GROUP_CONCAT(US.nome SEPARATOR ', ') AS ATLETAS,
-        GROUP_CONCAT(ATL.team SEPARATOR ', ') AS LADO
+		GROUP_CONCAT(US.nome SEPARATOR ',') AS ATLETAS,
+		GROUP_CONCAT(ATL.id_atleta SEPARATOR ',') AS ID_ATLETAS,
+        GROUP_CONCAT(ATL.team SEPARATOR ',') AS LADO,
+        GROUP_CONCAT(ATL.confirm SEPARATOR ',') AS CONFIRM,
+        GROUP_CONCAT(ATL.ask SEPARATOR ',') AS ASK        
 		FROM tb_ativ_atleta AS ATL
         INNER JOIN tb_usuario AS US
         ON US.id = ATL.id_atleta
@@ -49,19 +54,25 @@ SELECT * FROM vw_minhasQuadras;
 -- DROP VIEW vw_placarAtiv;
 CREATE VIEW vw_placarAtiv AS    
 	SELECT  AT.id,
-	SUM( IF(ST.p1_score > ST.p2_score,1,0))AS SETS_P1,
-	SUM( IF(ST.p1_score < ST.p2_score,1,0))AS SETS_P2
-FROM tb_atividades AS AT
-INNER JOIN tb_sets AS ST
-ON ST.id_atividade = AT.id
-GROUP BY AT.id;
+		SUM( IF(ST.p1_score > ST.p2_score,1,0))AS SETS_P1,
+		SUM( IF(ST.p1_score < ST.p2_score,1,0))AS SETS_P2,
+		GROUP_CONCAT(ST.p1_score SEPARATOR ',') AS P1_SCORE,
+		GROUP_CONCAT(ST.p2_score SEPARATOR ',') AS P2_SCORE
+		FROM tb_atividades AS AT
+		INNER JOIN tb_sets AS ST
+		ON ST.id_atividade = AT.id
+		GROUP BY AT.id;
+
+SELECT * FROM vw_placarAtiv;
 
 -- DROP VIEW vw_noSets;
 CREATE VIEW vw_noSets AS	
-	SELECT id AS id_atividade, 0 AS SETS_P1, 0 as SETS_P2
+	SELECT id AS id_atividade, 0 AS SETS_P1, 0 as SETS_P2, 0 as P1_SCORE, 0 as P2_SCORE
 	FROM tb_atividades 
 	WHERE id NOT IN (SELECT id_atividade FROM tb_sets)
 ORDER BY id;
+
+SELECT * FROM vw_noSets;
 
 -- DROP VIEW vw_placar;
 CREATE VIEW vw_placar AS
@@ -70,6 +81,7 @@ CREATE VIEW vw_placar AS
     SELECT * FROM vw_noSets 
     ORDER BY id ASC;
 
+SELECT * FROM vw_placar;
 -- ****************************************
 -- DROP VIEW vw_kudos;
 CREATE VIEW vw_kudos AS    
@@ -146,22 +158,24 @@ CREATE VIEW vw_alerta AS
 	SELECT AAT.id_atleta, COUNT(AAT.id_ativ)AS ALERTAS,
 		GROUP_CONCAT(AAT.id_ativ SEPARATOR ',') AS ATV,
 		GROUP_CONCAT(ATV.nome SEPARATOR ',') AS NOME,
-		GROUP_CONCAT(USR.nome SEPARATOR ',') AS NOME_OWNER
+		GROUP_CONCAT(USR.nome SEPARATOR ',') AS NOME_OWNER,
+		GROUP_CONCAT(USR.id SEPARATOR ',') AS ID_OWNER
 		FROM tb_ativ_atleta AS AAT
 		INNER JOIN tb_atividades AS ATV
 		INNER JOIN tb_usuario AS USR
 		ON ATV.id = AAT.id_ativ
 		AND USR.id = ATV.id_usuario
-		AND confirm=0 
+		AND AAT.confirm=0        
+        AND AAT.id_atleta != USR.id
 		AND ask=1 
 		GROUP BY id_atleta;
     
 SELECT * FROM vw_alerta;
 
 SELECT AAT.id_atleta, COUNT(AAT.id_ativ)AS ALERTAS,
-	GROUP_CONCAT(AAT.id_ativ SEPARATOR ', ') AS ATV,
-	GROUP_CONCAT(ATV.nome SEPARATOR ', ') AS NOME,
-	GROUP_CONCAT(USR.nome SEPARATOR ', ') AS NOME_OWNER
+	GROUP_CONCAT(AAT.id_ativ SEPARATOR ',') AS ATV,
+	GROUP_CONCAT(ATV.nome SEPARATOR ',') AS NOME,
+	GROUP_CONCAT(USR.nome SEPARATOR ',') AS NOME_OWNER
 	FROM tb_ativ_atleta AS AAT
     INNER JOIN tb_atividades AS ATV
     INNER JOIN tb_usuario AS USR

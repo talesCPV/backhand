@@ -18,7 +18,7 @@
         "11" => 'CALL sp_delAtividades("x00");',
         "12" => 'SELECT * FROM tb_sport',
         "13" => 'SELECT * FROM tb_evento',
-        "14" => 'SELECT * FROM vw_atv_atleta WHERE id_ativ="x00";',
+        "14" => 'SELECT * FROM vw_atv_atleta WHERE id_ativ="x00" ORDER BY id_ativ, ativ_owner DESC;',
         "15" => 'SELECT * FROM tb_sets WHERE id_atividade="x00" ORDER BY id ASC;',
         "16" => 'DELETE FROM tb_sets WHERE AND id_atividade="x01"',
         "17" => 'CALL sp_delSets("x00","x01");',
@@ -34,6 +34,8 @@
         "27" => 'SELECT * FROM vw_perfil WHERE id = x00;',
         "28" => 'SELECT * FROM vw_dashboard WHERE id=x00',
         "29" => 'SELECT * FROM vw_dashboard WHERE id_usuario=x00 AND dia>(NOW() - INTERVAL 28 DAY);',
+        "30" => 'CALL sp_editAtvAtl("x00","x01","x02","x03");',
+
     );
 
     $query_json = array(

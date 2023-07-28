@@ -159,11 +159,6 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
-CALL sp_insertAtividades("DEFAULT","1","TESTE ATIVIDADE 1","1","1","2023-07-07 17:25:00","95","1");
-CALL sp_sets("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",13,(id,id_atividade,p1_score,p2_score,obs),("0","13","1","1",""));
-CALL sp_AtvAtl('f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<',13,'(id_ativ,id_atleta,team,ativ_owner,confirm)','("13","1","A","1","1"),("13","5","B","0","0")');
-
-
 SELECT * FROM tb_atividades;
 
 -- DROP PROCEDURE sp_AtvAtl;
@@ -198,10 +193,25 @@ BEGIN
 DELIMITER ;
 
 
-
-
 CALL sp_AtvAtl(1,1,"A",TRUE);
 SELECT * FROM tb_ativ_atleta;
+
+-- DROP PROCEDURE sp_editAtvAtl;
+DELIMITER $$
+	CREATE PROCEDURE sp_editAtvAtl(
+		IN IidAtv int(11),
+		IN Ihash varchar(77),
+		IN Iconfirm BOOLEAN,
+		IN Iask BOOLEAN        
+    )
+	BEGIN			   		
+		SET @IidAtl = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);        
+        UPDATE tb_ativ_atleta SET confirm=Iconfirm AND ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;
+        SELECT * FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;
+	END $$
+DELIMITER ;
+
+CALL sp_editAtvAtl("5","p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M","TRUE","FALSE");
 
 -- DROP PROCEDURE sp_delAtividades;
 DELIMITER $$

@@ -6,28 +6,6 @@
 
 
 /* FUNCTIONS */
-/*
-function checkLogin(){
-    let out = false
-    if(localStorage.getItem('idUser') == null){
-        document.querySelector('#log-inout').style.display = 'block'
-        document.querySelector('#log-inout').innerHTML = 'login'
-        document.querySelector('#usr').innerHTML = ''
-//        hideMenu()
-        openScreen()
-    }else{
-        document.querySelector('#log-inout').innerHTML = 'logout'
-        document.querySelector('#log-inout').style.display = 'none'
-        document.querySelector('#usr').innerHTML = localStorage.getItem('atleta')
-//        hideMenu(false)
-        openScreen(false)
-        out = true
-        showUserPic()
-    }
-    
-    return out
-}
-*/
 
 function showUserPic(){
     const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
@@ -44,26 +22,27 @@ function fillPerfil(usr){
         const qtd = parseInt(PERFIL.ALERTA_QTD)
         const atv = PERFIL.ALERTA_ATV.split(',')
         const nome = PERFIL.ALERTA_NOME.split(',')
-        const owner = PERFIL.ALERTA_OWNER.split(',')
+//        const owner = PERFIL.ALERTA_OWNER.split(',')
         const container = document.querySelector('.alert-badge')
         container.innerHTML = ''
-        for(let i=0; i<qtd; i++){
 
-            const li = document.createElement('li')
-                li.id = 'alert-'+atv[i]
-                li.innerHTML = `jogo oficial ? ${nome[i]}`
-
-            // fill container
-
-            console.log(atv[i])
-            console.log(nome[i])
-            console.log(owner[i])
-
-            container.appendChild(li)
-
+        if(qtd>0){
+            const legend = document.createElement('li')
+            legend.innerHTML = 'Confirmar Jogos'
+            container.appendChild(legend)
+            for(let i=0; i<qtd; i++){
+                const data = new Object
+                    data.origem = 'confirm'
+                const li = document.createElement('li')
+                    li.id = 'alert-'+atv[i]
+                    li.innerHTML = nome[i]
+                    li.addEventListener('click',()=>{
+                        window.location.hash = 'G'+atv[i].padStart(10,0)
+                        loadHash(data)
+                    })
+                container.appendChild(li)
+            }
         }
-
-
         document.querySelector('#alert').innerText = qtd
     }
 
@@ -97,18 +76,18 @@ function breakImg(img){
     })   
 }
 
-function loadHash(){
+function loadHash(data = {}){
     const hash = window.location.hash
     if(hash.length > 0){
         const OP = hash.substring(1,2)
-        const address = hash.substring(2,99)
+        data.address = hash.substring(2,99)
     
         switch (OP){
             case 'P':                 
-                openHTML('perfil.html','modal',{address:address})
+                openHTML('perfil.html','modal',data)
             break
             case 'G':
-                openHTML('viewTrainning.html','modal',{address:address})
+                openHTML('viewTrainning.html','modal',data)
             break
         }
     }
