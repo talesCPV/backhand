@@ -1,11 +1,13 @@
 -- ********************************
 --  DROP VIEW vw_dashboard;
+
 CREATE VIEW vw_dashboard AS	
     SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS NOME_ATLETA,US.nick AS nick,
     QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2, PC.P1_SCORE, PC.P2_SCORE,
     ATL.ID_ATLETAS,ATL.ATLETAS,ATL.LADO,ATL.ASK,ATL.CONFIRM,
     (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
-    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES
+    (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES,
+    (SELECT IF(ATV.ranking=1,"RANQUEADO","AMISTOSO")) AS STATUS
 	FROM tb_atividades AS ATV
 	INNER JOIN tb_sport AS SP
 	INNER JOIN tb_evento AS EV
@@ -25,6 +27,7 @@ SELECT * FROM vw_dashboard;
     
 -- ********************************
 --  DROP VIEW vw_atvAtl;
+
 CREATE VIEW vw_atvAtl AS
     SELECT ATL.id_ativ, 
 		GROUP_CONCAT(US.nome SEPARATOR ',') AS ATLETAS,
@@ -50,14 +53,15 @@ SELECT AQ.*, MQ.id_usuario
 SELECT * FROM vw_minhasQuadras;
 
 -- *********************************
-
 -- DROP VIEW vw_placarAtiv;
-CREATE VIEW vw_placarAtiv AS    
+/*CREATE VIEW vw_placarAtiv AS*/
 	SELECT  AT.id,
 		SUM( IF(ST.p1_score > ST.p2_score,1,0))AS SETS_P1,
 		SUM( IF(ST.p1_score < ST.p2_score,1,0))AS SETS_P2,
 		GROUP_CONCAT(ST.p1_score SEPARATOR ',') AS P1_SCORE,
-		GROUP_CONCAT(ST.p2_score SEPARATOR ',') AS P2_SCORE
+		GROUP_CONCAT(ST.p2_score SEPARATOR ',') AS P2_SCORE,
+        (SELECT GROUP_CONCAT( id_atleta SEPARATOR ',') AS TEAM_A FROM tb_ativ_atleta WHERE id_ativ=AT.id AND team="A") AS TEAM_A,
+        (SELECT GROUP_CONCAT( id_atleta SEPARATOR ',') AS TEAM_A FROM tb_ativ_atleta WHERE id_ativ=AT.id AND team="B") AS TEAM_B
 		FROM tb_atividades AS AT
 		INNER JOIN (SELECT * FROM tb_sets ORDER BY id_atividade, id ASC) AS ST
 		ON ST.id_atividade = AT.id
@@ -68,23 +72,33 @@ SELECT * FROM vw_placarAtiv;
 
 -- DROP VIEW vw_noSets;
 CREATE VIEW vw_noSets AS	
-	SELECT id AS id_atividade, 0 AS SETS_P1, 0 as SETS_P2, 0 as P1_SCORE, 0 as P2_SCORE
+	SELECT id AS id_atividade, 0 AS SETS_P1, 0 as SETS_P2, 0 as P1_SCORE, 0 as P2_SCORE, NULL AS TEAM_A, NULL AS TEAM_B
 	FROM tb_atividades 
 	WHERE id NOT IN (SELECT id_atividade FROM tb_sets)
 ORDER BY id;
 
 SELECT * FROM vw_noSets;
 
+-- DROP VIEW vw_winners;
+CREATE VIEW vw_winners AS	
+	SELECT 	id AS id_ativ,
+		IF(SETS_P1>SETS_P2,TEAM_A, IF(SETS_P2>SETS_P1,TEAM_B,0)) AS WINNER,
+		IF(SETS_P1<SETS_P2,TEAM_A, IF(SETS_P2<SETS_P1,TEAM_B,0)) AS LOSER
+        FROM vw_placarAtiv;
+
+SELECT * FROM vw_winners;
+
 -- DROP VIEW vw_placar;
-CREATE VIEW vw_placar AS
+/*CREATE VIEW vw_placar AS*/
 	SELECT * FROM vw_placarAtiv 
     UNION ALL 
-    SELECT * FROM vw_noSets 
+    SELECT * FROM vw_noSets
     ORDER BY id ASC;
 
 SELECT * FROM vw_placar;
 -- ****************************************
 -- DROP VIEW vw_kudos;
+
 CREATE VIEW vw_kudos AS    
 SELECT KD.id_atividade AS id, US.id AS userID, US.nome, US.nick 
 	FROM tb_kudos AS KD
@@ -95,6 +109,7 @@ SELECT * FROM vw_kudos WHERE id = 22;
 
 -- *********************************
 -- DROP VIEW vw_message;
+
 CREATE VIEW vw_message AS    
 SELECT MS.id, MS.id_atividade, US.id AS userID, US.nome, US.nick, MS.scrap 
 	FROM tb_message AS MS
@@ -105,8 +120,10 @@ SELECT * FROM vw_message WHERE id_atividade = 22;
 
 -- *********************************
 -- DROP VIEW vw_friends;
-CREATE VIEW vw_friends AS    
-SELECT FW.id_host AS hostID,(SELECT nome FROM tb_usuario WHERE id=FW.id_host) AS hostname,US.id AS guestID, US.nome AS guestname 
+
+CREATE VIEW vw_friends AS
+SELECT FW.id_host AS hostID,(SELECT nome FROM tb_usuario WHERE id=FW.id_host) AS hostname,US.id AS guestID, US.nome AS guestname,
+	(SELECT COUNT(*) FROM tb_following WHERE id_host=FW.id_guest AND id_guest=FW.id_host) AS SEGUE_VOLTA
 	FROM tb_following AS FW
 	INNER JOIN tb_usuario AS US
 	ON US.id = FW.id_guest;
@@ -117,32 +134,56 @@ SELECT * FROM vw_friends;
 
 -- DROP VIEW vw_perfil;
 CREATE VIEW vw_perfil AS
-SELECT US.id, US.nome,
+SELECT US.id, US.nome,US.nivel,
 	(SELECT COUNT(*) FROM vw_friends WHERE hostID = US.id ) AS SEGUINDO, 
     (SELECT COUNT(*) FROM vw_friends WHERE guestID = US.id ) AS SEGUIDORES,
-    (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id) AS ATIVIDADES,
-    (SELECT COUNT(*) FROM tb_atividades WHERE id_usuario = US.id AND dia>(NOW() - INTERVAL 28 DAY)) AS LAST_28,
+    (SELECT COUNT(*) FROM vw_atv WHERE id_atleta = US.id) AS ATIVIDADES,
+    (SELECT COUNT(*) FROM vw_atv WHERE id_atleta = US.id AND dia>(NOW() - INTERVAL 28 DAY)) AS LAST_28,
     (SELECT ALERTAS FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_QTD,
     (SELECT NOME FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_NOME,
     (SELECT NOME_OWNER FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_OWNER,
     (SELECT ATV FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_ATV,
     (SELECT GROUP_CONCAT(SUBSTRING(dia,1,10) SEPARATOR ', ')
-		FROM tb_atividades 
+		FROM vw_atv 
         WHERE dia>(NOW() - INTERVAL 28 DAY) 
-        AND id_usuario = US.id) AS TREINOS,
-    (SELECT GROUP_CONCAT(id SEPARATOR ', ')
-		FROM tb_atividades 
+        AND id_atleta = US.id) AS TREINOS,
+    (SELECT GROUP_CONCAT(id_atv SEPARATOR ', ')
+		FROM vw_atv 
         WHERE dia>(NOW() - INTERVAL 28 DAY) 
-        AND id_usuario = US.id) AS TREINO_ID            
-    FROM tb_usuario AS US;
+        AND id_atleta = US.id) AS TREINO_ID            
+	FROM tb_usuario AS US;
     
-SELECT * FROM vw_perfil ;
+
+-- DROP VIEW vw_dashboard_atleta;
+CREATE VIEW vw_dashboard_atleta AS
+SELECT ATV.id_atleta, DSB.* 
+	FROM tb_ativ_atleta AS ATV
+	INNER JOIN vw_dashboard AS DSB
+	ON ATV.id_ativ = DSB.id
+	AND DSB.dia>(NOW() - INTERVAL 28 DAY)
+	AND (ATV.confirm=1 OR ATV.ativ_owner);
+
+SELECT * FROM vw_dashboard_atleta WHERE id_atleta = 1;
 
 -- SELECT * FROM vw_alerta WHERE id_atleta = 2;
+-- *********************************
+-- DROP VIEW vw_atv;
+
+CREATE VIEW vw_atv AS
+	SELECT ATV.id AS id_atv, ATL.id_atleta, ATV.id_quadra, ATV.id_sport, ATV.id_evento, ATV.nome, ATV.dia, ATV.duracao, ATV.ranking
+	FROM tb_ativ_atleta AS ATL
+	INNER JOIN tb_atividades AS ATV
+	ON ATV.id = ATL.id_ativ
+    AND (ATL.confirm = 1 OR ATL.ativ_owner = 1);
+
+SELECT * FROM vw_atv WHERE id_atleta = 2;
+SELECT * FROM tb_ativ_atleta WHERE id_atleta = 2 AND (confirm = 1 OR ativ_owner = 1);
+
 
 -- *********************************
 
 -- DROP VIEW vw_atv_atleta;
+
 CREATE VIEW vw_atv_atleta AS    
 	SELECT AA.*, US.nome 
 		FROM tb_ativ_atleta AS AA

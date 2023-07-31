@@ -6,11 +6,11 @@
             height: 200px;
             max-width: 500px;
         }
-
+/*
         p{
             text-indent: 0;
         }
-
+*/
         h2, p{
             padding: 0 20px;
         }
@@ -18,7 +18,7 @@
         .line{
             display: flex;
             flex-direction: row;
-            justify-content: space-around;
+            justify-content: center;
             padding: 0 10px;
             margin: 10px;
         }
@@ -44,9 +44,12 @@
         <div class="center" >
             <h2 id="atv-titulo"></h2>
             <div class="line">
+                <div id="timeA"></div>
                 <p id="atv-atleta"></p>
+                <div id="timeB"></div>
             </div>
             <div id="map"></div>
+            <div id="social-panel"></div>
         </div>
 
 
@@ -82,19 +85,44 @@
     function fillGame(data){
 console.log(data)
 
+        const placar = parseInt(data.SETS_P1)+parseInt(data.SETS_P2) > 0
+        function usrImg(div,time){
+            div.innerHTML = ''
+            for(let i=0; i<time.length; i++){
+                const img = document.createElement('img')
+                img.className = 'imgUser'
+                img.src = `assets/users/${time[i]}.jpg`
+                img.style.position = 'relative'
+                img.style.left = i*5
+                breakImg(img)
+                img.addEventListener('click',()=>{
+                    window.location.hash = 'P'+time[i].toString().padStart(10,0)
+                    loadHash()
+                })
+                div.appendChild(img)
+            }            
+        }
 
-        let timeA = ''
-        let timeB = ''
-        const players = data.ATLETAS.split(',')
+        let timeA = {nome:'',id:[]}
+        let timeB = {nome:'',id:[]}
+        const nome_atl = data.ATLETAS.split(',')
+        const id_atl = data.ID_ATLETAS.split(',')
         const times = data.LADO.split(',')
-        for(let j=0; j<players.length; j++){
-            times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
+        for(let j=0; j<nome_atl.length; j++){
+            if(times[j].trim()=='A'){
+                timeA.nome += (timeA.nome.length>0 ?', ':'') +  nome_atl[j].trim()
+                timeA.id.push(parseInt(id_atl[j]))
+            }else{
+                timeB.nome += (timeB.nome.length>0 ?', ':'') +  nome_atl[j].trim()
+                timeB.id.push(parseInt(id_atl[j]))
+            }           
         }  
-        timeA = timeA.substring(0,timeA.length-1)
-        timeB = timeB.substring(0,timeB.length-1)
 
-        document.querySelector('.title-viewTrainning').innerHTML = data.EVENTO
-        document.querySelector('#atv-atleta').innerHTML = `${timeA}  ${data.SETS_P1} x ${data.SETS_P2}  ${timeB}`
+        usrImg(document.querySelector('#timeA'),timeA.id)
+        usrImg(document.querySelector('#timeB'),timeB.id)
+
+        document.querySelector('.title-viewTrainning').innerHTML = `${data.EVENTO} ${data.id_evento=='1'? data.ranking=='1'?'(RANQUEADA)':'(AMISTOSA)':''}`
+        document.querySelector('#atv-atleta').innerHTML = placar? `${data.SETS_P1} x ${data.SETS_P2}`:data.NOME_ATLETA
         document.querySelector('#atv-titulo').innerHTML = data.nome
         document.querySelector('#atv-data').innerHTML = `date: ${data.dia.showDate()}`
         document.querySelector('#atv-hora').innerHTML = `time: ${data.dia.showTime()}`
@@ -107,7 +135,11 @@ console.log(data)
             btnEdit.className = 'btn btn-primary'
             btnEdit.innerHTML = 'EDIT'
             btnEdit.addEventListener('click',()=>{
-                openHTML('newActivity.html','modal',data,400)
+                if(data.ranking == '1'){
+                    alert('Este jogo já foi conferido pelos outros atletas envolvidos e não pode ser mais editado.')
+                }else{
+                    openHTML('newActivity.html','modal',data,500)
+                }
             })
             actBtn.appendChild(btnEdit)
 
@@ -115,19 +147,50 @@ console.log(data)
             btnDel.className = 'btn btn-primary'
             btnDel.innerHTML = 'DELETE'
             btnDel.addEventListener('click',()=>{
-                if(confirm('Do you realy wanna delete this trainning?')){
-                const params = new Object;
-                    params.id_ATV = parseInt(mainData.viewTrainning.data.address)
+                if(data.ranking == '1'){
+                    alert('Este jogo já foi conferido pelos outros atletas envolvidos e não pode ser deletado.')
+                }else{
+                    if(confirm('Deseja realmente deletar este treino?')){
+                        const params = new Object;
+                            params.id_ATV = parseInt(mainData.viewTrainning.data.address)
 
-                const myPromisse = queryDB(params,11);
-                myPromisse.then(()=>{
-                    const form = document.getElementById(mainData.data.formID)
-                    form.parentNode.removeChild( form )
-                    closeModal('')
-                })
-            }            })
+                        const myPromisse = queryDB(params,11);
+                        myPromisse.then(()=>{
+                            const form = document.getElementById(mainData.data.formID)
+                            form.parentNode.removeChild( form )
+                            closeModal('')
+                        })
+                    }
+                }
+            })
             actBtn.appendChild(btnDel)            
         }else{
+
+            function newButton(CONF=1){
+                const txt = CONF?'Você confirma os dados do jogo acima como verdadeiro?':'Você recusa os dados do jogo acima?'
+                const btn = document.createElement('button')
+                    btn.className = 'btn btn-primary'
+                    btn.innerHTML = CONF?'CONFIRMAR':'RECUSAR'
+                    btn.addEventListener('click',()=>{
+
+                        if(confirm(txt)){
+                            const params = new Object;
+                                params.id_ATV = parseInt(mainData.viewTrainning.data.address)
+                                params.hash = localStorage.getItem('hash')
+                                params.confirm = CONF
+                                params.ask = 0
+                            const myPromisse = queryDB(params,30);
+                            myPromisse.then(()=>{
+//                                alert('Resultado confirmado!')
+                                fillPerfil(localStorage.getItem('idUser'))
+                                closeModal('')
+                            })
+                        }
+                    })
+                return btn
+            }
+
+
             const id_atletas = data.ID_ATLETAS.split(',')
             if(id_atletas.includes(localStorage.getItem('idUser'))){
                 
@@ -136,27 +199,9 @@ console.log(data)
                 const conf = parseInt(data.CONFIRM.split(',')[i])
 
                 if(ask && !conf){
-
                     const actBtn = document.querySelector('.action-btn')
-                    const btnConfirm = document.createElement('button')
-                    btnConfirm.className = 'btn btn-primary'
-                    btnConfirm.innerHTML = 'CONFIRME'
-                    btnConfirm.addEventListener('click',()=>{
-                        if(confirm('Você confirma os dados do jogo acima como verdadeiro?')){
-                            const params = new Object;
-                                params.id_ATV = parseInt(mainData.viewTrainning.data.address)
-                                params.hash = localStorage.getItem('hash')
-                                params.confirm = 1
-                                params.ask = 0
-                            const myPromisse = queryDB(params,30);
-                            myPromisse.then(()=>{
-                                alert('Resultado confirmado!')
-                                fillPerfil(localStorage.getItem('idUser'))
-                                closeModal('')
-                            })
-                        }                       
-                    })
-                    actBtn.appendChild(btnConfirm)
+                    actBtn.appendChild(newButton(1))
+                    actBtn.appendChild(newButton(0))
                 }
             }
         }
@@ -166,19 +211,67 @@ console.log(data)
         map.locate({setView: false, maxZoom: 30})
         disableMap(map)
 
-        const params = new Object;
-            params.id_ATV = data.id
-
-        const myPromisse = queryDB(params,15);
-        myPromisse.then((result)=>{
-            data.sets = JSON.parse(result)
-            for(let i=0; i<data.sets.length; i++){
-                const p = document.createElement('p')
-                p.innerHTML = 'SET '+(i+1).toString().padStart(2,0) + ' - '+data.sets[i].p1_score.padStart(2,0)+' x '+data.sets[i].p2_score.padStart(2,0)
-                p.title = data.sets[i].obs
-                document.querySelector('.view-sets').appendChild(p)
-            }            
+        const socialPanel = document.querySelector('#social-panel')      
+//        const socialPanel = makeElement('div','','panel-social')
+        const numKudos = makeElement('div',`${data.KUDOS.padStart(2,0)} kudos`,'social-kudos')
+        socialPanel.appendChild(numKudos)
+        const div3 = makeElement('div')
+        div3.style = 'display:flex; gap:5px;'
+        const btnKudos = makeElement('button','<i class="fas fa-thumbs-up"></i>','btn-backhand btn-social')
+        btnKudos.addEventListener('click',()=>{
+            if(localStorage.getItem('idUser') != null){             
+                const params = new Object;
+                    params.hash =  localStorage.getItem('hash')
+                    params.id_atividade = data.id
+                const myPromisse = queryDB(params,18)
+                myPromisse.then((resolve)=>{                       
+                    numKudos.innerHTML = JSON.parse(resolve)[0].KUDOS.padStart(2,0)+ ' kudos'                                     
+                })
+            }
         })
+        div3.appendChild(btnKudos)
+        const btnScrap = makeElement('button','<i class="fas fa-comments"></i>','btn-backhand btn-social')
+        btnScrap.addEventListener('click',()=>{
+            openHTML('message.html','modal',data)
+        })
+        div3.appendChild(btnScrap)
+        socialPanel.appendChild(div3)
+
+
+        if(placar){
+            const params = new Object;
+                params.id_ATV = data.id
+
+            const myPromisse = queryDB(params,15);
+            myPromisse.then((result)=>{
+                data.sets = JSON.parse(result)
+                const tbl = document.createElement('table')
+                tbl.innerHTML = `<tr><th>${timeA.nome}</th><th>SETs</th><th>${timeB.nome}</th></tr>`
+                for(let i=0; i<data.sets.length; i++){
+                    const tr = document.createElement('tr')
+    
+                    const t1 = document.createElement('td')
+                    t1.innerHTML = data.sets[i].p1_score.padStart(2,0)
+                    tr.appendChild(t1)
+                    
+//                    tr.appendChild(document.createElement('td'))
+                    const x = document.createElement('td')
+                    x.innerHTML = 'x'
+                    tr.appendChild(x)
+//                    tr.appendChild(document.createElement('td'))
+
+                    const t2 = document.createElement('td')
+                    t2.innerHTML = data.sets[i].p2_score.padStart(2,0)
+                    tr.appendChild(t2)
+                    
+                    tbl.appendChild(tr)
+         
+                }   
+                document.querySelector('.view-sets').appendChild(tbl)         
+            })
+        }
+
+
     }
     
 

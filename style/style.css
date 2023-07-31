@@ -87,6 +87,13 @@ h3{
 button{
   cursor: pointer;
 }
+/* Trophy */
+
+.fa-trophy {
+  -webkit-text-stroke: 0.05em #e8e8e8;
+  color: #ffae00;
+  font-size: 1em;
+}
 
 /* ///////////..utility classes../////////// */
 
@@ -155,6 +162,7 @@ button{
   padding-top: 15px;
   color: rgb(155, 154, 154);
   font-size: 0.8em;
+  text-align: center;
 }
 
 .right-panel{
@@ -186,6 +194,17 @@ button{
   border: solid 1px #16a083;  
   color: #16a083;
   transition: background 0.3s ease-in-out;
+}
+
+.btn-fill{
+  background: #16a083 !important;
+  border: solid 1px #16a083;
+  color: #ffffff !important;
+}
+
+.btn-fill:hover{
+  background: #FFFFFF !important;
+  color: #16a083 !important;
 }
 
 .flex-line{
@@ -227,13 +246,15 @@ button{
 }
 
 .badge{
-  width: auto;
+  display: flex;
+  position: relative;
+  right: 10px;  
+  margin-bottom: 10px;
+  border-radius: 50%;
   min-width: 15px;
   height: 15px;
   background-color: rgb(165, 35, 35);
-  border-radius: 50%;
   color: #fff;
-  display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.5em;
@@ -335,6 +356,10 @@ button{
 
 
 @media (max-width: 769px) {
+
+  *{
+    max-width: 100vw;
+  }
 
   .hide{
     display: none !important;

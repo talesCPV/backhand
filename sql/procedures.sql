@@ -1,4 +1,4 @@
-q/*  USUARIO  */
+/*  USUARIO  */
 
 -- DROP PROCEDURE sp_insertUsuario;
 DELIMITER $$
@@ -101,7 +101,8 @@ DELIMITER ;
 DELIMITER $$
 		CREATE PROCEDURE sp_findQuadra(
         IN Ihash varchar(77),
-		IN Idistance int(11)
+		IN Idistance int(11),
+        IN Inome varchar(30)
     )
 	BEGIN	      
 		DECLARE Iid_host INT(11);
@@ -110,19 +111,28 @@ DELIMITER $$
 		SET Iid_host = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
 		SET Ilat = (SELECT lat FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
 		SET Ilng = (SELECT lng FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
-	            
+         
 		SELECT QD.*, 
 			(SELECT COUNT(*) FROM tb_minhasquadras WHERE id_quadra = QD.id AND id_usuario = Iid_host) AS MYCOURT,
 			(SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,QD.lat,QD.lng)),0)) AS DISTANCE
 			FROM tb_quadra AS QD
             WHERE (SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,QD.lat,QD.lng)),0)) < Idistance
-            ORDER BY DISTANCE,QD.nome;
+            AND QD.nome COLLATE utf8_general_ci LIKE CONCAT("%",Inome,"%")COLLATE utf8_general_ci
+            ORDER BY DISTANCE,QD.nome
+            LIMIT 30;
     		
 	END $$
 DELIMITER ;
 
-CALL sp_findQuadra("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",100);
+CALL sp_findQuadra("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",100,"mil");
 
+SELECT QD.*, 
+			(SELECT COUNT(*) FROM tb_minhasquadras WHERE id_quadra = 1 AND id_usuario = 1) AS MYCOURT,
+			(SELECT IFNULL((SELECT fn_calcDist("","","","")),0)) AS DISTANCE
+			FROM tb_quadra AS QD
+            WHERE (SELECT IFNULL((SELECT fn_calcDist("","","","")),0)) < 100
+            ORDER BY DISTANCE,QD.nome
+            LIMIT 30;
 
 /* ATIVIDADES */
 
@@ -192,6 +202,25 @@ BEGIN
 	END $$
 DELIMITER ;
 
+ DROP PROCEDURE sp_updatePlayer;
+DELIMITER $$
+CREATE PROCEDURE sp_updatePlayer(
+		IN Ipeso VARCHAR(10),
+		IN Iplayer VARCHAR(100)
+    )
+	BEGIN    
+    
+		SET @query = CONCAT('UPDATE tb_usuario SET nivel = ROUND(nivel+', Ipeso, ',2) WHERE id IN (', Iplayer,')');
+
+		PREPARE stmt1 FROM @query;
+		EXECUTE stmt1;
+		DEALLOCATE PREPARE stmt1;
+
+        SELECT * FROM tb_usuario WHERE id IN(Iplayer);
+	END $$
+DELIMITER ;
+
+CALL sp_updatePlayer(-0.1,"1,2");
 
 CALL sp_AtvAtl(1,1,"A",TRUE);
 SELECT * FROM tb_ativ_atleta;
@@ -206,7 +235,25 @@ DELIMITER $$
     )
 	BEGIN			   		
 		SET @IidAtl = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);        
-        UPDATE tb_ativ_atleta SET confirm=Iconfirm, ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;    			        
+        UPDATE tb_ativ_atleta SET confirm=Iconfirm, ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;  
+        SET @peso = (SELECT (SUM(USR.nivel* 0.05)) 
+						FROM tb_ativ_atleta AS ATV
+						INNER JOIN tb_usuario AS USR
+						ON ATV.id_atleta = USR.id 
+						WHERE ATV.id_ativ=IidAtv);
+		SET @winner = (SELECT WINNER FROM vw_winners WHERE id_ativ=IidAtv);
+        SET @loser = (SELECT LOSER FROM vw_winners WHERE id_ativ=IidAtv);
+        
+		IF ((SELECT COUNT(*) FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND ativ_owner=0 AND confirm=0)=0) THEN        
+			UPDATE tb_atividades SET ranking=1 WHERE id=IidAtv;
+            
+			CALL sp_updatePlayer(@peso,@winner);
+			CALL sp_updatePlayer(-@peso,@loser);
+            
+		ELSE
+			UPDATE tb_atividades SET ranking=0 WHERE id=IidAtv; 
+		END IF; 
+                
         SELECT * FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;
 	END $$
 DELIMITER ;
@@ -241,6 +288,33 @@ DELIMITER $$
 DELIMITER ;
 
 /* SETS */
+DELIMITER $$
+CREATE PROCEDURE sp_sets(
+		IN Ihash varchar(77),
+		IN IidAtv int(11), 
+		IN Ifields VARCHAR(3000),
+		IN Ivalues VARCHAR(3000)
+    )
+BEGIN                
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = IidAtv COLLATE utf8_general_ci);
+        	
+		IF (@call_owner = @atv_owner) THEN
+        
+			DELETE FROM tb_sets WHERE id_atividade=IidAtv;
+			
+			SET @query = CONCAT('INSERT INTO tb_sets ', Ifields, ' VALUES ', Ivalues);
+
+			PREPARE stmt1 FROM @query;
+			EXECUTE stmt1;
+			DEALLOCATE PREPARE stmt1;
+			
+		END IF; 
+
+        SELECT * FROM tb_sets WHERE id_atividade=IidAtv;
+        
+	END $$
+DELIMITER ;
 
 -- DROP PROCEDURE sp_insertSets;
 DELIMITER $$
@@ -312,8 +386,6 @@ DELIMITER ;
 SELECT * FROM tb_kudos;
 CALL sp_kudos("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",22);
 
-	
-
 /* MESSAGE */
 
 -- DROP PROCEDURE sp_message;
@@ -332,7 +404,7 @@ DELIMITER $$
         VALUES (Iid,Iid_usuario,Iid_atividade,Iscrap)
         ON DUPLICATE KEY UPDATE scrap=Iscrap;
         
-        SELECT * from vw_message WHERE id_atividade = Iid_atividade;
+        SELECT * from vw_message WHERE id_atividade = Iid_atividade ORDER BY id;
         
 	END$$
 DELIMITER ;

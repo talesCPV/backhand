@@ -62,8 +62,8 @@
         <input type="time" id="edtTempo" value="01:00">
 
         <label for="cmbQuadra">Quadra</label>
-        <div class="edtbtn">
-            <select id="cmbQuadra"></select>
+        <div class="edtbtn" >
+            <select id="cmbQuadra" style="max-width: 80%;"></select>
             <button id="btnAddCourt"><i class="fas fa-plus-circle"></i></button>
         </div>
 
@@ -95,6 +95,12 @@
     const edit = mainData.newActivity.data.id != undefined
     let id = 'DEFAULT'
 
+    mainData.newActivity.func.fillCourts = ()=>{
+        const courtParams = new Object;
+            courtParams.idUser = localStorage.getItem('idUser')
+        fillCombo('cmbQuadra',courtParams,6,['id','nome'], data != undefined ? data.id_quadra : '')
+    }
+
     mainData.newActivity.func.fillTime = (time)=>{
         const partners = mainData.newActivity.data[time]
         const cmb = document.querySelector('#cmb-'+time)
@@ -121,6 +127,7 @@
         document.querySelector('#edtTempo').value = dur
         document.querySelector('.title-newActivity').innerHTML = 'Edit Activity'
         document.querySelector('#btnAdd').innerHTML = "SAVE"
+
         querySets()
         queryPlayers()
 
@@ -156,16 +163,16 @@
     })
 
     function buscaAmigo(time){
-        openHTML('newFriend.html','modal',{source:'newActivity',time:time},500)
+        openHTML('newFriend.html','modal',{source:'newActivity',time:time})
     }
 
     document.querySelector('#btnAddCourt').addEventListener('click',()=>{
-        openHTML('myCourts.html','modal',null,500)
+        openHTML('findCourts.html','modal',{origem:'newActivity'})
     })
 
 
     document.querySelector('#btnSetScore').addEventListener('click',()=>{
-        openHTML('addSets.html','modal',null,500)
+        openHTML('addSets.html','modal',null)
     })
 
     document.querySelector('#btnEdtSet').addEventListener('click',()=>{
@@ -176,7 +183,7 @@
             const index = document.querySelector('#cmbSets').value
             const set = mainData.newActivity.data.sets[index]
             set.index = index
-            openHTML('addSets.html','modal',{sets : set},500)
+            openHTML('addSets.html','modal',{sets : set})
         }
     })
     
@@ -195,6 +202,7 @@
 
     }
 
+
     function refreshData(){
         data.nome = document.querySelector('#edtDesc').value.toUpperCase().trim()
         data.SPORT = document.querySelector('#cmbSport').options[document.querySelector('#cmbSport').selectedIndex].text
@@ -207,23 +215,29 @@
 
     function updateData(data){
 
-        let timeA = ''
-        let timeB = ''
-        const players = data.ATLETAS.split(',')
+        let timeA = {nome:'',id:[]}
+        let timeB = {nome:'',id:[]}
+        const nome_atl = data.ATLETAS.split(',')
+        const id_atl = data.ID_ATLETAS.split(',')
         const times = data.LADO.split(',')
-        for(let j=0; j<players.length; j++){
-            times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
-        }
-        timeA = timeA.substring(0,timeA.length-1)
-        timeB = timeB.substring(0,timeB.length-1)
+        for(let j=0; j<nome_atl.length; j++){
+            if(times[j].trim()=='A'){
+                timeA.nome += (timeA.nome.length>0 ?',':'') +  nome_atl[j].trim()
+                timeA.id.push(parseInt(id_atl[j]))
+            }else{
+                timeB.nome += (timeB.nome.length>0 ?',':'') +  nome_atl[j].trim()
+                timeB.id.push(parseInt(id_atl[j]))
+            }           
+        }  
 
 
         const form = document.getElementById(mainData.data.formID)
 //console.log(data)
 //console.log(form)
+
         form.querySelector('.head-activity-atleta').innerHTML = data.NOME_ATLETA
         form.querySelector('#nome').innerHTML = data.nome
-        form.querySelector('#placar').innerHTML = `${timeA} ${data.SETS_P1} vs ${data.SETS_P2} ${timeB}`
+//        form.querySelector('#placar').innerHTML = `${timeA.nome} ${data.SETS_P1} vs ${data.SETS_P2} ${timeB.nome}`
         form.querySelector('.map-label').innerHTML = data.QUADRA
         form.querySelector('#sport').innerHTML = `${data.SPORT} (${data.EVENTO})`
 //        form.querySelector('#evento').innerHTML = data.EVENTO
@@ -233,8 +247,9 @@
     }
 
     document.querySelector('#btnAdd').addEventListener('click',()=>{
+
         refreshData()
-   
+
         if(goon('edtDesc,edtData,edtHora,edtTempo')){
             const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
             const dt = document.querySelector('#edtData').value.trim()+" "+document.querySelector('#edtHora').value.trim()+':00'            
@@ -255,15 +270,20 @@
 
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
-                const json = JSON.parse(resolve)
-//console.log(json[0])                
+                const json = JSON.parse(resolve)             
                 edit ?  updateData(data) : 0
-                addSets(json[0].id)
-                addPlayers(json[0].id)
+                if(id=="DEFAULT"||json[0].ranking=="0"){
+                    addSets(json[0].id)
+                    addPlayers(json[0].id)
+                }
+
                 closeModal(0)
                 closeModal(0)
             })
         }
+    
+
+
     })
 
     mainData.newActivity.func.fillSets = ()=>{
@@ -300,9 +320,8 @@
         fillCmb(timeB,cmbB)
     }
 
-
     function addSets(idAtv){
-console.log(idAtv)
+
         const sets = mainData.newActivity.data.sets
         const setsize = mainData.newActivity.data.timeA.length
         const params = []
@@ -316,7 +335,7 @@ console.log(idAtv)
                 pr.obs = sets[i].obs
             params.push(pr)
         }
-console.log(params)
+
         if(params.length>0){
             queryJson(params,2,idAtv).then((txt)=>{
                 console.log(txt)

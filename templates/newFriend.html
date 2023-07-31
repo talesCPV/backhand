@@ -36,6 +36,14 @@
 </template>
 <script>
     
+    mainData.newFriend.func.onClose = ()=>{
+        if(mainData.newFriend.data.origem =='social'){
+            mainData.social.func.viewFriends('hostID','#myFriends','guestname','guestID')
+            mainData.social.func.viewFriends('guestID','#iFriend','hostname','hostID')
+        }
+
+
+    }
 
 
     friendsDistance(100)
@@ -138,10 +146,10 @@
                         const params = new Object;
                             params.hash = localStorage.getItem('hash')
                             params.id_guest = friends[i].userID
-                            queryDB(params,23).then((resolve)=>{
-                                console.log(resolve)
-                            })
-                            btn.style.display = 'none'     
+                        queryDB(params,23).then((resolve)=>{
+                            console.log(resolve)
+                        })
+                        btn.style.display = 'none'     
                     })
 
                     div.appendChild(btn)

@@ -33,6 +33,7 @@
       <link rel="stylesheet" href="style/style.css" />
       <link rel="stylesheet" href="style/menu.css">
       <link rel="stylesheet" href="style/modal.css">
+      <link rel="stylesheet" href="style/rating.css">
       <script src="scripts/smooth_scroll.js"></script>
       <script src="scripts/proto.js"></script>
       <script src="scripts/maps.js"></script>
@@ -122,6 +123,12 @@
           gap: 5px;
         }
 
+        .rating-line{
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
+
 /* BTN KUDOS E SCRAP */
         .btn-social{
           margin: 0 !important;
@@ -146,15 +153,12 @@
               <p id="usr"></p>
             </div>
             <ul class="menu-items">
-                <li class="only-login hide-menu"><a href="#dashboard"><i class="fas fa-home"></i></a></li>
                 <li class="only-login hide-menu"><a onclick="social()"><i class="fas fa-user-friends"></i></a></li>
-                <li class="only-login hide-menu" style="font-size: 1.8em;"><a onclick="addOne()"> <i class="fas fa-plus-circle"></i> </a></li>
-                <li class="only-login hide-menu"><a onclick="viewUser()" class="parent-sub-menu"><img class="imgUser" id="imgUser" src="assets/user.jpeg"></a>
-<!--                  <ul class="sub-menu"></ul>-->
-                </li>
-                <li class="only-login hide-menu" ><a style="display: flex; gap: 5px;" class="parent-sub-menu"> <i class="fas fa-bell" style="margin-top: 6px;"></i><span id="alert" class="badge" style="margin-bottom: 10px;position: relative; right: 10px;"></span>  </a>
+                <li class="only-login hide-menu" style="font-size: 1.3em;"><a onclick="addOne()"> <i class="fas fa-plus-circle"></i> </a></li>
+                <li class="only-login hide-menu" ><a style="display: flex; gap: 5px;" class="parent-sub-menu"> <i class="fas fa-bell" style="margin-top: 6px;"></i><span id="alert" class="badge"></span>  </a>
                   <ul class="sub-menu alert-badge"></ul>
                 </li>
+                <li class="only-login hide-menu"><a onclick="viewUser()"><img class="imgUser" id="imgUser" src="assets/user.jpeg"></a></li>
                 <li><a id="log-inout" onclick="login()">Inscreva-se</a></li> 
             </ul>
             <p></p>
@@ -175,6 +179,24 @@
               <p class="perfil-seguindo"></p>
               <p class="perfil-seguidores"></p>
               <p class="perfil-atividades"></p>
+            </div>
+
+            <svg style="display:none;">
+              <defs>
+                <symbol id="fivestars">
+                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd"/>
+                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd" transform="translate(24)"/>
+                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd" transform="translate(48)"/>
+                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd" transform="translate(72)"/>
+                  <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z M0 0 h24 v24 h-24 v-24" fill="white" fill-rule="evenodd"  transform="translate(96)"/>
+                </symbol>
+              </defs>
+            </svg>
+            <div class="rating-line">
+              <div class="rating">
+                <progress class="rating-bg" value="0" max="5"></progress>
+                <svg><use xlink:href="#fivestars"/></svg>
+              </div>    
             </div>
 
 
@@ -241,26 +263,27 @@
         openScreen(false)
       }
 
-
       function login(){
         if(localStorage.getItem('idUser') == null){
-          openHTML('novoUser.html','modal')           
-        }else{        
-          localStorage.clear();
-          document.querySelector('#footer').style.display = 'none'
-          document.querySelector('.dashboard').style.width = '100%'
-          document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
-          openHTML('noLogin.html','screen')
-          openScreen()
+          openHTML('novoUser.html','modal',null,500)           
+        }else{      
+          if(confirm('sair do backhand?')){
+            localStorage.clear();
+            document.querySelector('#footer').style.display = 'none'
+            document.querySelector('.dashboard').style.width = '100%'
+            document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
+            openHTML('noLogin.html','screen')
+            openScreen()
+          }  
         }
       }
 
       function addOne(){
-        openHTML('newActivity.html','modal',null,400)
+        openHTML('newActivity.html','modal',null,500)
       }
 
       function viewUser(){
-        openHTML('viewUser.html','modal',null,400)
+        openHTML('viewUser.html','modal',null)
       }
 
       function social(){

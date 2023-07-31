@@ -20,7 +20,7 @@
     <div class="form courtForm">
 
         <div>
-            <div class="edtbtn">
+            <div class="edtbtn" style="width: 100%;">
                 <input id="edtSearch" type="text">
                 <button id="btnSearch">  <i class="fas fa-search"></i></button>
                 <button id="btnNewCourt"><i class="fas fa-plus-circle"></i></button>
@@ -34,17 +34,25 @@
 </template>
 <script>
 
+    mainData.findCourts.func.onClose = ()=>{       
+        mainData[mainData.findCourts.data.origem].func.fillCourts()    
+    }
+
     viewCourts()
 
     document.querySelector('#btnNewCourt').addEventListener('click',()=>{
-        openHTML('newCourt.html','modal',null,500)
+        openHTML('newCourt.html','modal',null)
     })
 
-    function viewCourts(){
+    document.querySelector('#btnSearch').addEventListener('click',()=>{
+        viewCourts(document.querySelector('#edtSearch').value.trim())
+    })
+
+    function viewCourts(court_name=""){
         const params = new Object;
             params.hash = localStorage.getItem('hash')
             params.distance = 100
-
+            params.nome = court_name
         const myPromisse = queryDB(params,3)
 
         myPromisse.then((resolve)=>{
@@ -75,7 +83,7 @@
                         params.id_court = courts[i].id
                         queryDB(params,parseInt(courts[i].MYCOURT) ? 8 : 7).then((resolve)=>{
                             viewCourts()
-                            mainData.viewUser.fillCourts()
+                            
                         })
 
                 })

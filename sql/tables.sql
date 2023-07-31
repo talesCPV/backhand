@@ -1,4 +1,5 @@
 use d2soft98_backhand;
+use backha49_main_db;
 
 -- DROP TABLE tb_sport;
 CREATE TABLE tb_sport (
@@ -25,9 +26,13 @@ CREATE TABLE tb_usuario (
     class int(11) DEFAULT 0,
 	lat double DEFAULT NULL,
     lng double DEFAULT NULL,
+    nivel double DEFAULT 1,
 	UNIQUE KEY (hash),
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+ALTER TABLE tb_usuario
+ADD COLUMN nivel double DEFAULT 1;
 
 -- DROP TABLE tb_quadra;
 CREATE TABLE tb_quadra (
@@ -59,12 +64,16 @@ CREATE TABLE tb_atividades (
   dia datetime NOT NULL,
   duracao DOUBLE NOT NULL,
   ranking BOOLEAN DEFAULT FALSE,
+  peso double DEFAULT 0,
   FOREIGN KEY (id_usuario) REFERENCES tb_usuario(id),
   FOREIGN KEY (id_quadra) REFERENCES tb_quadra(id),
   FOREIGN KEY (id_sport) REFERENCES tb_sport(id),
   FOREIGN KEY (id_evento) REFERENCES tb_evento(id),
   PRIMARY KEY (id)
 )ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+ALTER TABLE tb_atividades
+ADD COLUMN peso double DEFAULT 0;
 
 -- DROP TABLE tb_ativ_atleta;
 CREATE TABLE tb_ativ_atleta (

@@ -39,7 +39,9 @@ function closeModal(id='all'){
         }catch{
             0
         }finally{
-            delete mainData[key]
+            if(!['data','coords'].includes(key)){
+                delete mainData[key]
+            }
         }
     }
 
@@ -48,9 +50,8 @@ function closeModal(id='all'){
         while(mod_main.querySelectorAll('.modal').length > 0){
             mod_main.querySelectorAll('.modal')[0].remove()    
             Object.entries(mainData).forEach(entry => {
-                const [key, value] = entry;
+                const [key, value] = entry;              
                 beforeClose(key)
-//                delete mainData[key]
               });
         }
     }else{
@@ -61,7 +62,6 @@ function closeModal(id='all'){
 
         const key = template.split('.')[0]
         beforeClose(key)
-//        delete mainData[key]
     }
     mod_main.style.display = (mod_main.querySelectorAll('.modal').length < 1) ? "none" : 'block'
 }
@@ -87,6 +87,8 @@ function newModal(content, max=0){
         mod_card.style.top =  50 + index*offset_y+'px'
         mod_card.style.left =  index*offset_x+'px'
         mod_card.style.right =  index*offset_x+'px'
+        mod_card.style['max-width'] = max
+
     
     const mod_title = document.createElement('div')
     mod_title.className = 'modal-header'    

@@ -20,26 +20,20 @@
             padding-top: 50px;
         }
 
-        #btnLogin, input{
+        input{
             width: 250px;
             height: 30px;
         }
 
-        .btnMessage{
-            border-radius: 5px;
-            padding: 5px;
-            background: #16a083;
-            border: solid 1px #16a083;
-            color: #ffffff;
-            margin: 20px;
-            min-width: 100px;
+        #btnAddUser{
+            width: 250px;
         }
 
-        .btnMessage:hover{
-            border: solid 1px #16a083;
-            border-radius: 5px;
-            background: #e0e6e4;
-            color: #16a083;
+        .form-newUser{
+            background-image: url("assets/background/04.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
         }
 
     </style>
@@ -54,18 +48,18 @@
         </div>
 
         <div class="line">
-            <input id="edtName" type="text" maxlength="60" placeholder="* Nome">
+            <input id="edtRePass" type="password" maxlength="12" placeholder="* Repita a Senha">
         </div>
 
         <div class="line">
-            <input id="edtNick" type="text" maxlength="15" placeholder="Apelido">
+            <input id="edtName" type="text" maxlength="60" placeholder="* Nome">
         </div>
 
         <div class="line">
             <input id="edtCel" type="text" maxlength="14" placeholder="Celular" onkeyup="phone(this)">
         </div>
 
-        <button  class="btnMessage" id="btnAddUser">Salvar</button>
+        <button  class="btn-backhand btn-fill" id="btnAddUser">Salvar</button>
     </div>
 
 </template>
@@ -73,28 +67,33 @@
 
 
     document.querySelector('#btnAddUser').addEventListener('click',()=>{
-
-        if(goon('edtMail,edtPass,edtName')){
-            const email = document.querySelector('#edtMail').value.trim().toLowerCase()
-            const pass = document.querySelector('#edtPass').value.trim()
-            const nome = document.querySelector('#edtName').value.trim().toUpperCase()
-
-            const params = new Object;
-                params.id = 'DEFAULT'
-                params.email = email
-                params.hash = (email+pass).getHash(77)
-                params.name = nome
-                params.nick = document.querySelector('#edtNick').value.trim()
-                params.cel = document.querySelector('#edtCel').value.trim()
-                params.class = 0
-                params.lat = mainData.data.lat
-                params.lng = mainData.data.lng
-            const myPromisse = queryDB(params,1);
-            myPromisse.then((resolve)=>{
-                    alert('Usuário cadastrado com sucesso!')
-                    closeModal()       
-            })
+        const pass = document.querySelector('#edtPass').value.trim()
+        const repass = document.querySelector('#edtRePass').value.trim()
+        if(pass == repass){     
+            if(goon('edtMail,edtPass,edtName')){
+                const email = document.querySelector('#edtMail').value.trim().toLowerCase()                
+                const nome = document.querySelector('#edtName').value.trim().toUpperCase()
+                const params = new Object;
+                    params.id = 'DEFAULT'
+                    params.email = email
+                    params.hash = (email+pass).getHash(77)
+                    params.name = nome
+                    params.nick = nome
+                    params.cel = document.querySelector('#edtCel').value.trim()
+                    params.class = 0
+                    params.lat = mainData.data.lat
+                    params.lng = mainData.data.lng
+                const myPromisse = queryDB(params,1);
+                myPromisse.then((resolve)=>{
+                        alert('Usuário cadastrado com sucesso!')
+                        closeModal()       
+                })
+            }
+        }else{
+            alert('As senhas não conferem.')
+            document.querySelector('#edtRePass').focus()
         }
+
     })
 
 

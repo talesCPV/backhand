@@ -145,9 +145,8 @@
 <script>
 
     const data = mainData.message.data
+    let numMsg = 0
     document.querySelector('.title-message').innerHTML = data.nome
-    document.querySelector('#tab-kudos').innerHTML = `Kudos (${data.KUDOS})`
-    document.querySelector('#tab-comentarios').innerHTML = `Scraps (${data.MESSAGES})`
     document.querySelector('#imgUserMs').src = document.querySelector('#imgUser').src
     pictab(document.querySelector('#tab-comentarios'))
 
@@ -159,6 +158,8 @@
 
     myPromisse_kudos.then((resolve)=>{
         const kudos =  JSON.parse(resolve)
+        document.querySelector('#tab-kudos').innerHTML = `Kudos (${kudos.length})`
+        
         const div_kudos = document.querySelector('#kudos') 
         for(let i=0; i<kudos.length; i++){      
             const div = document.createElement('div')
@@ -205,15 +206,16 @@
     const myPromisse_message = queryDB(params_message,22)
 
     myPromisse_message.then((resolve)=>{
-        const message =  JSON.parse(resolve)             
+        const message =  JSON.parse(resolve)                     
         refreshMessage(message)
     })
 
     function refreshMessage(dt){
+        numMsg = dt.length;
         const div_message = document.querySelector('.show-com') 
         div_message.innerHTML = ''
-        document.querySelector('#tab-comentarios').innerHTML = `Scraps (${dt.length})`
-        for(let i=0; i<dt.length; i++){
+        document.querySelector('#tab-comentarios').innerHTML = `Scraps (${numMsg})`
+        for(let i=0; i<numMsg; i++){
            
             const div = document.createElement('div')
             div.className = 'view-message'
@@ -246,15 +248,16 @@
                 btn.className = 'btnMessage'
 
                 btn.addEventListener('click',()=>{
-                    console.log(dt[i])
-                    
+
                     const params = new Object;
                         params.hash = localStorage.getItem('hash')
                         params.id_message = dt[i].id
                         queryDB(params,20).then((resolve)=>{
-                            console.log(resolve)
+                            numMsg--
+                            document.querySelector('#tab-comentarios').innerHTML = `Scraps (${numMsg})`
                         })
-                        div.style.display = 'none'     
+                        div.style.display = 'none'   
+                          
                        
                 })
 

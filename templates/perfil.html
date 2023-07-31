@@ -13,6 +13,7 @@
 
         .top{
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             width: 100%;
             justify-content: space-around;
@@ -75,24 +76,65 @@
             border-radius: 50%;
         }
 
+        .left-perfil{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .rigth-perfil{
+            width: 80%;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+
+        .line{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .line > *{
+            padding: 0;
+            text-indent: 0;
+        }
+
     </style>
 
     <div class="form-perfil">
 
         <div class="top">
-            <img id="pic-perfil" class="imgUser" src="assets/user.jpeg" alt="">
-            <div class="box">
-                <p>Seguindo</p>
-                <p id="seguindo"></p>
+            <div class="left-perfil">
+                <img id="pic-perfil" class="imgUser" src="assets/user.jpeg" alt="">
+                <div class="rating-line">
+                    <div class="rating">
+                        <progress id="perfil-rating" class="rating-bg" value="0" max="5"></progress>
+                        <svg><use xlink:href="#fivestars"/></svg>
+                    </div>    
+                </div>   
+                <div class="line">
+                    <p>nível:</p>
+                    <h2 id="val-nivel">0</h2>
+                </div>                
             </div>
-            <div class="box">
-                <p>Seguidores</p>
-                <p id="seguidores"></p>
+
+            <div class="rigth-perfil">
+                <div class="box">
+                    <p>Seguindo</p>
+                    <p id="val-seguindo"></p>
+                </div>
+                <div class="box">
+                    <p>Seguidores</p>
+                    <p id="val-seguidores"></p>
+                </div>
+                <div class="box">
+                    <p>Atividades</p>
+                    <p id="val-atividades"></p>
+                </div>                                              
             </div>
-            <div class="box">
-                <p>Atividades</p>
-                <p id="atividades"></p>
-            </div>
+
         </div>
 
         <div class="middle">
@@ -134,7 +176,6 @@
             const json = JSON.parse(resolve)
             const treinos = json[0].TREINOS!=null?json[0].TREINOS.split(','):0
             const treinos_id = json[0].TREINO_ID!=null?json[0].TREINO_ID.split(','):0
-console.log(json)
 
             for(let i=0; i<treinos.length; i++){                
                 document.getElementById(treinos[i].trim()).classList.add('day-trainning')
@@ -143,19 +184,19 @@ console.log(json)
             const pic = document.querySelector('#pic-perfil')
 
             document.querySelector('.title-perfil').innerHTML = json[0].nome
-            document.querySelector('#seguindo').innerHTML = json[0].SEGUINDO
-            document.querySelector('#seguidores').innerHTML = json[0].SEGUIDORES
-            document.querySelector('#atividades').innerHTML = json[0].ATIVIDADES
+            document.querySelector('#val-seguindo').innerHTML = json[0].SEGUINDO
+            document.querySelector('#val-seguidores').innerHTML = json[0].SEGUIDORES
+            document.querySelector('#val-atividades').innerHTML = json[0].ATIVIDADES
             document.querySelector('#last-4').innerHTML = json[0].LAST_28
-            
+            document.querySelector('#perfil-rating').value = json[0].nivel
+            document.querySelector('#val-nivel').innerHTML = json[0].nivel
+
             pic.src = `assets/users/${json[0].id}.jpg`
             breakImg(pic)
 
-            console.log(params)
             queryDB(params,29).then((res_ATV)=>{
                 const jsonATV = JSON.parse(res_ATV)
 
-                console.log(jsonATV)
                 for(let i=0; i<jsonATV.length; i++){
                     makeActivity(jsonATV[i],'activities',false)
                     mainData.perfil.data.mapLength++

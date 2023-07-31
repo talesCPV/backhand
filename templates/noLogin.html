@@ -15,14 +15,21 @@
             max-width: 400px;
         }
 
-        #btnLogin, input[type="email"], input[type="password"]{
+        input[type="email"], input[type="password"]{
             width: 250px;
             height: 30px;
         }
 
+        #btnLogin{
+            width: 250px;
+        }
+
         .main-content{
-            background-image: url("assets/background/01.jpg");
-            background-position: center;
+            background-image: url("assets/background/05.jpg");
+            background-position: right;
+            
+            background-size: cover;
+            
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
@@ -50,19 +57,9 @@
             color: white;
         }
 
-        .btnMessage{
-            border-radius: 5px;
-            padding: 5px;
-            background: #16a083;
-            border: solid 1px #16a083;
-            color: #ffffff;
-        }
-
-        .btnMessage:hover{
-            border: solid 1px #16a083;
-            border-radius: 5px;
-            background: #e0e6e4;
-            color: #16a083;
+        #btnNewUser:hover{
+            cursor: pointer;
+            color: rgb(211, 247, 51);
         }
 
     </style>
@@ -76,7 +73,10 @@
             <div class="login-text">
                 <input type="email" id="edtEmail" placeholder="  Seu e-mail">
                 <input type="password" id="edtSenha" placeholder="  Senha">
-                <button id="btnLogin" class="btnMessage" >login</button>
+                <button id="btnLogin" class="btn-backhand btn-fill" >login</button>
+                <div>
+                    <p id="btnNewUser" onclick="openHTML('novoUser.html','modal',null,500)">Novo Usuário?</p>
+                </div>
 
             </div>
     
@@ -135,7 +135,6 @@
                 }else{
                     alert('Usuário ou senha inválido!')
                     localStorage.clear();
-                    checkLogin()
                     openScreen(true)
                 }
 

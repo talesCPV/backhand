@@ -91,7 +91,7 @@
     pictab(document.querySelector('#tab-perfil'))
 
     
-    mainData.viewUser.fillCourts = ()=>{
+    mainData.viewUser.func.fillCourts = ()=>{
         const params = new Object;
             params.idUser = localStorage.getItem('idUser')
 
@@ -129,7 +129,7 @@
         })
     }
 
-    mainData.viewUser.fillCourts()
+    mainData.viewUser.func.fillCourts()
 
     const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
 
@@ -139,7 +139,6 @@
         let path = ''
         path = imgExist ? `assets/users/${localStorage.getItem('idUser')}.jpg` : 'assets/user.jpeg'    
         loadImg(path)
-        console.log(path)
     })
 
     document.querySelector('#edtMail').value = localStorage.getItem('email')
@@ -148,6 +147,9 @@
     document.querySelector('#edtCel').value = localStorage.getItem('cel')
     document.querySelector('#btnUpload').addEventListener('click',()=>{
         uploadImage('up_file','/../assets/users/',localStorage.getItem('idUser')+'.jpg')
+        .then(()=>{
+            fillPerfil(localStorage.getItem('idUser'))
+        })
     })
 
     document.querySelector('#up_file').addEventListener('change',()=>{
@@ -192,13 +194,14 @@
             const myPromisse = queryDB(params,1);
             myPromisse.then((resolve)=>{
                     alert('Usuário cadastrado com sucesso!')
+                    fillPerfil(localStorage.getItem('idUser'))
                     closeModal()       
             })
         }
     })
 
     document.querySelector('#btnFindCourt').addEventListener('click',()=>{
-        openHTML('findCourts.html', 'modal',null,500)
+        openHTML('findCourts.html', 'modal',{origem:'viewUser'})
     })
 
 

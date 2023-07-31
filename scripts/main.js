@@ -18,14 +18,16 @@ function showUserPic(){
 function fillPerfil(usr){
 
     function alertas(PERFIL){        
-        const qtd = parseInt(PERFIL.ALERTA_QTD)
-        const atv = PERFIL.ALERTA_ATV.split(',')
-        const nome = PERFIL.ALERTA_NOME.split(',')
-//        const owner = PERFIL.ALERTA_OWNER.split(',')
         const container = document.querySelector('.alert-badge')
-        container.innerHTML = ''
-
-        if(qtd>0){
+        const alert =  document.querySelector('#alert')
+        container.innerText = ''
+        alert.innerText = ''
+ 
+        if(PERFIL.ALERTA_QTD != null){
+            const qtd = parseInt(PERFIL.ALERTA_QTD)
+            const atv = PERFIL.ALERTA_ATV.split(',')
+            const nome = PERFIL.ALERTA_NOME.split(',')            
+            container.innerHTML = ''
             const legend = document.createElement('li')
             legend.innerHTML = 'Confirmar Jogos'
             container.appendChild(legend)
@@ -41,8 +43,8 @@ function fillPerfil(usr){
                     })
                 container.appendChild(li)
             }
+            alert.innerText = qtd
         }
-        document.querySelector('#alert').innerText = qtd
     }
 
 
@@ -52,7 +54,7 @@ function fillPerfil(usr){
     const myPromisse = queryDB(params,27);
     myPromisse.then((resolve)=>{
         const json = JSON.parse(resolve)  
-    
+//console.log(json)
         const img = document.querySelector('#perfil-img') 
 
         img.src = `assets/users/${json[0].id}.jpg`
@@ -64,6 +66,7 @@ function fillPerfil(usr){
         document.querySelector('.perfil-seguidores').innerText = 'Seguidores '+json[0].SEGUIDORES.padStart(2,0)
         document.querySelector('.perfil-atividades').innerText = 'Atividades '+json[0].ATIVIDADES.padStart(2,0)
         document.querySelector('.perfil-nome').innerText = json[0].nome
+        document.querySelector('.rating-bg').value = json[0].nivel
         alertas(json[0])
 
     })
@@ -96,41 +99,47 @@ function removeHash() {
     history.pushState("", document.title, window.location.pathname + window.location.search);
 }
 
+function makeElement(kind,html='',cn='',id='',src='',target=''){
+    const el = document.createElement(kind)
+    id.trim()!=''?el.id=id:0
+    cn.trim()!=''?el.className=cn:0
+    html.trim()!=''?el.innerHTML=html:0
+    target.trim()!=''?el.target=target:0
+
+    if(src.trim()!=''){
+        el.src=src
+        breakImg(el)
+    }
+    return el
+}
+
 function makeActivity(ATV,classScreen,showUser=true){
     
     const screen =  document.querySelector('.'+classScreen)
     const mapDiv = 'map-'+classScreen
     const i = maps.length
 
-
-    function makeElement(kind,html='',cn='',id='',src='',target=''){
-        const el = document.createElement(kind)
-        id.trim()!=''?el.id=id:0
-        cn.trim()!=''?el.className=cn:0
-        html.trim()!=''?el.innerHTML=html:0
-        target.trim()!=''?el.target=target:0
-
-        if(src.trim()!=''){
-            el.src=src
-            breakImg(el)
-        }
-        return el
-    }
-  
-    let timeA = ''
-    let timeB = ''
-    const players = ATV.ATLETAS.split(',')
+    let timeA = {nome:'',id:[]}
+    let timeB = {nome:'',id:[]}
+    const nome_atl = ATV.ATLETAS.split(',')
+    const id_atl = ATV.ID_ATLETAS.split(',')
     const times = ATV.LADO.split(',')
-    for(let j=0; j<players.length; j++){
-        times[j].trim()=='A'? timeA += players[j].trim()+',':timeB += players[j].trim()+','
-    }
-    timeA = timeA.substring(0,timeA.length-1)
-    timeB = timeB.substring(0,timeB.length-1)
+    for(let j=0; j<nome_atl.length; j++){
+        if(times[j].trim()=='A'){
+            timeA.nome += (timeA.nome.length>0 ?',':'') +  nome_atl[j].trim()
+            timeA.id.push(parseInt(id_atl[j]))
+        }else{
+            timeB.nome += (timeB.nome.length>0 ?',':'') +  nome_atl[j].trim()
+            timeB.id.push(parseInt(id_atl[j]))
+        }           
+    }  
+
 
     const mainDiv = makeElement('div','','post-activity',`atv-${i}`)
 
+    const head = makeElement('div','','head-activity')
     if(showUser){
-        const head = makeElement('div','','head-activity')
+        
         const img = makeElement('img','','imgUser head-activity-img','',`assets/users/${ATV.id_usuario}.jpg`)    
         img.addEventListener('click',()=>{
             window.location.hash = 'P'+ATV.id_usuario.padStart(10,0)
@@ -146,12 +155,17 @@ function makeActivity(ATV,classScreen,showUser=true){
         div1.appendChild(headDat)
         head.appendChild(div1)
         mainDiv.appendChild(head)
+    }else{
+        head.appendChild(makeElement('p',`${ATV.dia.showDate()} as ${ATV.dia.showTime()}`,'head-activity-data'))
     }
-
-    const h2Nome = makeElement('h2',ATV.nome,'','nome')
+    
+    const h2Nome = makeElement('h2',`${ATV.ranking=="1"?'<i class="fas fa-trophy"></i> ':''}  ${ATV.nome}` ,'','nome')
     mainDiv.appendChild(h2Nome)
-    if(timeB.trim()!=''){
-        const h4Placar = makeElement('h4',`${timeA}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB}`,'','placar')    
+
+    !showUser ? mainDiv.appendChild(head) : 0
+
+    if(timeB.nome.trim()!=''){
+        const h4Placar = makeElement('h4',`${timeA.nome}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB.nome}`,'','placar')    
         mainDiv.appendChild(h4Placar)    
     }
 
@@ -199,6 +213,7 @@ function makeActivity(ATV,classScreen,showUser=true){
     const numKudos = makeElement('div',`${ATV.KUDOS.padStart(2,0)} kudos`,'social-kudos')
     socialPanel.appendChild(numKudos)
     const div3 = makeElement('div')
+    div3.style = 'display:flex; gap:5px;'
     const btnKudos = makeElement('button','<i class="fas fa-thumbs-up"></i>','btn-backhand btn-social')
     btnKudos.addEventListener('click',()=>{
         if(localStorage.getItem('idUser') != null){             
@@ -419,4 +434,6 @@ function uploadImage(inputFile,path,filename){
             } 
         });
     }); 
+
+    return myPromisse
 }
