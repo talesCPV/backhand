@@ -181,7 +181,6 @@ console.log(data)
                                 params.ask = 0
                             const myPromisse = queryDB(params,30);
                             myPromisse.then(()=>{
-//                                alert('Resultado confirmado!')
                                 fillPerfil(localStorage.getItem('idUser'))
                                 closeModal('')
                             })
@@ -212,7 +211,6 @@ console.log(data)
         disableMap(map)
 
         const socialPanel = document.querySelector('#social-panel')      
-//        const socialPanel = makeElement('div','','panel-social')
         const numKudos = makeElement('div',`${data.KUDOS.padStart(2,0)} kudos`,'social-kudos')
         socialPanel.appendChild(numKudos)
         const div3 = makeElement('div')
@@ -246,19 +244,17 @@ console.log(data)
             myPromisse.then((result)=>{
                 data.sets = JSON.parse(result)
                 const tbl = document.createElement('table')
-                tbl.innerHTML = `<tr><th>${timeA.nome}</th><th>SETs</th><th>${timeB.nome}</th></tr>`
+                tbl.innerHTML = `<tr><th>${timeA.nome}</th><th></th><th>${timeB.nome}</th></tr>`
                 for(let i=0; i<data.sets.length; i++){
                     const tr = document.createElement('tr')
     
                     const t1 = document.createElement('td')
                     t1.innerHTML = data.sets[i].p1_score.padStart(2,0)
                     tr.appendChild(t1)
-                    
-//                    tr.appendChild(document.createElement('td'))
+
                     const x = document.createElement('td')
                     x.innerHTML = 'x'
                     tr.appendChild(x)
-//                    tr.appendChild(document.createElement('td'))
 
                     const t2 = document.createElement('td')
                     t2.innerHTML = data.sets[i].p2_score.padStart(2,0)
