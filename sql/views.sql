@@ -2,7 +2,7 @@
 --  DROP VIEW vw_dashboard;
 
 CREATE VIEW vw_dashboard AS	
-    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nome AS NOME_ATLETA,US.nick AS nick,
+    SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nick AS NOME_ATLETA,US.nick AS nick,
     QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2, PC.P1_SCORE, PC.P2_SCORE,
     ATL.ID_ATLETAS,ATL.ATLETAS,ATL.LADO,ATL.ASK,ATL.CONFIRM,
     (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,

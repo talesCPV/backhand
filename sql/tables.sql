@@ -27,12 +27,13 @@ CREATE TABLE tb_usuario (
 	lat double DEFAULT NULL,
     lng double DEFAULT NULL,
     nivel double DEFAULT 1,
+    cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	UNIQUE KEY (hash),
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 ALTER TABLE tb_usuario
-ADD COLUMN nivel double DEFAULT 1;
+ADD COLUMN cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 -- DROP TABLE tb_quadra;
 CREATE TABLE tb_quadra (

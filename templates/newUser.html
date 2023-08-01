@@ -30,7 +30,7 @@
         }
 
         .form-newUser{
-            background-image: url("assets/background/04.jpg");
+            background-image: url("assets/background/06.jpg");
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
@@ -40,19 +40,19 @@
 
     <div class="form-newUser">
         <div class="line">
-            <input id="edtMail" type="email" maxlength="70" placeholder="* Email">
-        </div>
-
-        <div class="line">
-            <input id="edtPass" type="password" maxlength="12" placeholder="* Senha">
-        </div>
-
-        <div class="line">
-            <input id="edtRePass" type="password" maxlength="12" placeholder="* Repita a Senha">
-        </div>
-
-        <div class="line">
             <input id="edtName" type="text" maxlength="60" placeholder="* Nome">
+        </div>
+
+        <div class="line">
+            <input id="edtMail" type="email" maxlength="70" placeholder="* Email" onkeyup="valNoSpace(this)" >
+        </div>
+
+        <div class="line">
+            <input id="edtPass" type="password" maxlength="12" placeholder="* Senha" onkeyup="valNoSpace(this)">
+        </div>
+
+        <div class="line">
+            <input id="edtRePass" type="password" maxlength="12" placeholder="* Repita a Senha" onkeyup="valNoSpace(this)">
         </div>
 
         <div class="line">

@@ -129,6 +129,19 @@
           width: 100%;
         }
 
+        .nivel-line{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+        }
+
+        .nivel-line p{
+          text-indent: 0;
+          margin: 0;
+          padding: 0;
+        }
+
 /* BTN KUDOS E SCRAP */
         .btn-social{
           margin: 0 !important;
@@ -153,13 +166,13 @@
               <p id="usr"></p>
             </div>
             <ul class="menu-items">
-                <li class="only-login hide-menu"><a onclick="social()"><i class="fas fa-user-friends"></i></a></li>
-                <li class="only-login hide-menu" style="font-size: 1.3em;"><a onclick="addOne()"> <i class="fas fa-plus-circle"></i> </a></li>
-                <li class="only-login hide-menu" ><a style="display: flex; gap: 5px;" class="parent-sub-menu"> <i class="fas fa-bell" style="margin-top: 6px;"></i><span id="alert" class="badge"></span>  </a>
+                <li class="only-login hide-menu"><a onclick="social()" class="menu-mobile"><i class="fas fa-user-friends"></i><div></div> </a></li>
+                <li class="only-login hide-menu" style="font-size: 1.3em;"><a onclick="addOne()" class="menu-mobile"> <i class="fas fa-plus-circle"></i><div></div> </a></li>
+                <li class="only-login hide-menu" ><a  class="menu-mobile" style="display: flex; gap: 5px;" class="parent-sub-menu"> <i class="fas fa-bell" style="margin-top: 6px;"></i><span id="alert" class="badge"></span><div></div>  </a>
                   <ul class="sub-menu alert-badge"></ul>
                 </li>
-                <li class="only-login hide-menu"><a onclick="viewUser()"><img class="imgUser" id="imgUser" src="assets/user.jpeg"></a></li>
-                <li><a id="log-inout" onclick="login()">Inscreva-se</a></li> 
+                <li class="only-login hide-menu"><a onclick="viewUser()" class="menu-mobile"><img class="imgUser" id="imgUser" src="assets/user.jpeg"><div></div></a></li>
+                <li><a id="log-inout" onclick="login()">Inscreva-se <div>sair</div></a></li> 
             </ul>
             <p></p>
         </div>
@@ -198,7 +211,10 @@
                 <svg><use xlink:href="#fivestars"/></svg>
               </div>    
             </div>
-
+            <div class="nivel-line">
+              <p>nível:</p>
+              <h2 class="perfil-nivel"></h2>
+            </div>
 
           </div>
 
@@ -210,7 +226,7 @@
 
       <footer id="footer">
         <h2>BackHand &copy; 
-          <br>create by Tales Cembraneli Dantas
+          <br>todos os direitos reservados®
         </h2>
       </footer>
 
@@ -246,26 +262,20 @@
         }
       }
 
-      navigator.geolocation.getCurrentPosition((latlng)=>{
-          mainData.data = new Object
-          mainData.data.lat = latlng.coords.latitude
-          mainData.data.lng = latlng.coords.longitude
-      })
-
-      if(localStorage.getItem('idUser') == null){
-        openHTML('noLogin.html','screen')
-        openScreen()      
-      }else{
-
+      if(localStorage.getItem('log')){
         openHTML('dashboard.html','screen')
         fillPerfil(localStorage.getItem('idUser'))
-        loadActivity(100,0,10)
+        loadActivity()
         openScreen(false)
+      }else{
+        openHTML('noLogin.html','screen')
+        openScreen()      
       }
+
 
       function login(){
         if(localStorage.getItem('idUser') == null){
-          openHTML('novoUser.html','modal',null,500)           
+          openHTML('newUser.html','modal',null,500)           
         }else{      
           if(confirm('sair do backhand?')){
             localStorage.clear();

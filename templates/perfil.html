@@ -58,8 +58,7 @@
 
         .day{
             display: flex;
-            gap: 2px;
-            
+            gap: 2px;            
             width: 25px;
             height: 25px;
             justify-content: center;
@@ -86,6 +85,7 @@
         .rigth-perfil{
             width: 80%;
             display: flex;
+            gap: 5px;
             justify-content: space-evenly;
             align-items: center;
         }
@@ -163,7 +163,6 @@
     mainData.perfil.func.onClose = ()=>{
         maps.splice(mainData.perfil.data.iniMap,mainData.perfil.data.mapLength)
     }
-
 
     document.querySelector('.myDate').appendChild(calendar())
 

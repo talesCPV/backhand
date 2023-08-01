@@ -42,6 +42,16 @@
     padding-right: 20px;
   }
   
+  .menu-mobile{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .menu-mobile div{
+    display: none;
+  }
+
   .menu-items li {
     list-style: none;
     margin-left: 1.5rem;
@@ -107,6 +117,11 @@
 /* ......../ media query /.......... */
 
 @media (max-width: 768px) {
+
+    .menu-mobile div{
+      display: block;
+    }
+
 
     .username{
       width: 100%;

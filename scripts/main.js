@@ -1,11 +1,35 @@
 /* GLOBAL DATA */ 
     const today = new Date
     var mainData = new Object
+        mainData.data = new Object
+            mainData.data.dashPos = 0
+            mainData.data.dashDist = 100
+            mainData.data.dashLim = 5
+            mainData.data.activities = []
+            mainData.data.memoryLength = 50
+            mainData.data.lat = -23.0996385
+            mainData.data.lng = -45.6866616
+        mainData.func = new Object
+        
     const maps = []
     
+/* WINDOWS FUNCTIONS */
 
+window.onscroll = function() {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        loadActivity()
+    }
+}
 
 /* FUNCTIONS */
+
+function clearMemory(){
+    if(mainData.data.activities.length > mainData.data.memoryLength){
+        const div =  document.getElementById(mainData.data.activities[0])
+        div.parentElement.removeChild(div);
+        mainData.data.activities.splice(0,1)
+    }
+}
 
 function showUserPic(){
     const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
@@ -54,7 +78,6 @@ function fillPerfil(usr){
     const myPromisse = queryDB(params,27);
     myPromisse.then((resolve)=>{
         const json = JSON.parse(resolve)  
-//console.log(json)
         const img = document.querySelector('#perfil-img') 
 
         img.src = `assets/users/${json[0].id}.jpg`
@@ -66,6 +89,7 @@ function fillPerfil(usr){
         document.querySelector('.perfil-seguidores').innerText = 'Seguidores '+json[0].SEGUIDORES.padStart(2,0)
         document.querySelector('.perfil-atividades').innerText = 'Atividades '+json[0].ATIVIDADES.padStart(2,0)
         document.querySelector('.perfil-nome').innerText = json[0].nome
+        document.querySelector('.perfil-nivel').innerText = json[0].nivel
         document.querySelector('.rating-bg').value = json[0].nivel
         alertas(json[0])
 
@@ -184,7 +208,7 @@ function makeActivity(ATV,classScreen,showUser=true){
     rigthPanel.appendChild(pSport)
     const div2 = makeElement('div','',`only-login social-icon ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}`)
     
-    const link = encodeURI('https://www.d2soft.com.br/backhand#G'+ATV.id.padStart(10,0));
+    const link = encodeURI('https://www.backhand.com.br/#G'+ATV.id.padStart(10,0));
     const msg = encodeURIComponent('Hey, olhe meu treino no backhand');
     
     const facebook = makeElement('a','<i class="fab fa-facebook">','facebook','','','blank')
@@ -237,6 +261,9 @@ function makeActivity(ATV,classScreen,showUser=true){
     mainDiv.database = ATV
 
     screen.appendChild(mainDiv)        
+    mainData.data.activities.push(`atv-${i}`)
+
+    clearMemory()
 
     maps.push(createMap(mapDiv+i,[ATV.lat, ATV.lng],30))
     pinMap([ATV.lat, ATV.lng],maps[maps.length-1])
@@ -250,25 +277,26 @@ function makeActivity(ATV,classScreen,showUser=true){
 
 }
 
-function loadActivity(D,S,L){
-
-    mainData.coords = new Object
-    mainData.coords.lat = localStorage.getItem('lat')
-    mainData.coords.lng = localStorage.getItem('lng')
+function loadActivity(){
 
     const screen = document.querySelector('.dashboard')
-    S == '0' ? screen.innerHTML = '' : 0
-    const params = new Object;
-        params.lat =  mainData.coords.lat
-        params.lng =  mainData.coords.lng
-        params.maxDistance = D
-        params.start = S
-        params.limit = L
+    if(mainData.data.dashPos == '0'){
+        screen.innerHTML = ''
+        mainData.data.activities = []
+    }
 
+    const params = new Object;
+        params.lat =  mainData.data.lat
+        params.lng =  mainData.data.lng
+        params.maxDistance = mainData.data.dashDist
+        params.start = mainData.data.dashPos
+        params.limit = mainData.data.dashLim
+        
     const myPromisse = queryDB(params,9);
     myPromisse.then((resolve)=>{
+        mainData.data.dashPos += mainData.data.dashLim
         const json = JSON.parse(resolve)   
-
+//console.log(json)
         for(let i=0; i<json.length; i++){            
             makeActivity(json[i],'dashboard')          
         }
@@ -298,8 +326,22 @@ function pictab(e){
 
 /* VALIDATION */
 
+function valNoSpace(edt){
+    edt.value = noSpace(edt.value)
+}
+
 function valInt(edt){
     edt.value = getNum(edt.value)
+}
+
+function noSpace(V){
+    let out = ''
+    for(let i=0; i< V.length; i++){
+        if(V[i]!=" "){
+            out+=V[i]
+        }
+    }
+    return out
 }
 
 function getNum(V){

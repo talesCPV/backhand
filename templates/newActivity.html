@@ -146,12 +146,21 @@
     mainData.newActivity.func.fillTime('timeA')
     mainData.newActivity.func.fillTime('timeB')
 
-    document.querySelector('#btnTimeA').addEventListener('click',()=>{
-        buscaAmigo('timeA')
+    document.querySelector('#btnTimeA').addEventListener('click',()=>{        
+        if(mainData.newActivity.data.timeA.length<2){
+            buscaAmigo('timeA')
+        }else{
+            alert('Máximo de 2 jogadores por equipe.')
+        }
     })
 
     document.querySelector('#btnTimeB').addEventListener('click',()=>{
-        buscaAmigo('timeB')
+        if(mainData.newActivity.data.timeB.length<2){
+            buscaAmigo('timeB')
+        }else{
+            alert('Máximo de 2 jogadores por equipe.')
+        }
+
     })
 
     document.querySelector('#btnDelTimeA').addEventListener('click',()=>{
@@ -207,7 +216,6 @@
         data.nome = document.querySelector('#edtDesc').value.toUpperCase().trim()
         data.SPORT = document.querySelector('#cmbSport').options[document.querySelector('#cmbSport').selectedIndex].text
         data.EVENTO = document.querySelector('#cmbTipo').options[document.querySelector('#cmbTipo').selectedIndex].text
-//        data.parceiro = document.querySelector('#edtParceiro').value.toUpperCase().trim()
         data.dia = document.querySelector('#edtData').value+' '+document.querySelector('#edtHora').value+':00'
         data.duracao = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
         data.QUADRA = document.querySelector('#cmbQuadra').options[document.querySelector('#cmbQuadra').selectedIndex].text
@@ -232,30 +240,25 @@
 
 
         const form = document.getElementById(mainData.data.formID)
-//console.log(data)
-//console.log(form)
 
         form.querySelector('.head-activity-atleta').innerHTML = data.NOME_ATLETA
         form.querySelector('#nome').innerHTML = data.nome
-//        form.querySelector('#placar').innerHTML = `${timeA.nome} ${data.SETS_P1} vs ${data.SETS_P2} ${timeB.nome}`
         form.querySelector('.map-label').innerHTML = data.QUADRA
         form.querySelector('#sport').innerHTML = `${data.SPORT} (${data.EVENTO})`
-//        form.querySelector('#evento').innerHTML = data.EVENTO
         form.querySelector('.head-activity-data').innerHTML = `${data.dia.showDate()} as ${data.dia.showTime()}`
-//        form.querySelector('#hora').innerHTML = data.dia.showTime()
-//        form.querySelector('#tempo').innerHTML = Math.floor(data.duracao/60).toString().padStart(2,'0')+":"+ (data.duracao%60).toString().padStart(2,'0')
     }
 
     document.querySelector('#btnAdd').addEventListener('click',()=>{
 
         refreshData()
+        const tipo = document.querySelector('#cmbTipo').value.trim()
+        const jogo = (tipo=='1' && mainData.newActivity.data.sets.length > 0)
 
-        if(goon('edtDesc,edtData,edtHora,edtTempo')){
+        if(goon('edtDesc,edtData,edtHora,edtTempo') && jogo){
             const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
             const dt = document.querySelector('#edtData').value.trim()+" "+document.querySelector('#edtHora').value.trim()+':00'            
             const temp = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
             const sport = document.querySelector('#cmbSport').value.trim()
-            const tipo = document.querySelector('#cmbTipo').value.trim()
             const quad = document.querySelector('#cmbQuadra').value.trim()
 
             const params = new Object;
@@ -274,15 +277,17 @@
                 edit ?  updateData(data) : 0
                 if(id=="DEFAULT"||json[0].ranking=="0"){
                     addSets(json[0].id)
-                    addPlayers(json[0].id)
+                    addPlayers(json[0].id,tipo=='1')
                 }
 
                 closeModal(0)
                 closeModal(0)
             })
+        }else{
+            if(tipo=='1'){
+                alert('Para jogo oficial você deve adicionar pelo menos um set completo, ou selecione treino ou aula')
+            }
         }
-    
-
 
     })
 
@@ -344,7 +349,7 @@
 
     }
 
-    function addPlayers(idAtv){
+    function addPlayers(idAtv,ask=1){
 
         const players = mainData.newActivity.data.timeA.concat(mainData.newActivity.data.timeB)
         const teamAsize = mainData.newActivity.data.timeA.length
@@ -358,6 +363,7 @@
                 pr.team = i<teamAsize ? 'A':'B'
                 pr.ativ_owner = i==0?1:0
                 pr.confirm = i==0?1:0
+                pr.ask = i==0?0:ask
             params.push(pr)
         }
 

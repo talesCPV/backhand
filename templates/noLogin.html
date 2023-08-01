@@ -72,10 +72,10 @@
             </div>
             <div class="login-text">
                 <input type="email" id="edtEmail" placeholder="  Seu e-mail">
-                <input type="password" id="edtSenha" placeholder="  Senha">
+                <input type="password" id="edtSenha" placeholder="  Senha" onkeyup="valNoSpace(this)">
                 <button id="btnLogin" class="btn-backhand btn-fill" >login</button>
                 <div>
-                    <p id="btnNewUser" onclick="openHTML('novoUser.html','modal',null,500)">Novo Usuário?</p>
+                    <p id="btnNewUser" onclick="openHTML('newUser.html','modal',null,500)">Novo Usuário?</p>
                 </div>
 
             </div>
@@ -114,7 +114,9 @@
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)                
                 if(json.length > 0){
-           
+                    mainData.data.lat = json[0].lat  
+                    mainData.data.lng = json[0].lng
+
                     localStorage.setItem('idUser',json[0].id)
                     localStorage.setItem('email',json[0].email)
                     localStorage.setItem('hash',json[0].hash)
@@ -122,14 +124,15 @@
                     localStorage.setItem('nick',json[0].nick)
                     localStorage.setItem('cel',json[0].cel)
                     localStorage.setItem('class',json[0].class)   
-                    localStorage.setItem('lat',mainData.data.lat)   
-                    localStorage.setItem('lng',mainData.data.lng)   
+                    localStorage.setItem('lat',json[0].lat)   
+                    localStorage.setItem('lng',json[0].lng)   
+                    localStorage.setItem('log',true)   
                     localizaUser(json[0])
                     document.querySelector('#log-inout').innerHTML = 'Sair'
                     document.querySelector('#footer').style.display = 'block'   
                     document.querySelector('.dashboard').style.width = '70%'                 
                     openHTML('dashboard.html','screen')
-                    loadActivity(100,0,10)
+                    loadActivity()
                     fillPerfil(json[0].id)
                     openScreen(false)
                 }else{

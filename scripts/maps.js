@@ -1,7 +1,11 @@
 var mbAttr = 'www.backhand.com.br';
 var mapUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';    
 var satUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-//var marker = new L.Marker([0, 0]);
+
+navigator.geolocation.getCurrentPosition((latlng)=>{
+    mainData.data.lat = latlng.coords.latitude
+    mainData.data.lng = latlng.coords.longitude
+})
 
 maplayer = L.tileLayer(mapUrl, {
     id: 'mapbox.streets',

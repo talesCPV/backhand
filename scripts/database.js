@@ -16,8 +16,22 @@ function queryDB(params,cod){
         .then(function (response){
             if (response.status === 200) { 
                 resolve(response.text());                    
-            } else { 
-                reject(new Error("Houve algum erro na comunicação com o servidor"));                    
+            }if (response.status === 500 && localStorage.getItem('idUser') != null) { 
+                setTimeout(() => {
+                    switch (cod){
+                        case 9:
+                            mainData.data.dashPos = 0
+                            mainData.data.dashDist = 100
+                            mainData.data.dashLim = 5
+                            mainData.data.activities = []
+                            mainData.data.memoryLength = 50                            
+                            loadActivity()
+                        break
+                    }
+
+                }, 3000)
+            }else{ 
+                reject(new Error("Houve algum erro na comunicação com o servidor"));
             } 
         });
     });      

@@ -222,6 +222,41 @@ DELIMITER ;
 
 CALL sp_updatePlayer(-0.1,"1,2");
 
+DELIMITER $$
+CREATE PROCEDURE sp_AtvAtl(
+		IN Ihash varchar(77),
+		IN IidAtv int(11), 
+		IN Ifields VARCHAR(3000),
+		IN Ivalues VARCHAR(3000)
+    )
+	BEGIN
+
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = IidAtv COLLATE utf8_general_ci);
+        	
+		IF (@call_owner = @atv_owner) THEN
+        
+            CALL sp_clearAtvAtl(IidAtv);
+			
+			SET @query = CONCAT('INSERT INTO tb_ativ_atleta ', Ifields, ' VALUES ', Ivalues);
+
+			PREPARE stmt1 FROM @query;
+			EXECUTE stmt1;
+			DEALLOCATE PREPARE stmt1;
+        
+		END IF; 
+    
+        
+        SELECT * FROM tb_ativ_atleta WHERE id_ativ=IidAtv;
+
+	END $$
+DELIMITER ;
+
+
+
+
+
+
 CALL sp_AtvAtl(1,1,"A",TRUE);
 SELECT * FROM tb_ativ_atleta;
 
