@@ -22,6 +22,11 @@
             border: solid 1px;
         }
 
+        #btnNewEquip{
+            top: 135px;
+        }
+
+
     </style>
 
     <div class="tab-bar">
@@ -48,15 +53,15 @@
                 </div>
         
                 <div class="line">
-                    <input id="edtPass" type="password" maxlength="12" placeholder="* Senha">
+                    <input id="edtPass" type="password" maxlength="12" placeholder="* Senha" onkeyup="valForbid(this,[' '])">
                 </div>
         
                 <div class="line">
-                    <input id="edtName" type="text" maxlength="60" placeholder="* Nome">
+                    <input id="edtName" type="text" maxlength="60" placeholder="* Nome" onkeyup="valForbid(this,[','])" >
                 </div>
         
                 <div class="line">
-                    <input id="edtNick" type="text" maxlength="15" placeholder="Apelido">
+                    <input id="edtNick" type="text" maxlength="15" placeholder="Apelido" onkeyup="valForbid(this,[','])" >
                 </div>
         
                 <div class="line">
@@ -72,15 +77,15 @@
 
         </div>
         <div id="equip" class="tab">
+            <label>Meus Equipamentos</label>
+            <div id="btnNewEquip" onclick="openHTML('addEquip.html','modal',{id:'DEFAULT',id_owner:localStorage.getItem('idUser')},500)" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
 
+            <div id="myEquip"></div>
         </div>
         <div id="quadras" class="tab">
             <label>Minhas Quadras</label>
             <button id="btnFindCourt" class="btn-round"><i class="fas fa-search"></i></button>
-
             <div id="myCourts"></div>
-
-
         </div>
 
     </div>
@@ -90,7 +95,38 @@
 
     pictab(document.querySelector('#tab-perfil'))
 
-    
+    mainData.viewUser.func.fillEquip = ()=>{
+        const params = new Object;
+            params.id_owner = localStorage.getItem('idUser')
+
+        const myPromisse = queryDB(params,31);
+        myPromisse.then((resolve)=>{
+            const equip = JSON.parse(resolve)
+            const div_search = document.querySelector('#myEquip') 
+
+            div_search.innerHTML = ''
+            for(let i=0; i<equip.length; i++){      
+                const div = document.createElement('div')
+                div.className = 'view-inline'
+
+                const p = document.createElement('p')
+                p.innerHTML = `${equip[i].descricao}(${equip[i].marca})`
+                div.appendChild(p)
+
+                const btn = document.createElement('button')
+                btn.innerHTML = 'EDITAR'
+                btn.className = 'btn btn-primary'
+
+                btn.addEventListener('click',()=>{
+                    openHTML('addEquip.html','modal',equip[i],500)
+                })
+
+                div.appendChild(btn)
+                div_search.appendChild(div)
+            }
+        })
+    }
+
     mainData.viewUser.func.fillCourts = ()=>{
         const params = new Object;
             params.idUser = localStorage.getItem('idUser')
@@ -130,6 +166,7 @@
     }
 
     mainData.viewUser.func.fillCourts()
+    mainData.viewUser.func.fillEquip()
 
     const back = backFunc({'filename':`../assets/users/${localStorage.getItem('idUser')}.jpg`},1)
 

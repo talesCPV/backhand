@@ -131,3 +131,27 @@ CREATE TABLE tb_following (
 
 INSERT INTO tb_following VALUES (3,1);
 
+-- DROP TABLE tb_equip;
+CREATE TABLE tb_equip (
+	id int(11) NOT NULL AUTO_INCREMENT,
+    id_owner int(11) NOT NULL,
+    descricao varchar(15) DEFAULT "RAQUETE",
+    marca varchar(15) DEFAULT NULL,
+    aquisicao date DEFAULT NULL,
+    ativo boolean DEFAULT TRUE,
+    obs varchar(255) DEFAULT NULL,
+	FOREIGN KEY (id_owner) REFERENCES tb_usuario(id),
+    PRIMARY KEY (id)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+-- DROP TABLE tb_equip_manut;
+CREATE TABLE tb_equip_manut (
+	id int(11) NOT NULL AUTO_INCREMENT,
+    id_equip int(11) NOT NULL, 
+    descricao varchar(80) DEFAULT NULL,
+    tensao varchar(15) DEFAULT NULL,
+    data date DEFAULT NULL,
+    obs varchar(255) DEFAULT NULL,
+	FOREIGN KEY (id_equip) REFERENCES tb_equip(id),
+    PRIMARY KEY (id)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

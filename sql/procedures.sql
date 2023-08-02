@@ -171,6 +171,17 @@ DELIMITER ;
 
 SELECT * FROM tb_atividades;
 
+DROP PROCEDURE sp_ativ_weigth;
+DELIMITER $$
+	CREATE PROCEDURE sp_ativ_weigth(
+		IN Iid int(11),
+		IN Ipeso DOUBLE
+    )
+	BEGIN
+		UPDATE tb_atividades SET peso=Ipeso WHERE id=Iid;
+	END $$
+DELIMITER ;
+
 -- DROP PROCEDURE sp_AtvAtl;
 DELIMITER $$
 CREATE PROCEDURE sp_AtvAtl(
@@ -222,41 +233,6 @@ DELIMITER ;
 
 CALL sp_updatePlayer(-0.1,"1,2");
 
-DELIMITER $$
-CREATE PROCEDURE sp_AtvAtl(
-		IN Ihash varchar(77),
-		IN IidAtv int(11), 
-		IN Ifields VARCHAR(3000),
-		IN Ivalues VARCHAR(3000)
-    )
-	BEGIN
-
-		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
-		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = IidAtv COLLATE utf8_general_ci);
-        	
-		IF (@call_owner = @atv_owner) THEN
-        
-            CALL sp_clearAtvAtl(IidAtv);
-			
-			SET @query = CONCAT('INSERT INTO tb_ativ_atleta ', Ifields, ' VALUES ', Ivalues);
-
-			PREPARE stmt1 FROM @query;
-			EXECUTE stmt1;
-			DEALLOCATE PREPARE stmt1;
-        
-		END IF; 
-    
-        
-        SELECT * FROM tb_ativ_atleta WHERE id_ativ=IidAtv;
-
-	END $$
-DELIMITER ;
-
-
-
-
-
-
 CALL sp_AtvAtl(1,1,"A",TRUE);
 SELECT * FROM tb_ativ_atleta;
 
@@ -280,7 +256,7 @@ DELIMITER $$
         SET @loser = (SELECT LOSER FROM vw_winners WHERE id_ativ=IidAtv);
         
 		IF ((SELECT COUNT(*) FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND ativ_owner=0 AND confirm=0)=0) THEN        
-			UPDATE tb_atividades SET ranking=1 WHERE id=IidAtv;
+			UPDATE tb_atividades SET ranking=1, peso=@peso WHERE id=IidAtv;
             
 			CALL sp_updatePlayer(@peso,@winner);
 			CALL sp_updatePlayer(-@peso,@loser);
@@ -520,7 +496,7 @@ DELIMITER $$
 		SET Ilat = (SELECT lat FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
 		SET Ilng = (SELECT lng FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
 
-		SELECT US.id AS userID, US.nome, US.lat, US.lng,Ilat,Ilng,
+		SELECT US.id AS userID, US.nick AS nome, US.lat, US.lng,Ilat,Ilng,
         (SELECT IFNULL((SELECT fn_calcDist(Ilat,Ilng,US.lat,US.lng)),0)) AS DISTANCE,
         (SELECT COUNT(*) FROM tb_following WHERE id_host=Iid_host AND id_guest=US.id)AS FOLLOW
 		FROM tb_usuario AS US
@@ -552,28 +528,23 @@ DELIMITER ;
 
 CALL sp_usersByName(4,"%%",0,10);
 
- /* TESTE */
- 
-DROP PROCEDURE sp_teste;
+
+DROP PROCEDURE sp_addEquip;
 DELIMITER $$
-	CREATE PROCEDURE sp_teste(
-		IN Idata varchar(255),
-		IN Isize int(11)
+	CREATE PROCEDURE sp_addEquip(
+		IN Iid int(11),
+		IN Iid_owner int(11),
+		IN Idescricao varchar(15),
+		IN Imarca varchar(15),
+		IN Iaquisicao date,
+		IN Iobs varchar(255)
     )
 	BEGIN			 
 
-		DECLARE counter INT DEFAULT 0;
-		DECLARE Ifield VARCHAR(50);
-		DECLARE Iout VARCHAR(255) DEFAULT "";
-
-		REPEAT
-			SET Ifield =  (SELECT SUBSTRING_INDEX(Idata,',', counter));
-			SET Iout =  (SELECT CONCAT(Iout, Ifield));
-			SET counter = counter + 1;
-		UNTIL counter >= Isize			
-        END REPEAT;
-        
-		SELECT Iout;
+		INSERT INTO tb_equip (id,id_owner,descricao,marca,aquisicao,obs) 
+        VALUES (Iid,Iid_owner,Idescricao,Imarca,Iaquisicao,Iobs)
+        ON DUPLICATE KEY UPDATE
+        descricao=Idescricao, marca=Imarca, aquisicao=Iaquisicao, obs=Iobs;
         
 	END $$
 DELIMITER ;

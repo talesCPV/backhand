@@ -35,6 +35,8 @@
         "28" => 'SELECT * FROM vw_dashboard WHERE id=x00',
         "29" => 'SELECT * FROM vw_dashboard_atleta WHERE id_atleta=x00;',
         "30" => 'CALL sp_editAtvAtl("x00","x01","x02","x03");',
+        "31" => 'SELECT * FROM tb_equip WHERE id_owner=x00;',
+        "32" => 'CALL sp_addEquip("x00","x01","x02","x03","x04","x05")',
 
 
     );

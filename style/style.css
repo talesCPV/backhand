@@ -139,7 +139,8 @@ button{
   position: relative;
   cursor: pointer;
   width: 100%;
-  height: 150px;
+  max-width: 568px;
+  height: 218px;
   z-index: 0;  
 }
 
@@ -327,6 +328,35 @@ button{
   border: solid 2px #16a083;
   color: #16a083;
   background-color: #ffffff;
+}
+
+
+.btn-icon{
+  cursor: pointer;
+/*  background-color: #f0f0f0;*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 30px;
+  
+/*  
+  border: solid 2px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;  */
+  font-size: 1.8em;
+}
+
+.btn-icon:hover{
+  color: #16a083;
+/*  background-color: #ffffff;*/
+}
+
+/* PICTAGRAMERS ICONS */
+
+.mdi{
+  font-size: 1.5em !important;
 }
 
 /* TAB SCREEN */

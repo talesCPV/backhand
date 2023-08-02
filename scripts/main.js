@@ -142,12 +142,15 @@ function makeActivity(ATV,classScreen,showUser=true){
     const screen =  document.querySelector('.'+classScreen)
     const mapDiv = 'map-'+classScreen
     const i = maps.length
+    const owner = localStorage.getItem('idUser') == ATV.id_usuario
+
 
     let timeA = {nome:'',id:[]}
     let timeB = {nome:'',id:[]}
     const nome_atl = ATV.ATLETAS.split(',')
     const id_atl = ATV.ID_ATLETAS.split(',')
     const times = ATV.LADO.split(',')
+
     for(let j=0; j<nome_atl.length; j++){
         if(times[j].trim()=='A'){
             timeA.nome += (timeA.nome.length>0 ?',':'') +  nome_atl[j].trim()
@@ -189,8 +192,18 @@ function makeActivity(ATV,classScreen,showUser=true){
     !showUser ? mainDiv.appendChild(head) : 0
 
     if(timeB.nome.trim()!=''){
-        const h4Placar = makeElement('h4',`${timeA.nome}  ${ATV.SETS_P1} x ${ATV.SETS_P2}  ${timeB.nome}`,'','placar')    
-        mainDiv.appendChild(h4Placar)    
+
+        const p1_score = parseInt(ATV.SETS_P1)
+        const p2_score = parseInt(ATV.SETS_P2)
+
+        if(p1_score+p2_score==0){
+            const h4Placar = makeElement('h4',`<span class="mdi mdi-tennis"></span> ${timeA.nome} & ${timeB.nome}`,'','placar')    
+            mainDiv.appendChild(h4Placar)        
+        }else{
+            const h4Placar = makeElement('h4',`${timeA.nome}  ${p1_score} x ${p2_score}  ${timeB.nome}`,'','placar')    
+            mainDiv.appendChild(h4Placar)        
+        }
+
     }
 
     const panel = makeElement('div','','panel')
@@ -206,30 +219,33 @@ function makeActivity(ATV,classScreen,showUser=true){
     const rigthPanel = makeElement('div','','right-panel')
     const pSport = makeElement('p',`${ATV.SPORT} (${ATV.EVENTO})`,'','sport')
     rigthPanel.appendChild(pSport)
-    const div2 = makeElement('div','',`only-login social-icon ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}`)
+    if(owner){
+        const div2 = makeElement('div','',`only-login social-icon ${localStorage.getItem('idUser') == null ? 'hide-menu' : ''}`)
     
-    const link = encodeURI('https://www.backhand.com.br/#G'+ATV.id.padStart(10,0));
-    const msg = encodeURIComponent('Hey, olhe meu treino no backhand');
-    
-    const facebook = makeElement('a','<i class="fab fa-facebook">','facebook','','','blank')
-    facebook.href = `https://www.facebook.com/share.php?u=${link}`;
-    div2.appendChild(facebook)
-    const twitter = makeElement('a','<i class="fab fa-twitter"></i>','twitter','','','blank')
-    twitter.href = `http://twitter.com/share?&url=${link}&text=${msg}&hashtags=javascript,programming`;
-    div2.appendChild(twitter)
-    const linkedin = makeElement('a','<i class="fab fa-linkedin"></i>','linkedin','','','blank')
-    linkedin.href = `https://www.linkedin.com/sharing/share-offsite/?url=${link}`;
-    div2.appendChild(linkedin)
-    const reddit = makeElement('a','<i class="fab fa-reddit"></i>','reddit','','','blank')
-    reddit.href = `http://www.reddit.com/submit?url=${link}&title=${msg}`;
-    div2.appendChild(reddit)
-    const whatsapp = makeElement('a','<i class="fab fa-whatsapp"></i>','whatsapp','','','blank')
-    whatsapp.href = `https://api.whatsapp.com/send?text=${msg}: ${link}`;
-    div2.appendChild(whatsapp)
-    const telegram = makeElement('a','<i class="fab fa-telegram"></i>','telegram','','','blank')
-    telegram.href = `https://telegram.me/share/url?url=${link}&text=${msg}`;
-    div2.appendChild(telegram)
-    rigthPanel.appendChild(div2)
+        const link = encodeURI('https://www.backhand.com.br/#G'+ATV.id.padStart(10,0));
+        const msg = encodeURIComponent('Hey, olhe meu treino no backhand');
+        
+        const facebook = makeElement('a','<i class="fab fa-facebook">','facebook','','','blank')
+        facebook.href = `https://www.facebook.com/share.php?u=${link}`;
+        div2.appendChild(facebook)
+        const twitter = makeElement('a','<i class="fab fa-twitter"></i>','twitter','','','blank')
+        twitter.href = `http://twitter.com/share?&url=${link}&text=${msg}&hashtags=javascript,programming`;
+        div2.appendChild(twitter)
+        const linkedin = makeElement('a','<i class="fab fa-linkedin"></i>','linkedin','','','blank')
+        linkedin.href = `https://www.linkedin.com/sharing/share-offsite/?url=${link}`;
+        div2.appendChild(linkedin)
+        const reddit = makeElement('a','<i class="fab fa-reddit"></i>','reddit','','','blank')
+        reddit.href = `http://www.reddit.com/submit?url=${link}&title=${msg}`;
+        div2.appendChild(reddit)
+        const whatsapp = makeElement('a','<i class="fab fa-whatsapp"></i>','whatsapp','','','blank')
+        whatsapp.href = `https://api.whatsapp.com/send?text=${msg}: ${link}`;
+        div2.appendChild(whatsapp)
+        const telegram = makeElement('a','<i class="fab fa-telegram"></i>','telegram','','','blank')
+        telegram.href = `https://telegram.me/share/url?url=${link}&text=${msg}`;
+        div2.appendChild(telegram)
+        rigthPanel.appendChild(div2)
+    }
+
     panel.appendChild(rigthPanel)
     mainDiv.appendChild(panel)
 
@@ -328,6 +344,20 @@ function pictab(e){
 
 function valNoSpace(edt){
     edt.value = noSpace(edt.value)
+}
+
+function valForbid(edt,forbid){
+    edt.value = forbidenStr(edt.value,forbid)
+}
+
+function forbidenStr(V,forbid){    
+    let out = ''
+    for(let i=0; i< V.length; i++){
+        if(!forbid.includes(V[i])){
+            out+=V[i]
+        }
+    }
+    return out
 }
 
 function valInt(edt){

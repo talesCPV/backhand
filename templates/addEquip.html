@@ -1,0 +1,120 @@
+<title>
+    Meus Equipamentos
+</title>
+<template>
+    <style>
+
+        .frm-equip{
+            display: flex;
+            gap: 5px;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .frm-equip > *{
+            width: 100%;
+        }
+
+        textarea{
+            width: 100%;
+            margin: auto;
+            padding: 5px;
+            resize: none;
+        }
+
+        .inline{
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+        }
+
+        .inline label{
+            width: auto;
+        }
+
+        .inline input{
+            width: 50px;
+            border: 0 0 1px 0;
+        }
+
+        fieldset{
+            width: 97% !important;
+            min-height: 100px;
+        }
+
+    </style>
+
+    <div class="frm-equip">
+
+        <label for="cmbEquip">Equipamento</label>
+        <select id="cmbEquip">
+            <option value="RAQUETE" selected>Raquete</option>
+            <option value="BOLAS">Bolas</option>
+            <option value="TENIS">Tênis</option>
+            <option value="OUTROS">Outros</option>
+        </select>
+    
+        <label for="edtMarca">Marca</label>
+        <input type="text" id="edtMarca">
+
+        <label for="edtAqui">Aquisição</label>
+        <input type="date" id="edtAqui">
+
+        <label for="edtObs">Observação</label>
+        <textarea id="edtObs" cols="30" rows="5" maxlength="255"></textarea>
+
+        <fieldset>
+            <legend>Manutenção</legend>
+            <div class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
+            <table id="tblManut"></table>
+        </fieldset>
+
+        <div class="inline">
+            <button id="btnAddEquip" class="btn btn-primary">Salvar</button>
+            <button id="btnDelEquip" class="btn btn-primary">Deletar</button>
+        </div>
+
+    </div>
+
+
+
+
+</template>
+<script>
+
+    const data = mainData.addEquip.data
+
+    if(mainData.addEquip.data.id=='DEFAULT'){
+        document.querySelector('#edtAqui').value = today.getFormatDate()
+    }else{
+        document.querySelector('#cmbEquip').value = data.descricao
+        document.querySelector('#edtMarca').value = data.marca
+        document.querySelector('#edtAqui').value = data.aquisicao
+        document.querySelector('#edtObs').value = data.obs
+
+    }
+
+
+
+
+    document.querySelector('#btnAddEquip').addEventListener('click',()=>{
+
+        const params = new Object;
+            params.id = mainData.addEquip.data.id
+            params.id_owner = mainData.addEquip.data.id_owner
+            params.descricao = document.querySelector('#cmbEquip').value.trim()
+            params.marca = document.querySelector('#edtMarca').value.trim()
+            params.aquisicao = document.querySelector('#edtAqui').value
+            params.obs = document.querySelector('#edtObs').value.trim()
+
+        const myPromisse = queryDB(params,32);
+        myPromisse.then(()=>{
+            mainData.viewUser.func.fillEquip()
+            closeModal('')
+        })
+        
+
+    })
+
+
+</script>

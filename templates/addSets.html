@@ -1,5 +1,5 @@
 <title>
-    Set Score
+    Set
 </title>
 <template>
     <style>
@@ -27,15 +27,15 @@
     </style>
     
     <div class="inline">
-        <label for="edtP1">Me</label>
-        <input type="text" id="edtP1" onkeyup="valInt(this)">
+        <label for="edtP1">Time A</label>
+        <input type="text" id="edtP1" inputmode="decimal" onkeyup="valInt(this)">
         <label>VS</label>
-        <input type="text" id="edtP2" onkeyup="valInt(this)">
-        <label for="edtP2">My Partner</label>
+        <input type="text" id="edtP2" inputmode="decimal" onkeyup="valInt(this)">
+        <label for="edtP2">Time B</label>
     </div>
  
     <div class="inline">
-        <textarea id="edtAboutSet" cols="30" rows="10" placeholder="Type About Set"></textarea>
+        <textarea id="edtAboutSet" cols="30" rows="10" placeholder="Sobre o set..." maxlength="255"></textarea>
     </div>
 
     <div class="inline">

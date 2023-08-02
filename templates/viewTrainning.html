@@ -33,6 +33,10 @@
             font-weight: bold;
             cursor: zoom-in;
         }
+
+        #atv-atleta{
+            text-indent: 0;
+        }
                 
     </style>
 
@@ -117,7 +121,7 @@
         usrImg(document.querySelector('#timeB'),timeB.id)
 
         document.querySelector('.title-viewTrainning').innerHTML = `${data.EVENTO} ${data.id_evento=='1'? data.ranking=='1'?'(RANQUEADA)':'(AMISTOSA)':''}`
-        document.querySelector('#atv-atleta').innerHTML = placar? `${data.SETS_P1} x ${data.SETS_P2}`:data.NOME_ATLETA
+        document.querySelector('#atv-atleta').innerHTML = placar? `${data.SETS_P1} x ${data.SETS_P2}`:'<span class="mdi mdi-tennis"></span>'
         document.querySelector('#atv-titulo').innerHTML = data.nome
         document.querySelector('#atv-data').innerHTML = `date: ${data.dia.showDate()}`
         document.querySelector('#atv-hora').innerHTML = `time: ${data.dia.showTime()}`

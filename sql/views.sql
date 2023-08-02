@@ -4,7 +4,7 @@
 CREATE VIEW vw_dashboard AS	
     SELECT ATV.*, SP.nome AS SPORT, EV.nome AS EVENTO, US.nick AS NOME_ATLETA,US.nick AS nick,
     QD.lat, QD.lng , QD.nome AS QUADRA, PC.SETS_P1, PC.SETS_P2, PC.P1_SCORE, PC.P2_SCORE,
-    ATL.ID_ATLETAS,ATL.ATLETAS,ATL.LADO,ATL.ASK,ATL.CONFIRM,
+    ATL.ID_ATLETAS,ATL.ATLETAS,ATL.LADO,ATL.ASK,ATL.CONFIRM,ATL.PESO AS NIVEL,
     (SELECT COUNT(*) FROM tb_kudos WHERE id_atividade = ATV.id) AS KUDOS,
     (SELECT COUNT(*) FROM tb_message WHERE id_atividade = ATV.id) AS MESSAGES,
     (SELECT IF(ATV.ranking=1,"RANQUEADO","AMISTOSO")) AS STATUS
@@ -27,14 +27,14 @@ SELECT * FROM vw_dashboard;
     
 -- ********************************
 --  DROP VIEW vw_atvAtl;
-
 CREATE VIEW vw_atvAtl AS
     SELECT ATL.id_ativ, 
-		GROUP_CONCAT(US.nome SEPARATOR ',') AS ATLETAS,
+		GROUP_CONCAT(US.nick SEPARATOR ',') AS ATLETAS,        
 		GROUP_CONCAT(ATL.id_atleta SEPARATOR ',') AS ID_ATLETAS,
         GROUP_CONCAT(ATL.team SEPARATOR ',') AS LADO,
         GROUP_CONCAT(ATL.confirm SEPARATOR ',') AS CONFIRM,
-        GROUP_CONCAT(ATL.ask SEPARATOR ',') AS ASK        
+        GROUP_CONCAT(ATL.ask SEPARATOR ',') AS ASK,
+        ROUND(SUM(US.nivel),2) AS PESO
 		FROM tb_ativ_atleta AS ATL
         INNER JOIN tb_usuario AS US
         ON US.id = ATL.id_atleta
@@ -122,7 +122,7 @@ SELECT * FROM vw_message WHERE id_atividade = 22;
 -- DROP VIEW vw_friends;
 
 CREATE VIEW vw_friends AS
-SELECT FW.id_host AS hostID,(SELECT nome FROM tb_usuario WHERE id=FW.id_host) AS hostname,US.id AS guestID, US.nome AS guestname,
+SELECT FW.id_host AS hostID,(SELECT nick FROM tb_usuario WHERE id=FW.id_host) AS hostname,US.id AS guestID, US.nick AS guestname,
 	(SELECT COUNT(*) FROM tb_following WHERE id_host=FW.id_guest AND id_guest=FW.id_host) AS SEGUE_VOLTA
 	FROM tb_following AS FW
 	INNER JOIN tb_usuario AS US
@@ -214,21 +214,6 @@ CREATE VIEW vw_alerta AS
     
 SELECT * FROM vw_alerta;
 
-SELECT AAT.id_atleta, COUNT(AAT.id_ativ)AS ALERTAS,
-	GROUP_CONCAT(AAT.id_ativ SEPARATOR ',') AS ATV,
-	GROUP_CONCAT(ATV.nome SEPARATOR ',') AS NOME,
-	GROUP_CONCAT(USR.nome SEPARATOR ',') AS NOME_OWNER
-	FROM tb_ativ_atleta AS AAT
-    INNER JOIN tb_atividades AS ATV
-    INNER JOIN tb_usuario AS USR
-    ON ATV.id = AAT.id_ativ
-    AND USR.id = ATV.id_usuario
-    AND confirm=0 
-    AND ask=1 
-    GROUP BY id_atleta;
-
-SELECT id_ativ from tb_ativ_atleta WHERE id_atleta = 2;
-
 
 -- *********************************
 
@@ -250,4 +235,8 @@ SELECT US.nome, US.lat, US.lng, (SELECT fn_calcDist(-23,-45,US.lat,US.lng)) AS D
 FROM tb_usuario AS US;
 
 SELECT fn_calcDist(-23,-45,-23.5,-45.5);
-       
+/*       
+SELECT EQP.* 
+FROM tb_equip AS EQP
+INNER JOIN (SELECT * FROM ) AS MNT
+*/
