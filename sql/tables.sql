@@ -148,10 +148,10 @@ CREATE TABLE tb_equip (
 CREATE TABLE tb_equip_manut (
 	id int(11) NOT NULL AUTO_INCREMENT,
     id_equip int(11) NOT NULL, 
-    descricao varchar(80) DEFAULT NULL,
-    tensao varchar(15) DEFAULT NULL,
+    servico varchar(40) DEFAULT NULL,    
     data date DEFAULT NULL,
     obs varchar(255) DEFAULT NULL,
 	FOREIGN KEY (id_equip) REFERENCES tb_equip(id),
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+

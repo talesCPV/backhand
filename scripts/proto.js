@@ -132,7 +132,12 @@ HTMLTableElement.prototype.plot = function(obj, fields,type='',file=false, mark=
                     break;  
                 case 'let':                            
                     html = arr[0]
+                    break;
+                case 'cut':
+                    const pos = parseInt(type[i].substring(3,6))
+                    html = obj[arr[0]] != null ? obj[arr[0]].trim().substring(0,pos) : ''
                     break;                                       
+
                 default:
                   html = obj[arr[0]] != null ? obj[arr[0]] :''
             }            

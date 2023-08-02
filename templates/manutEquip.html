@@ -1,0 +1,114 @@
+<title>
+    
+</title>
+<template>
+    <style>
+
+        .frm-equip{
+            display: flex;
+            gap: 5px;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .frm-equip > *{
+            width: 100%;
+        }
+
+        textarea{
+            width: 100%;
+            margin: auto;
+            padding: 5px;
+            resize: none;
+        }
+
+        .inline{
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+        }
+
+        .inline label{
+            width: auto;
+        }
+
+        .inline input{
+            width: 50px;
+            border: 0 0 1px 0;
+        }
+
+        fieldset{
+            width: 97% !important;
+            min-height: 100px;
+        }
+
+        #btnManut{
+            top: 410px;
+            right: 20px;
+        }
+
+    </style>
+
+    <div class="frm-equip">
+
+        <label for="edtServ">Serviço</label>
+        <input type="text" id="edtServ" maxlength="40" placeholder="Colocar o tipo de manutenção, como encordoamento, grip, etc.">
+    
+        <label for="edtDataManut">Data</label>
+        <input type="date" id="edtDataManut">
+
+        <label for="edtObsManut">Observação</label>
+        <textarea id="edtObsManut" cols="30" rows="5" maxlength="255" placeholder="Colocar dados importantes como a corda que usou e a tensão aplicada"></textarea>
+
+        <div class="inline">
+            <button id="btnAddManut" class="btn btn-primary">Salvar</button>
+            <button id="btnDelManut" class="btn btn-primary">Deletar</button>
+        </div>
+
+    </div>
+
+</template>
+<script>
+
+    const data = mainData.manutEquip.data
+    document.querySelector('.title-manutEquip').innerHTML=`${mainData.addEquip.data.descricao} (${mainData.addEquip.data.marca})`
+
+    if(mainData.manutEquip.data.id_manut =='DEFAULT'){
+        document.querySelector('#edtDataManut').value = today.getFormatDate()
+    }else{
+        document.querySelector('#edtServ').value = data.servico
+        document.querySelector('#edtDataManut').value = data.data
+        document.querySelector('#edtObsManut').value = data.obs
+    }
+
+    document.querySelector('#btnAddManut').addEventListener('click',()=>{
+        const params = new Object;
+            params.id = mainData.manutEquip.data.id_manut
+            params.id_equip = mainData.manutEquip.data.id_equip
+            params.servico = document.querySelector('#edtServ').value.trim()
+            params.data = document.querySelector('#edtDataManut').value
+            params.obs = document.querySelector('#edtObsManut').value.trim()
+
+        const myPromisse = queryDB(params,33);
+        myPromisse.then(()=>{
+            mainData.addEquip.func.fillManut()
+            closeModal('')
+        })        
+    })
+
+    document.querySelector('#btnDelManut').addEventListener('click',()=>{
+
+        if(confirm('Deletar esta manutenção?')){
+            const params = new Object;
+            params.id = mainData.manutEquip.data.id_manut
+
+            const myPromisse = queryDB(params,35);
+            myPromisse.then(()=>{
+                mainData.addEquip.func.fillManut()
+                closeModal('')
+            })        
+        }
+    })
+
+
+</script>

@@ -23,7 +23,7 @@
         }
 
         #btnNewEquip{
-            top: 135px;
+            top: 125px;
         }
 
 
@@ -110,14 +110,14 @@
                 div.className = 'view-inline'
 
                 const p = document.createElement('p')
-                p.innerHTML = `${equip[i].descricao}(${equip[i].marca})`
+                p.innerHTML = `${equip[i].descricao} (${equip[i].marca})`
                 div.appendChild(p)
 
                 const btn = document.createElement('button')
                 btn.innerHTML = 'EDITAR'
                 btn.className = 'btn btn-primary'
 
-                btn.addEventListener('click',()=>{
+                btn.addEventListener('click',()=>{                    
                     openHTML('addEquip.html','modal',equip[i],500)
                 })
 

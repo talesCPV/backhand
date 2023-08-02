@@ -37,6 +37,10 @@
         "30" => 'CALL sp_editAtvAtl("x00","x01","x02","x03");',
         "31" => 'SELECT * FROM tb_equip WHERE id_owner=x00;',
         "32" => 'CALL sp_addEquip("x00","x01","x02","x03","x04","x05")',
+        "33" => 'CALL sp_addEquipManut("x00","x01","x02","x03","x04")',
+        "34" => 'SELECT * FROM tb_equip_manut WHERE id_equip=x00;',
+        "35" => 'CALL sp_delEquipManut("x00")',
+        "36" => 'CALL sp_delEquip("x00")',
 
 
     );

@@ -42,6 +42,15 @@
             min-height: 100px;
         }
 
+        #btnManut{
+            top: 410px;
+            right: 20px;
+        }
+
+        .manut{
+            display: none;
+        }
+
     </style>
 
     <div class="frm-equip">
@@ -55,7 +64,7 @@
         </select>
     
         <label for="edtMarca">Marca</label>
-        <input type="text" id="edtMarca">
+        <input type="text" id="edtMarca" maxlength="15">
 
         <label for="edtAqui">Aquisição</label>
         <input type="date" id="edtAqui">
@@ -63,9 +72,9 @@
         <label for="edtObs">Observação</label>
         <textarea id="edtObs" cols="30" rows="5" maxlength="255"></textarea>
 
-        <fieldset>
+        <fieldset class="manut">
             <legend>Manutenção</legend>
-            <div class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
+            <div id="btnManut" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
             <table id="tblManut"></table>
         </fieldset>
 
@@ -82,20 +91,42 @@
 </template>
 <script>
 
+    mainData.addEquip.func.fillManut = ()=>{
+        const params = new Object;
+            params.id = mainData.addEquip.data.id
+
+        const myPromisse = queryDB(params,34);
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+            if(json.length>0){
+                const tbl = document.querySelector('#tblManut')
+                tbl.head('Data,Serviço,Obs')            
+                for(let i=0; i<json.length; i++){
+                    tbl.plot(json[i],'data,servico,obs','dat,Upp,cut20')
+                }
+            }
+        })                
+    }
+
     const data = mainData.addEquip.data
 
     if(mainData.addEquip.data.id=='DEFAULT'){
         document.querySelector('#edtAqui').value = today.getFormatDate()
+        document.querySelector('.manut').style.display = 'none'
     }else{
+        mainData.addEquip.func.fillManut()
         document.querySelector('#cmbEquip').value = data.descricao
         document.querySelector('#edtMarca').value = data.marca
         document.querySelector('#edtAqui').value = data.aquisicao
         document.querySelector('#edtObs').value = data.obs
-
+        document.querySelector('.manut').style.display = 'block'
     }
 
-
-
+    document.querySelector('#btnManut').addEventListener('click',()=>{
+        mainData.addEquip.data.id_equip = mainData.addEquip.data.id
+        mainData.addEquip.data.id_manut = 'DEFAULT'
+        openHTML('manutEquip.html','modal',mainData.addEquip.data,500)
+    })
 
     document.querySelector('#btnAddEquip').addEventListener('click',()=>{
 
@@ -111,9 +142,26 @@
         myPromisse.then(()=>{
             mainData.viewUser.func.fillEquip()
             closeModal('')
-        })
-        
+        })        
+    })
 
+    document.querySelector('#tblManut').addEventListener('click',(e)=>{        
+        const data = e.target.parentNode.data
+        data.id_manut = data.id    
+        
+        openHTML('manutEquip.html','modal',data,500)
+    })
+
+    document.querySelector('#btnDelEquip').addEventListener('click',()=>{
+        if(confirm('Deletar este equipamento?')){
+            const params = new Object;
+                params.id = mainData.addEquip.data.id
+            const myPromisse = queryDB(params,36);
+            myPromisse.then(()=>{
+                mainData.viewUser.func.fillEquip()
+                closeModal('')
+            })        
+        }
     })
 
 

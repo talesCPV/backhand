@@ -529,7 +529,7 @@ DELIMITER ;
 CALL sp_usersByName(4,"%%",0,10);
 
 
-DROP PROCEDURE sp_addEquip;
+-- DROP PROCEDURE sp_addEquip;
 DELIMITER $$
 	CREATE PROCEDURE sp_addEquip(
 		IN Iid int(11),
@@ -549,11 +549,42 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
-CALL sp_teste ("A,B,c,D",4);
+-- DROP PROCEDURE sp_addEquipManut;
+DELIMITER $$
+	CREATE PROCEDURE sp_addEquipManut(
+		IN Iid int(11),
+		IN Iid_equip int(11),
+		IN Iservico varchar(15),
+		IN Idata date,
+		IN Iobs varchar(255)
+    )
+	BEGIN			 
 
-/*
+		INSERT INTO tb_equip_manut (id,id_equip,servico,data,obs) 
+        VALUES (Iid,Iid_equip,Iservico,Idata,Iobs)
+        ON DUPLICATE KEY UPDATE
+        servico=Iservico, data=Idata, obs=Iobs;
+        
+	END $$
+DELIMITER ;
 
+-- DROP PROCEDURE sp_delEquipManut;
+DELIMITER $$
+	CREATE PROCEDURE sp_delEquipManut(
+		IN Iid int(11)
+    )
+	BEGIN			 
+		DELETE FROM tb_equip_manut WHERE id=Iid;        
+	END $$
+DELIMITER ;
 
-
-
-*/
+-- DROP PROCEDURE sp_delEquip;
+DELIMITER $$
+	CREATE PROCEDURE sp_delEquip(
+		IN Iid int(11)
+    )
+	BEGIN
+		DELETE FROM tb_equip_manut WHERE id_equip=Iid;
+		DELETE FROM tb_equip WHERE id=Iid;        
+	END $$
+DELIMITER ;
