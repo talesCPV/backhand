@@ -169,10 +169,10 @@
               <p id="usr"></p>
             </div>
             <ul class="menu-items">
-                <li class="only-login hide-menu"><a  class="menu-mobile"><span class="mdi mdi-tournament"></span><div></div> </a></li>
+                <li class="only-login hide-menu"><a onclick="torneio()" class="menu-mobile"><span class="mdi mdi-tournament"></span><div></div> </a></li>
                 <li class="only-login hide-menu"><a onclick="social()" class="menu-mobile"><i class="fas fa-user-friends"></i><div></div> </a></li>
-                <li class="only-login hide-menu" style="font-size: 1.3em;"><a onclick="addOne()" class="menu-mobile"> <i class="fas fa-plus-circle"></i><div></div> </a></li>
-                <li class="only-login hide-menu" ><a  class="menu-mobile" style="display: flex; gap: 5px;" class="parent-sub-menu"> <i class="fas fa-bell" style="margin-top: 6px;"></i><span id="alert" class="badge"></span><div></div>  </a>
+                <li class="only-login hide-menu"><a onclick="addOne()" class="menu-mobile"><span class="mdi mdi-plus-circle-outline"></span><div></div> </a></li>
+                <li class="only-login hide-menu" ><a  class="menu-mobile" style="display: flex; gap: 5px;" class="parent-sub-menu"><span class="mdi mdi-bell-outline"></span><span id="alert" class="badge"></span><div></div>  </a>
                   <ul class="sub-menu alert-badge"></ul>
                 </li>
                 <li class="only-login hide-menu"><a onclick="viewUser()" class="menu-mobile"><img class="imgUser" id="imgUser" src="assets/user.jpeg"><div></div></a></li>
@@ -276,6 +276,9 @@
         openScreen()      
       }
 
+      function torneio(){
+        openHTML('torneios.html','modal',null)
+      }
 
       function login(){
         if(localStorage.getItem('idUser') == null){

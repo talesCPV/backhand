@@ -84,9 +84,20 @@ h3{
   text-align: center;
 }
 
-button{
+button, select, option{
   cursor: pointer;
 }
+
+
+input[type="date"], input[type="time"]{
+  text-align: center;
+  cursor: pointer;
+}
+
+input[type="text"],input[type="number"],select{
+  padding: 5px;
+}
+
 /* Trophy */
 
 .fa-trophy {

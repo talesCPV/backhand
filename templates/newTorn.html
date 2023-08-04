@@ -1,0 +1,75 @@
+<title> Novo Torneio</title>
+<template>
+    <style>
+
+        .frm-torn{
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 5px;
+        }
+
+        .center{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #cnvLogo{
+            width: 150px;
+            border: solid 1px;
+            border-radius: 50%;
+        }
+        
+    </style>
+
+        <div class="frm-torn">
+
+            <label>Logo</label>
+            <div class="center">
+                <canvas  width="300" height="300"  id="cnvLogo"></canvas>
+                <input  name="up_file" id="up_file" type="file" accept=".jpg,.jpeg,.png">
+        
+                <button id="btnUpload" class="btn btn-primary">Upload</button>
+            </div>
+
+            <label for="edtNomeTorn">Nome</label>
+            <input type="text" id="edtNomeTorn">
+
+
+            <label for="cmbModTorn">Modelo</label>
+            <select id="cmbModTorn">
+                <option value="1">Play-Off</option>
+                <option value="2">Grupos/Play-Off</option>
+                <option value="3">Pontos Corridos</option>
+            </select>
+
+            <label for="edtNumPlayer">Num. de Jogadores</label>
+            <input type="number" id="edtNumPlayer" onkeyup="valInt(this)">
+
+     
+
+        </div>
+
+
+</template>
+<script>
+  
+  loadImg('assets/torn/trophy.jpg','#cnvLogo')
+/*
+  document.querySelector('#btnUpload').addEventListener('click',()=>{
+        uploadImage('up_file','/../assets/users/',localStorage.getItem('idUser')+'.jpg')
+        .then(()=>{
+            fillPerfil(localStorage.getItem('idUser'))
+        })
+    })
+*/
+    document.querySelector('#up_file').addEventListener('change',()=>{
+        showFile('#up_file','#cnvLogo')
+    })
+
+
+
+
+</script>

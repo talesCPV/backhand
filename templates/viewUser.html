@@ -30,9 +30,9 @@
     </style>
 
     <div class="tab-bar">
-        <div class="tab-item" id="tab-perfil" onclick="pictab(this)">Meu Perfil   </div>
-        <div class="tab-item" id="tab-equip"  onclick="pictab(this)">Equipamentos </div>
-        <div class="tab-item" id="tab-quadras"  onclick="pictab(this)">Quadras      </div>
+        <div class="tab-item" id="tab-perfil" onclick="pictab(this)">Perfil</div>
+        <div class="tab-item" id="tab-equip"  onclick="pictab(this)">Equipamentos</div>
+        <div class="tab-item" id="tab-quadras"  onclick="pictab(this)">Quadras</div>
     </div>
     <div class="tab-screen">        
         <div id="perfil" class="tab">
@@ -190,24 +190,7 @@
     })
 
     document.querySelector('#up_file').addEventListener('change',()=>{
-
-        if (document.querySelector('#up_file').files && document.querySelector('#up_file').files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                var ctx = document.getElementById('cnvImg');
-                if (ctx.getContext) {
-                    ctx = ctx.getContext('2d');
-                    let preview = new Image();
-                    preview.onload = function () {
-                        ar = aspect_ratio(preview)
-                        ctx.drawImage(preview, 0, 0,preview.width,preview.height,ar[0],ar[1],ar[2],ar[3]);
-                    };
-                    preview.src = e.target.result           
-                }
-            }
-            reader.readAsDataURL(document.querySelector('#up_file').files[0]);
-        }
+        showFile('#up_file','#cnvImg')     
     })
 
     document.querySelector('#btnAddUser').addEventListener('click',()=>{

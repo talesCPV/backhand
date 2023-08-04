@@ -588,3 +588,72 @@ DELIMITER $$
 		DELETE FROM tb_equip WHERE id=Iid;        
 	END $$
 DELIMITER ;
+
+ DROP PROCEDURE sp_newTorn;
+DELIMITER $$
+	CREATE PROCEDURE sp_newTorn(
+		IN Iid int(11) ,
+		IN Iid_owner int(11), 
+		IN Inome varchar(50),
+		IN Imodelo varchar(15),    
+		IN Inum_players int,
+        IN Inum_grupos int,
+        IN IplayOff int
+    )
+	BEGIN
+    
+		SET @edit = (SELECT COUNT(*) FROM tb_torneio WHERE id=Iid);
+    
+		INSERT INTO tb_torneio (id,id_owner,nome,modelo,num_players)
+        VALUES (Iid,Iid_owner,Inome,Imodelo,Inum_players)
+        ON DUPLICATE KEY UPDATE
+        nome=Inome;
+		
+        SET @id_torn =Iid;          
+		IF (@edit=0) THEN			    
+			SET @id_torn = (SELECT MAX(id) FROM tb_torneio);
+            SET @num_jogos =  fn_numJogos(Imodelo,Inum_players,Inum_grupos,IplayOff);
+			SET @nJogadorGrupo = (SELECT IFNULL((SELECT Inum_players DIV Inum_grupos),0)); 
+			SET @nRestaJog = (SELECT IFNULL((SELECT Inum_players % Inum_grupos),0));
+            
+            SET @numJogo = 0;
+            SET @numGrupo = 1;
+            SET @numJogGrupo = 0;
+            SET @jogadorAMais = 1;
+            
+            loop_jogos:  LOOP
+            
+				INSERT INTO tb_jogo (id,id_torn,grupo)
+				VALUES (@numJogo,@id_torn,@numGrupo);                   
+                        
+				SET @numJogGrupo = @numJogGrupo+1;
+				IF @numJogGrupo >= (@nJogadorGrupo + (SELECT IF(@nRestaJog>0,1,0))) THEN
+					SET @numJogGrupo = 0;
+					SET @numGrupo = @numGrupo+1;
+                    IF @nRestaJog > 0 THEN
+						SET @nRestaJog = @nRestaJog-1;
+                    END IF;
+                END IF;
+            
+				IF  @numJogo >= @num_jogos THEN
+					LEAVE  loop_jogos;
+				ELSE
+					SET @numJogo = @numJogo+1;
+				END  IF;
+			END LOOP;
+		END IF;
+        
+        SELECT * FROM tb_torneio WHERE id=@id_torn;
+	END $$
+DELIMITER ;
+
+CALL sp_newTorn("DEFAULT",1,"Torneio Teste",2,20,3);
+
+SELECT fn_numJogos(2,20,3);
+
+SELECT * FROM tb_torneio;
+SELECT * FROM tb_jogo;
+/* JOG por GRUPO */
+SELECT IFNULL((SELECT 20 DIV 3),0);
+/* RESTA JOG */
+SELECT IFNULL((SELECT 20 % 3),0);

@@ -155,3 +155,39 @@ CREATE TABLE tb_equip_manut (
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
+ DROP TABLE tb_torneio;
+CREATE TABLE tb_torneio (
+	id int(11) NOT NULL AUTO_INCREMENT,
+    id_owner int(11) NOT NULL, 
+    nome varchar(50) DEFAULT NULL,
+    modelo int DEFAULT 1,    
+    num_players int DEFAULT 4,
+	FOREIGN KEY (id_owner) REFERENCES tb_usuario(id),
+    PRIMARY KEY (id)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+ DROP TABLE tb_jogo;
+CREATE TABLE tb_jogo (
+	id int NOT NULL,
+    id_torn int(11) NOT NULL, 
+    id_P1 int(11) DEFAULT NULL,
+    id_P2 int(11) DEFAULT NULL,
+	id_Ativ int(11) DEFAULT NULL,
+    grupo int DEFAULT 1,
+    data date DEFAULT NULL,    
+	FOREIGN KEY (id_torn) REFERENCES tb_torneio(id),
+	FOREIGN KEY (id_P1) REFERENCES tb_usuario(id),
+	FOREIGN KEY (id_P2) REFERENCES tb_usuario(id),
+    PRIMARY KEY (id,id_torn)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+-- DROP TABLE tb_torn_invite;
+CREATE TABLE tb_torn_invite (
+    id_torn int(11) NOT NULL, 
+    id_player int(11) NOT NULL,
+    accept BOOLEAN DEFAULT 0,
+	ask BOOLEAN DEFAULT 1,  
+	FOREIGN KEY (id_torn) REFERENCES tb_torneio(id),
+	FOREIGN KEY (id_player) REFERENCES tb_usuario(id),
+    PRIMARY KEY (id_torn,id_player)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

@@ -1,0 +1,29 @@
+<title> Torneios</title>
+<template>
+    <style>
+
+        #myTorns{
+            min-height: 200px;
+        }
+
+        #btnNewTorn{
+            top: 60px;
+            right: 12px;
+        }
+
+    </style>
+
+        <div id="btnNewTorn" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
+        <div id="myTorns"></div>
+
+
+</template>
+<script>
+  
+    document.querySelector('#btnNewTorn').addEventListener('click',()=>{
+        openHTML('newTorn.html','modal',{},500)
+    })
+
+
+
+</script>

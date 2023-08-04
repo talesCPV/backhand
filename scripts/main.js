@@ -342,6 +342,10 @@ function pictab(e){
 
 /* VALIDATION */
 
+function valInt(edt){
+    edt.value = getNum(edt.value)
+}
+
 function valNoSpace(edt){
     edt.value = noSpace(edt.value)
 }
@@ -358,10 +362,6 @@ function forbidenStr(V,forbid){
         }
     }
     return out
-}
-
-function valInt(edt){
-    edt.value = getNum(edt.value)
 }
 
 function noSpace(V){
@@ -469,19 +469,30 @@ function aspect_ratio(img,cvw=300, cvh=300){
     return out
 }
 
-function loadImg(filename, id='cnvImg') {
+function showFile(idFile,idCanvas){
+    const inputFile = document.querySelector(idFile)
+    if (inputFile.files && inputFile.files[0]) {
+        var reader = new FileReader();
 
-    var ctx = document.getElementById(id);
+        reader.onload = function (e) {
+            loadImg(e.target.result,idCanvas)             
+        }
+        reader.readAsDataURL(inputFile.files[0]);
+    }
+}
+
+function loadImg(filename, id='#cnvImg') {
+    var ctx = document.querySelector(id); 
+    const size = {w:ctx.width, h:ctx.height}
     if (ctx.getContext) {
-
         ctx = ctx.getContext('2d');
+        ctx.clearRect(0, 0, size.w, size.h);
         var img = new Image();
         img.onload = function () {
             ar = aspect_ratio(img)
             ctx.drawImage(img, 0, 0,img.width,img.height,ar[0],ar[1],ar[2],ar[3]);
         };        
         img.src = filename;        
-    
     }
 }
 
