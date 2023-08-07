@@ -30,7 +30,7 @@
         "23" => 'CALL sp_follow("x00",x01);',
         "24" => 'CALL sp_searchFriends("x00",x01);',
         "25" => 'SELECT * FROM vw_friends WHERE y00 = x00;',
-        "26" => 'CALL sp_usersByName(x00,"%x01%",0,10);',
+        "26" => 'CALL sp_usersByName(x00,"%x01%",x02,x03);',
         "27" => 'SELECT * FROM vw_perfil WHERE id = x00;',
         "28" => 'SELECT * FROM vw_dashboard WHERE id=x00',
         "29" => 'SELECT * FROM vw_dashboard_atleta WHERE id_atleta=x00;',
@@ -41,7 +41,12 @@
         "34" => 'SELECT * FROM tb_equip_manut WHERE id_equip=x00;',
         "35" => 'CALL sp_delEquipManut("x00")',
         "36" => 'CALL sp_delEquip("x00")',
-
+        "37" => 'CALL sp_newTorn("x00",x01,"x02",x03,x04,x05,x06,"x07");',
+        "38" => 'CALL sp_delTorn("x00")',
+        "39" => 'SELECT * FROM tb_torneio WHERE id_owner=x00',
+        "40" => 'SELECT * FROM vw_torn WHERE id=x00',
+        "41" => 'CALL sp_inviteTorn("x00",x01,x02)',
+        "42" => 'SELECT * FROM vw_torn_invite WHERE id_torn=x00',
 
     );
 

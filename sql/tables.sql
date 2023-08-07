@@ -66,6 +66,7 @@ CREATE TABLE tb_atividades (
   duracao DOUBLE NOT NULL,
   ranking BOOLEAN DEFAULT FALSE,
   peso double DEFAULT 0,
+  nao_usuario varchar(50) DEFAULT NULL,
   FOREIGN KEY (id_usuario) REFERENCES tb_usuario(id),
   FOREIGN KEY (id_quadra) REFERENCES tb_quadra(id),
   FOREIGN KEY (id_sport) REFERENCES tb_sport(id),
@@ -74,7 +75,7 @@ CREATE TABLE tb_atividades (
 )ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 ALTER TABLE tb_atividades
-ADD COLUMN peso double DEFAULT 0;
+ADD COLUMN nao_usuario varchar(50) DEFAULT NULL;
 
 -- DROP TABLE tb_ativ_atleta;
 CREATE TABLE tb_ativ_atleta (
@@ -162,6 +163,10 @@ CREATE TABLE tb_torneio (
     nome varchar(50) DEFAULT NULL,
     modelo int DEFAULT 1,    
     num_players int DEFAULT 4,
+    num_grupos int DEFAULT 0,
+    playOff int DEFAULT 0,
+    regras varchar(1000) DEFAULT NULL,
+    criado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (id_owner) REFERENCES tb_usuario(id),
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
@@ -172,6 +177,8 @@ CREATE TABLE tb_jogo (
     id_torn int(11) NOT NULL, 
     id_P1 int(11) DEFAULT NULL,
     id_P2 int(11) DEFAULT NULL,
+    P1_nome varchar(30) DEFAULT NULL,
+    P2_nome varchar(30) DEFAULT NULL,    
 	id_Ativ int(11) DEFAULT NULL,
     grupo int DEFAULT 1,
     data date DEFAULT NULL,    
@@ -181,13 +188,13 @@ CREATE TABLE tb_jogo (
     PRIMARY KEY (id,id_torn)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
--- DROP TABLE tb_torn_invite;
+ DROP TABLE tb_torn_invite;
 CREATE TABLE tb_torn_invite (
     id_torn int(11) NOT NULL, 
-    id_player int(11) NOT NULL,
+    id_atleta int(11) NOT NULL,
     accept BOOLEAN DEFAULT 0,
 	ask BOOLEAN DEFAULT 1,  
 	FOREIGN KEY (id_torn) REFERENCES tb_torneio(id),
-	FOREIGN KEY (id_player) REFERENCES tb_usuario(id),
-    PRIMARY KEY (id_torn,id_player)
+	FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),
+    PRIMARY KEY (id_torn,id_atleta)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

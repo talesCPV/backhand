@@ -16,22 +16,22 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
--- DROP FUNCTION fn_numJogosPC;
+ DROP FUNCTION fn_numJogosPC;
 DELIMITER $$
-	CREATE FUNCTION fn_numJogosPC(numPlayers INT)
+	CREATE FUNCTION fn_numJogosPC(numPlayersPC INT)
     RETURNS INT 
     DETERMINISTIC
 	BEGIN    
-		SET @num_jogos = 0;
+		SET @num_jogos_PC = 0;
 		SET @cont = 0;
 		loop_PC:  LOOP
 			SET @cont = @cont+1;
-			SET @num_jogos = @num_jogos + @cont;                    
-			IF  @cont >=numPlayers-1 THEN 
+			SET @num_jogos_PC = @num_jogos_PC + @cont;                    
+			IF  @cont >=numPlayersPC-1 THEN 
 				LEAVE  loop_PC;
 			END  IF;                
 		END LOOP;  	
-		RETURN (SELECT @num_jogos AS QTD_JOGOS);		
+		RETURN @num_jogos_PC;		
 	END $$
 DELIMITER ;
 
@@ -101,9 +101,9 @@ DELIMITER $$
 DELIMITER ;
 
 SELECT fn_calcDist(-23,-45,-23.5,-45.5);
-SELECT fn_numJogosPC(11);
+SELECT fn_numJogosPC(7);
 SELECT fn_numJogosP_OFF(33);
 
-SELECT fn_numJogos(2,32,2,0);
+SELECT fn_numJogos(2,20,3,8);
 
 

@@ -52,19 +52,33 @@ function fillPerfil(usr){
             const atv = PERFIL.ALERTA_ATV.split(',')
             const nome = PERFIL.ALERTA_NOME.split(',')            
             container.innerHTML = ''
+/*            
             const legend = document.createElement('li')
             legend.innerHTML = 'Confirmar Jogos'
             container.appendChild(legend)
+*/            
             for(let i=0; i<qtd; i++){
                 const data = new Object
                     data.origem = 'confirm'
                 const li = document.createElement('li')
-                    li.id = 'alert-'+atv[i]
-                    li.innerHTML = nome[i]
+                    li.id = 'alert-'+atv[i]                    
+//                    li.innerHTML = nome[i]
                     li.addEventListener('click',()=>{
                         window.location.hash = 'G'+atv[i].padStart(10,0)
                         loadHash(data)
                     })
+
+                    const div = document.createElement('div')
+                    div.className = 'sub-menu-item'
+                    const label = document.createElement('label')
+                    label.innerText = 'Partida'
+                    div.appendChild(label)
+                    const p = document.createElement('p')
+                    p.innerText = nome[i]
+                    div.appendChild(p)
+
+                    li.appendChild(div)
+
                 container.appendChild(li)
             }
             alert.innerText = qtd
@@ -96,9 +110,9 @@ function fillPerfil(usr){
     })
 }
 
-function breakImg(img){
+function breakImg(img,url='assets/user.jpeg'){
     img.addEventListener('error',()=>{
-        img.src = 'assets/user.jpeg'
+        img.src = url
     })   
 }
 
@@ -115,7 +129,11 @@ function loadHash(data = {}){
             case 'G':
                 openHTML('viewTrainning.html','modal',data)
             break
+            case 'T':
+                openHTML('viewTorn.html','modal',data)
+            break            
         }
+        removeHash()
     }
 }
 
@@ -376,13 +394,13 @@ function noSpace(V){
 
 function getNum(V){
     const ok_chr = ['1','2','3','4','5','6','7','8','9','0'];
-    let out = ''
+    let out = '0'
     for(let i=0; i< V.length; i++){
         if(ok_chr.includes(V[i])){
             out+=V[i]
         }
     }
-    return out
+    return parseInt(out)
 }
 
 function getFone(V){
@@ -483,17 +501,22 @@ function showFile(idFile,idCanvas){
 
 function loadImg(filename, id='#cnvImg') {
     var ctx = document.querySelector(id); 
-    const size = {w:ctx.width, h:ctx.height}
-    if (ctx.getContext) {
-        ctx = ctx.getContext('2d');
-        ctx.clearRect(0, 0, size.w, size.h);
-        var img = new Image();
-        img.onload = function () {
-            ar = aspect_ratio(img)
-            ctx.drawImage(img, 0, 0,img.width,img.height,ar[0],ar[1],ar[2],ar[3]);
-        };        
-        img.src = filename;        
+    try{
+        const size = {w:ctx.width, h:ctx.height}
+        if (ctx.getContext) {
+            ctx = ctx.getContext('2d');
+            ctx.clearRect(0, 0, size.w, size.h);
+            var img = new Image();
+            img.onload = function () {
+                ar = aspect_ratio(img)
+                ctx.drawImage(img, 0, 0,img.width,img.height,ar[0],ar[1],ar[2],ar[3]);
+            };        
+            img.src = filename;        
+        }
+    }catch{
+        console.error('Imagem não existe!')
     }
+
 }
 
 function uploadImage(inputFile,path,filename){

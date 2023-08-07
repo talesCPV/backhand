@@ -598,17 +598,19 @@ DELIMITER $$
 		IN Imodelo varchar(15),    
 		IN Inum_players int,
         IN Inum_grupos int,
-        IN IplayOff int
+        IN IplayOff int,
+        IN Iregras varchar(1000)
     )
 	BEGIN
-    
+
 		SET @edit = (SELECT COUNT(*) FROM tb_torneio WHERE id=Iid);
-    
-		INSERT INTO tb_torneio (id,id_owner,nome,modelo,num_players)
-        VALUES (Iid,Iid_owner,Inome,Imodelo,Inum_players)
+        
+		INSERT INTO tb_torneio (id,id_owner,nome,modelo,num_players,num_grupos,playOff,regras)
+        VALUES (Iid,Iid_owner,Inome,Imodelo,Inum_players,Inum_grupos,IplayOff,Iregras)
         ON DUPLICATE KEY UPDATE
-        nome=Inome;
+        nome=Inome, regras=Iregras;
 		
+        SET @playOff = IplayOff DIV 2;        
         SET @id_torn =Iid;          
 		IF (@edit=0) THEN			    
 			SET @id_torn = (SELECT MAX(id) FROM tb_torneio);
@@ -616,23 +618,31 @@ DELIMITER $$
 			SET @nJogadorGrupo = (SELECT IFNULL((SELECT Inum_players DIV Inum_grupos),0)); 
 			SET @nRestaJog = (SELECT IFNULL((SELECT Inum_players % Inum_grupos),0));
             
-            SET @numJogo = 0;
+            SET @numJogo = 1;
             SET @numGrupo = 1;
-            SET @numJogGrupo = 0;
-            SET @jogadorAMais = 1;
-            
+            SET @numJogGrupo = 1;
+            SET @numJogPorGrupo = fn_numJogosPC(@nJogadorGrupo + (SELECT IF(@nRestaJog>0,1,0)));
             loop_jogos:  LOOP
             
 				INSERT INTO tb_jogo (id,id_torn,grupo)
 				VALUES (@numJogo,@id_torn,@numGrupo);                   
                         
 				SET @numJogGrupo = @numJogGrupo+1;
-				IF @numJogGrupo >= (@nJogadorGrupo + (SELECT IF(@nRestaJog>0,1,0))) THEN
-					SET @numJogGrupo = 0;
-					SET @numGrupo = @numGrupo+1;
-                    IF @nRestaJog > 0 THEN
+                IF @numGrupo <= Inum_grupos THEN                
+					IF @numJogGrupo > @numJogPorGrupo THEN
+						SET @numJogGrupo = 1;
+						SET @numGrupo = @numGrupo+1;						
 						SET @nRestaJog = @nRestaJog-1;
-                    END IF;
+                        SET @numJogPorGrupo = fn_numJogosPC(@nJogadorGrupo + (SELECT IF(@nRestaJog>0,1,0)));
+					END IF;
+				ELSE 
+					IF @numJogGrupo > @playOff THEN
+						SET @numJogGrupo = 1;
+						SET @numGrupo = @numGrupo+1;
+                        IF @playOff > 2 THEN
+							SET @playOff = @playOff DIV 2;
+						END IF;
+					END IF;                
                 END IF;
             
 				IF  @numJogo >= @num_jogos THEN
@@ -647,9 +657,52 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
-CALL sp_newTorn("DEFAULT",1,"Torneio Teste",2,20,3);
+-- DROP PROCEDURE sp_delTorn;
+DELIMITER $$
+	CREATE PROCEDURE sp_delTorn(
+		IN Iid int(11)
+    )
+	BEGIN
+		DELETE FROM tb_jogo WHERE id_torn=Iid;
+		DELETE FROM tb_torneio WHERE id=Iid;        
+	END $$
+DELIMITER ;
 
-SELECT fn_numJogos(2,20,3);
+ DROP PROCEDURE sp_inviteTorn;
+DELIMITER $$
+	CREATE PROCEDURE sp_inviteTorn(
+		IN Ihash varchar(77),
+		IN Iid_torn int(11),
+        IN Iid_atleta int(11)
+    )
+	BEGIN
+		SET @OWNER_HASH = (SELECT US.hash FROM tb_usuario AS US INNER JOIN tb_torneio AS TN ON US.id=TN.id_owner AND TN.id=Iid_torn);
+        SET @tot = (SELECT num_players FROM tb_torneio WHERE id=Iid_torn);
+        SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
+		SET @invite = 0;
+        
+		IF (Ihash COLLATE utf8_general_ci = @OWNER_HASH COLLATE utf8_general_ci)THEN
+			IF ((SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta)>0) THEN
+			   DELETE FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta ;  
+               SET @tot_invite = @tot_invite -1;
+			ELSE
+				IF(@tot_invite<@tot)THEN
+					INSERT INTO tb_torn_invite (id_torn, id_atleta) VALUES (Iid_torn,Iid_atleta);
+					SET @invite = 1;
+				END IF;
+			END IF;		
+        END IF;
+        
+        SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
+		SELECT @invite as OK, (@tot-@tot_invite) AS VAGAS;
+	END $$
+DELIMITER ;
+
+CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",1,1);
+CALL sp_newTorn("1",1,"Torneio Teste editado",2,20,3,8);
+CALL sp_delTorn(1);
+
+SELECT fn_numJogos(2,20,3,8);
 
 SELECT * FROM tb_torneio;
 SELECT * FROM tb_jogo;

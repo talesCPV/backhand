@@ -68,6 +68,10 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
+textarea{
+  resize: none;
+}
+
 p {
   text-indent: 1.5em;
   padding: 20px;
@@ -324,6 +328,11 @@ input[type="text"],input[type="number"],select{
   .view-inline:hover{
     border-bottom: solid 1px #16a083;
     border-top: solid 1px #16a083;
+  }
+
+  .view-inline button{
+    margin: 5px 10px 5px 0;
+    min-width: 100px;
   }
 
 /* ROUND BUTTON */

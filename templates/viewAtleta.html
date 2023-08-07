@@ -17,6 +17,12 @@
             width: 100%;
         }
 
+        #searchFriends{
+            width: 100%;
+            height: 400px;
+            overflow-y: scroll;
+        }
+
 
     </style>
 
@@ -36,20 +42,33 @@
 </template>
 <script>
     
-    mainData.newFriend.func.onClose = ()=>{
-        if(mainData.newFriend.data.origem =='social'){
+    const data = mainData.viewAtleta.data
+    const scroll = {start:0, limit:10}
+
+
+    mainData.viewAtleta.func.onClose = ()=>{
+        if(data.origem =='social'){
             mainData.social.func.viewFriends('hostID','#myFriends','guestname','guestID')
             mainData.social.func.viewFriends('guestID','#iFriend','hostname','hostID')
         }
-
-
     }
 
+    mainData.viewAtleta.func.findAtleta = ()=>{
+        const params = new Object;
+            params.id = localStorage.getItem('idUser')            
+            params.nome = document.querySelector('#edtNomeAtleta').value.trim()    
+            params.start = scroll.start
+            params.limit = scroll.limit
 
-    friendsDistance(100)
+        const myPromisse = queryDB(params,26)
 
+        myPromisse.then((resolve)=>{
+            const friends =  JSON.parse(resolve)
+            showFriends(friends)
+        })
+    }
 
-    function friendsDistance(radius){
+    mainData.viewAtleta.func.friendsDistance = (radius)=>{
         const params = new Object;
             params.hash = localStorage.getItem('hash')
             params.distance = radius
@@ -62,23 +81,29 @@
         })
     }
 
+    if(data.origem == 'social'){
+        mainData.viewAtleta.func.friendsDistance(100)
+    }else{
+        mainData.viewAtleta.func.findAtleta()
+    }
+
+    
 
     document.querySelector('#btnSearchAtleta').addEventListener('click',()=>{
-
-        const params = new Object;
-            params.id = localStorage.getItem('idUser')            
-            params.nome = document.querySelector('#edtNomeAtleta').value.trim()            
-
-        const myPromisse = queryDB(params,26)
-
-        myPromisse.then((resolve)=>{
-            const friends =  JSON.parse(resolve)
-            showFriends(friends)
-        })
-
-
-
+        scroll.start = 0
+        mainData.viewAtleta.func.findAtleta()
     })
+
+
+    document.querySelector('#searchFriends').addEventListener('scroll',()=>{
+        const win = document.querySelector('#searchFriends')
+        if( win.scrollTop === (win.scrollHeight - win.offsetHeight)){
+            scroll.start += scroll.limit
+            mainData.viewAtleta.func.findAtleta()
+        }
+    })
+
+
 
     function repeatUser(id){
 
@@ -90,12 +115,12 @@
 
 
     function showFriends(friends){
-        const newActivity = mainData.newFriend.data.source == 'newActivity'
+
         const div_search = document.querySelector('#searchFriends') 
-        div_search.innerHTML = ''
+        scroll.start === 0 ? div_search.innerHTML = '' : 0
         for(let i=0; i<friends.length; i++){      
 
-            if(newActivity){
+            if(data.origem == 'newActivity'){
                 while(repeatUser(friends[i].userID)){
                     i++
                 }
@@ -120,23 +145,17 @@
             leftdiv.appendChild(p)
             div.appendChild(leftdiv)
 
-            if(newActivity){
-
-
+            if(data.origem == 'newActivity'){ // nova atividade
                 const btn = document.createElement('button')
                 btn.innerHTML = 'ADICIONAR'
                 btn.className = 'btn btn-primary'
                 btn.addEventListener('click',()=>{
-                    mainData.newActivity.data[mainData.newFriend.data.time].push(friends[i])
-                    mainData.newActivity.func.fillTime(mainData.newFriend.data.time)
+                    mainData.newActivity.data[data.time].push(friends[i])
+                    mainData.newActivity.func.fillTime(data.time)
                     closeModal(0)
                 })
-
-                div.appendChild(btn)
-                    
-
-            }else{
-
+                div.appendChild(btn)                    
+            }else if(data.origem == 'social'){ // social / seguir
                 if(friends[i].FOLLOW=="0" && localStorage.getItem('idUser')!= friends[i].userID ){
                 const btn = document.createElement('button')
                     btn.innerHTML = 'SEGUIR'
@@ -154,6 +173,23 @@
 
                     div.appendChild(btn)
                 }
+            }else if(data.origem == 'torneio'){ // torneio
+                
+                const btn = document.createElement('button')
+                btn.innerHTML =  mainData.viewTorn.data.id_atleta.includes(friends[i].userID) ?'RETIRAR':'CONVIDAR'
+                btn.className = 'btn btn-primary'
+                btn.addEventListener('click',()=>{
+                    const params = new Object;
+                            params.hash = localStorage.getItem('hash')
+                            params.id_torn = mainData.viewTorn.data.address
+                            params.id_atleta = friends[i].userID
+                        queryDB(params,41).then((resolve)=>{
+                            mainData.viewTorn.func.fillAtletas()
+                        })
+                    closeModal(0)
+                })
+                div.appendChild(btn)                      
+
             }
 
             div_search.appendChild(div)

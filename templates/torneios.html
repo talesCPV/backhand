@@ -4,6 +4,7 @@
 
         #myTorns{
             min-height: 200px;
+            padding-top: 55px;
         }
 
         #btnNewTorn{
@@ -20,6 +21,79 @@
 </template>
 <script>
   
+    mainData.torneios.func.fillTorn = ()=>{
+        const params = new Object;
+            params.id_owner =  localStorage.getItem('idUser')
+
+        const myPromisse = queryDB(params,39)
+        myPromisse.then((resolve)=>{                       
+            const torneios = JSON.parse(resolve)
+            
+            const div_torn = document.querySelector('#myTorns') 
+            div_torn.innerHTML = ''
+            for(let i=0; i<torneios.length; i++){      
+                const div = document.createElement('div')
+                div.className = 'view-inline'
+    
+                const leftdiv = document.createElement('div')
+                leftdiv.style.display = 'flex'
+                const img = document.createElement('img')
+                img.src = `assets/torn/${torneios[i].id}.jpg?`+ new Date().getTime();
+                img.id = `torn-${torneios[i].id}`
+                breakImg(img,'assets/torn/trophy.jpg')
+                               
+                img.addEventListener('click',()=>{
+//                    openHTML('viewTorn.html','modal',torneios[i])
+                    window.location.hash = 'T'+torneios[i].id.padStart(10,0)
+                    loadHash()
+                })
+                
+                img.className = 'imgUser'
+                leftdiv.appendChild(img)
+
+                const p = document.createElement('p')
+                p.innerHTML = torneios[i].nome
+                leftdiv.appendChild(p)
+                div.appendChild(leftdiv)
+          
+                const divBtn = document.createElement('div')
+
+                if(torneios[i].id_owner == localStorage.getItem('idUser')){
+                    const btn = document.createElement('button')
+                    btn.innerHTML = 'EDITAR' 
+                    btn.className = 'btn btn-primary'
+
+                    btn.addEventListener('click',()=>{
+                        openHTML('newTorn.html','modal',torneios[i],500)
+
+                    })
+                    divBtn.appendChild(btn)
+                }
+           
+                const btn2 = document.createElement('button')
+                btn2.innerHTML = 'Visualizar' 
+                btn2.className = 'btn btn-primary'
+
+                btn2.addEventListener('click',()=>{
+//                    openHTML('viewTorn.html','modal',torneios[i])
+                    window.location.hash = 'T'+torneios[i].id.padStart(10,0)
+                        loadHash()                    
+                })
+                divBtn.appendChild(btn2)
+                div.appendChild(divBtn)
+
+                div_torn.appendChild(div)
+            }            
+            
+
+
+        })
+
+    }
+
+
+    mainData.torneios.func.fillTorn()
+
     document.querySelector('#btnNewTorn').addEventListener('click',()=>{
         openHTML('newTorn.html','modal',{},500)
     })

@@ -3,10 +3,20 @@
     <style>
 
         .frm-torn{
+            padding: 10px;         
             display: flex;
             flex-direction: column;
-            padding: 10px;
+            gap: 5px;   
+        }
+
+        .flex-col{
+            display: flex;
+            flex-direction: column;
             gap: 5px;
+        }
+
+        .flex-col > *{
+            width: 100%;
         }
 
         .center{
@@ -22,6 +32,14 @@
             border-radius: 50%;
         }
         
+        #divNumGrupo, #divNumJog{
+            display: none;
+        }
+
+        .show-edit{
+            display: none;
+        }
+
     </style>
 
         <div class="frm-torn">
@@ -31,12 +49,11 @@
                 <canvas  width="300" height="300"  id="cnvLogo"></canvas>
                 <input  name="up_file" id="up_file" type="file" accept=".jpg,.jpeg,.png">
         
-                <button id="btnUpload" class="btn btn-primary">Upload</button>
+                <button id="btnUpload" class="btn btn-primary show-edit">Upload</button>
             </div>
 
             <label for="edtNomeTorn">Nome</label>
             <input type="text" id="edtNomeTorn">
-
 
             <label for="cmbModTorn">Modelo</label>
             <select id="cmbModTorn">
@@ -45,31 +62,180 @@
                 <option value="3">Pontos Corridos</option>
             </select>
 
-            <label for="edtNumPlayer">Num. de Jogadores</label>
-            <input type="number" id="edtNumPlayer" onkeyup="valInt(this)">
+            <div id="divNumJog" class="flex-col">
+                <label for="edtNumPlayer">Num. de Jogadores</label>
+                <input type="text" id="edtNumPlayer" inputmode="decimal" onkeyup="valInt(this)" value="4">
+            </div>
 
-     
+            <div id="divPlayOff" class="flex-col">
+                <label for="cmbPlayOff">PlayOff</label>
+                <select id="cmbPlayOff">
+                    <option value="64">64</option>
+                    <option value="32">32</option>
+                    <option value="16" selected>16</option>
+                    <option value="8">8</option>
+                    <option value="4">4</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
 
+            <div id="divNumGrupo" class="flex-col">
+                <label for="edtNumGrupo">Num. de Grupos</label>
+                <input type="text" id="edtNumGrupo" inputmode="decimal" onkeyup="valInt(this)" value="0">
+            </div>
+
+            <label for="edtObs">Obs:</label>
+            <textarea id="edtObs" cols="30" rows="5" maxlength="999"></textarea>
+
+            <button id="btnTorn" class="btn btn-primary">Criar Torneio</button>
+            <button id="btnDelTorn" class="btn btn-primary show-edit">Deletar</button>
         </div>
-
 
 </template>
 <script>
   
-  loadImg('assets/torn/trophy.jpg','#cnvLogo')
-/*
+    const data = mainData.newTorn.data
+    const edit = Object.keys(data).length?1:0
+    let id = 'DEFAULT'
+    let imgExist = false
+
+    if(edit){
+        id = data.id
+        document.querySelector('#edtNomeTorn').value = data.nome
+        document.querySelector('#edtNumPlayer').value = data.num_players
+        document.querySelector('#edtNumGrupo').value = data.num_grupos
+        document.querySelector('#cmbModTorn').value = data.modelo
+        document.querySelector('#cmbPlayOff').value = data.playOff
+        document.querySelector('#edtObs').value = data.regras
+        document.querySelector('#btnTorn').innerHTML = 'SALVAR'
+        document.querySelector('#edtNumPlayer').disabled = true
+        document.querySelector('#edtNumGrupo').disabled = true
+        document.querySelector('#cmbModTorn').disabled = true
+        document.querySelector('#cmbPlayOff').disabled = true
+        changeModel(data.modelo)
+      
+        const showEdit = document.querySelectorAll('.show-edit')
+        for(let i=0; i<showEdit.length; i++){
+            showEdit[i].style.display = 'block'
+        }
+    }
+
+    const back = backFunc({'filename':`../assets/torn/${data.id}.jpg`},1)
+    back.then((resp)=>{
+        imgExist = JSON.parse(resp)
+
+        let path = ''
+        path = imgExist ? `assets/torn/${data.id}.jpg` : 'assets/torn/trophy.jpg'    
+        loadImg(path,'#cnvLogo')
+    })
+
+    function changeModel(mode){
+        switch (mode){
+            case '1':
+                document.querySelector('#divNumJog').style.display = 'none'
+                document.querySelector('#divNumGrupo').style.display = 'none'
+                document.querySelector('#divPlayOff').style.display = 'flex'
+            break
+            case '2':
+                document.querySelector('#divNumJog').style.display = 'flex'
+                document.querySelector('#divNumGrupo').style.display = 'flex'
+                document.querySelector('#divPlayOff').style.display = 'flex'
+            break
+            case '3':
+                document.querySelector('#divNumJog').style.display = 'flex'
+                document.querySelector('#divNumGrupo').style.display = 'none'
+                document.querySelector('#divPlayOff').style.display = 'none'
+            break
+        }
+    }
+
+
+
+    document.querySelector('#cmbModTorn').addEventListener('change',()=>{
+        const mode = document.querySelector('#cmbModTorn').value
+        changeModel(mode)
+      
+    })
+
+
   document.querySelector('#btnUpload').addEventListener('click',()=>{
-        uploadImage('up_file','/../assets/users/',localStorage.getItem('idUser')+'.jpg')
+        uploadImage('up_file','/../assets/torn/',data.id+'.jpg')
         .then(()=>{
-            fillPerfil(localStorage.getItem('idUser'))
+            alert('novo logo salvo!')
+            imgExist = true
+            mainData.torneios.func.fillTorn()
         })
     })
-*/
+
+
     document.querySelector('#up_file').addEventListener('change',()=>{
         showFile('#up_file','#cnvLogo')
     })
 
+    document.querySelector('#btnTorn').addEventListener('click',()=>{
+        
+        let numPlayers = parseInt(document.querySelector('#edtNumPlayer').value)
+        let numGrupo = parseInt(document.querySelector('#edtNumGrupo').value)
+        const playOff = parseInt(document.querySelector('#cmbPlayOff').value)
+        const nome = document.querySelector('#edtNomeTorn').value.trim().toUpperCase()
+        const mode = document.querySelector('#cmbModTorn').value
+        const obs = document.querySelector('#edtObs').value
 
+        let ok = nome==''?false:true
+        let motivo = nome==''? 'O campo nome é obrigatório' :''
 
+        ok = numPlayers<4 ?false:ok
+        motivo =  numPlayers<4 ? 'O número de jogadores deve ser igual ou superior a 4' :''
+
+        switch (mode){
+            case '1':
+                numPlayers = playOff
+            break
+            case '2':
+                ok = (numPlayers-numGrupo) < playOff ? false : ok
+                motivo = (numPlayers-numGrupo) < playOff ? 'Deve-se eliminar pelo menos 1 jogador por grupo' :motivo
+            break
+
+        }
+        
+        if(ok){
+            const params = new Object;
+                params.id = id
+                params.id_owner = localStorage.getItem('idUser')
+                params.nome = nome
+                params.modelo = mode
+                params.num_players = numPlayers
+                params.num_grupos = numGrupo
+                params.playOff = playOff
+                params.obs = obs
+
+            const myPromisse = queryDB(params,37);
+            myPromisse.then((resolve)=>{
+                const json = JSON.parse(resolve)
+                if(document.querySelector('#up_file').files.length){
+                    uploadImage('up_file','/../assets/torn/',json[0].id+'.jpg')
+                }
+                mainData.torneios.func.fillTorn()
+                closeModal('')
+            })
+
+        }else{
+            alert(motivo)
+        }
+
+    })
+
+    document.querySelector('#btnDelTorn').addEventListener('click',()=>{
+        if(confirm('Deseja deletar este torneio e todos seus jogos?')){
+            const params = new Object;
+                params.id = id
+
+            const myPromisse = queryDB(params,38);
+            myPromisse.then((resolve)=>{
+                mainData.torneios.func.fillTorn()
+                closeModal('')
+            })
+        }
+    })
 
 </script>

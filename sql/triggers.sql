@@ -21,3 +21,13 @@ DELIMITER $$
         DELETE FROM tb_equip_manut WHERE id_equip = OLD.id;
     END$$;        
 DELIMITER ;    
+
+-- DROP TRIGGER tr_delTorn;
+DELIMITER $$
+	CREATE TRIGGER tr_delTorn AFTER DELETE 
+    ON tb_torneio
+    FOR EACH ROW 
+	BEGIN
+        DELETE FROM tb_jogo WHERE id_torn = OLD.id;
+    END$$;        
+DELIMITER ;  

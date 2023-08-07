@@ -196,25 +196,49 @@ SELECT * FROM vw_atv_atleta;
 -- *********************************
 
 -- DROP VIEW vw_alerta;
-CREATE VIEW vw_alerta AS    
+/*CREATE VIEW vw_alerta AS    */
 	SELECT AAT.id_atleta, COUNT(AAT.id_ativ)AS ALERTAS,
 		GROUP_CONCAT(AAT.id_ativ SEPARATOR ',') AS ATV,
 		GROUP_CONCAT(ATV.nome SEPARATOR ',') AS NOME,
 		GROUP_CONCAT(USR.nome SEPARATOR ',') AS NOME_OWNER,
 		GROUP_CONCAT(USR.id SEPARATOR ',') AS ID_OWNER
-		FROM tb_ativ_atleta AS AAT
+		FROM tb_usuario AS USR
 		INNER JOIN tb_atividades AS ATV
-		INNER JOIN tb_usuario AS USR
+        INNER JOIN tb_ativ_atleta AS AAT
 		ON ATV.id = AAT.id_ativ
 		AND USR.id = ATV.id_usuario
 		AND AAT.confirm=0        
         AND AAT.id_atleta != USR.id
-		AND ask=1 
-		GROUP BY id_atleta;
+		AND AAT.ask=1 
+		GROUP BY AAT.id_atleta;
     
 SELECT * FROM vw_alerta;
 
+SELECT * FROM tb_torn_invite;
+SELECT id_torn FROM tb_torn_invite WHERE id_player=3 AND ask=1;
 
+-- *********************************
+
+/* DROP VIEW vw_torn;*/
+CREATE VIEW vw_torn AS
+	SELECT TRN.*, USR.nome AS OWNER_NOME,
+		(SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=TRN.id) AS CONVITES,
+		(SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=TRN.id AND accept=1) AS ACEITOS
+		FROM tb_torneio AS TRN
+		INNER JOIN tb_usuario AS USR
+		ON TRN.id_owner = USR.id;
+
+SELECT * FROM vw_torn;
+
+-- DROP VIEW vw_torn_invite;
+-- CREATE VIEW vw_torn_invite AS
+SELECT IVT.*,USR.nome AS nome_atleta, USR.nivel
+	FROM tb_torn_invite AS IVT
+	INNER JOIN tb_usuario AS USR
+	ON IVT.id_atleta = USR.id
+    ORDER BY id_torn,nivel DESC;
+
+SELECT * FROM vw_torn_invite;
 -- *********************************
 
 SELECT * FROM vw_placarAtiv;
@@ -225,6 +249,8 @@ SELECT * FROM vw_placar;
 SELECT * FROM vw_friends;
 SELECT * FROM vw_perfil;
 SELECT * FROM vw_alerta;
+SELECT * FROM vw_torn;
+SELECT * FROM vw_torn_invite;
 
 -- ****************************************
 SELECT * FROM vw_placarAtiv UNION ALL SELECT * FROM vw_noSets ORDER BY id ASC;
@@ -240,3 +266,4 @@ SELECT EQP.*
 FROM tb_equip AS EQP
 INNER JOIN (SELECT * FROM ) AS MNT
 */
+ UPDATE tb_torn_invite SET accept=1 WHERE id_torn=1 AND id_atleta=1;
