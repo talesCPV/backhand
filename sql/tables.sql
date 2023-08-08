@@ -167,9 +167,14 @@ CREATE TABLE tb_torneio (
     playOff int DEFAULT 0,
     regras varchar(1000) DEFAULT NULL,
     criado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status int DEFAULT 0,
 	FOREIGN KEY (id_owner) REFERENCES tb_usuario(id),
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+ALTER TABLE tb_torneio
+ADD COLUMN status int DEFAULT 0;
+
 
  DROP TABLE tb_jogo;
 CREATE TABLE tb_jogo (

@@ -136,7 +136,7 @@
             <div id="show-atl"></div>
             <div class="line owner-btn">
                 <button id="btnInvite" class="btn btn-primary">CONVIDAR</button>
-                <button id="btnGerar" class="btn btn-primary">Gerar Jogos</button>
+                <button id="btnGerar" class="btn btn-primary">INICIAR</button>
             </div>
         </div>
     
@@ -168,11 +168,9 @@
             const myPromisse = queryDB(params,40);
             myPromisse.then((resolve)=>{
                 const torn = JSON.parse(resolve)[0]
-                console.log(torn)
-
                 const tornData = new Date(torn.criado)
+                mainData.viewTorn.data.torneio = torn
 
-                console.log(tornData)
                 mainData.viewTorn.data.num_players = Number(torn.num_players)
                 mainData.viewTorn.data.id_owner = torn.id_owner
                 document.querySelector('.title-viewTorn').innerHTML = torn.nome
@@ -204,12 +202,11 @@
         const myPromisse = queryDB(params,42);
         myPromisse.then((resolve)=>{
             const atletas = JSON.parse(resolve)
-            console.log(atletas)
-
             const main = document.querySelector('#show-atl')
             main.innerHTML = ''
             mainData.viewTorn.data.id_atleta = []
             mainData.viewTorn.data.id_confirm = []
+            mainData.viewTorn.data.atletas = atletas
             for(let i=0; i< atletas.length; i++){
 
                 mainData.viewTorn.data.id_atleta.push(atletas[i].id_atleta)
@@ -219,26 +216,9 @@
                 div.className = 'view-inline'
 
                 div.addEventListener('click',()=>{
-
-
                     if([mainData.viewTorn.data.id_owner,atletas[i].id_atleta].includes(localStorage.getItem('idUser'))){
                         openHTML('tornConfirm.html','modal',atletas[i],400)
                     }
-/*
-                        const message = atletas[i].accept == '1' ? 'Desistir do torneio?' : 'Aceitar o Convite?'
-
-                        if(confirm(message)){
-                            const params = new Object;
-                                params.hash = localStorage.getItem('hash')
-                                params.id_torn = Number(mainData.viewTorn.data.address)
-                                params.accept = atletas[i].accept == '1' ? 0 : 1
-                            queryDB(params,43).then((resolve)=>{
-                                fillPerfil(localStorage.getItem('idUser'))
-                                closeModal(0)
-                            }) 
-                        }
-*/                        
-//                    }
                 })
 
                 const leftdiv = document.createElement('div')
@@ -269,10 +249,10 @@
                 const rate = document.createElement('div')
                 rate.className = 'rating-line'
                 rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'
-
+/*
                 let ok = localStorage.getItem('idUser') == atletas[i].id_atleta
                 ok = !mainData.data.torn.includes(Number(mainData.viewTorn.data.address).toString()) ? 0 : ok
-
+*/
                 rate.innerHTML += `          
                         <div class="rating">                        
                             <progress id="rating-nivel-${atletas[i].id_atleta}" class="rating-bg" value="${atletas[i].nivel}" max="5"></progress>
@@ -297,21 +277,15 @@
     })
 
     document.querySelector('#btnGerar').addEventListener('click',()=>{
-
         let ok = 0
-
         if(mainData.viewTorn.data.id_atleta.length > mainData.viewTorn.data.id_confirm.length){
                 alert('Ainda falta a confirmação de alguns participantes!')
         }else{
-            ok = (mainData.viewTorn.data.id_atleta.length < mainData.viewTorn.data.num_players)?confirm('Ainda existem vagas em aberto, deseja adicionar atletas não usuários?'):true
+            ok = (mainData.viewTorn.data.id_atleta.length < mainData.viewTorn.data.num_players)?confirm('Ainda existem vagas em aberto, deseja adicionar atletas não usuários manualmente?'):true
         }
 
         if(ok){
-
-            alert('bora')
-            
-        }else{
-            alert('não')
+            openHTML('geraJogos.html','modal',null,500)
         }
     })
     

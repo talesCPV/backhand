@@ -1,0 +1,164 @@
+<title>
+    Gerar Jogos
+</title>
+<template>
+    <style>
+        .cards{
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 10px;
+        }
+
+        .cards p{
+            text-indent: 0;
+            padding: 10 0;
+            text-align: center;
+        }
+
+        .rdo-item{
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+        
+        .rdo-item label{
+            cursor: pointer;
+            width: 100px;
+        }
+
+    </style>
+
+    <div class="edge cards">
+        <legend>Atletas</legend>
+        <div id="divAtleta"></div>
+    </div>
+
+
+    <div class="edge cards">
+        <legend>Sorteio</legend>
+        <p>Grupos/Playoff</p>
+        <div class="rdo-item">
+            <input type="radio" id="rdo-sorteio-1" name="rdo-sorteio" value="1" checked>
+            <label for="rdo-sorteio-1">Aleatório</label><br>    
+        </div>
+        <div class="rdo-item">
+            <input type="radio" id="rdo-sorteio-2" name="rdo-sorteio" value="2">
+            <label for="rdo-sorteio-2">Balanceado</label><br>    
+        </div>
+    </div>
+
+
+    <div class="line">
+        <button id="btnSort" class="btn btn-primary">Sortear</button>
+    </div>
+
+
+</template>
+<script>
+    const torn = mainData.viewTorn.data.torneio
+    const atletas = mainData.viewTorn.data.atletas
+
+    mainData.geraJogos.func.fillAtleta = ()=>{
+
+        const main = document.querySelector('#divAtleta')
+            main.innerHTML = ''
+
+        for(let i=0; i<mainData.viewTorn.data.num_players; i++){
+                    
+            const div = document.createElement('div')
+            div.className = 'view-inline'
+
+            const leftdiv = document.createElement('div')
+            leftdiv.style.display = 'flex'
+            
+            const h = document.createElement('h4')
+            h.style = 'align-self: center;padding-left: 5px;max-width:20px;';
+            h.innerText = (i+1).toString().padStart(2,0)
+            leftdiv.appendChild(h)
+
+            const img = document.createElement('img')
+            img.src =  i<atletas.length ?`assets/users/${atletas[i].id_atleta}.jpg` : ''
+            img.className = 'imgUser'
+            breakImg(img)
+
+            img.addEventListener('click',()=>{
+                window.location.hash = 'P'+atletas[i].id_atleta.padStart(10,0)
+                loadHash()
+            })
+            leftdiv.appendChild(img)
+
+
+            if(i<atletas.length){
+
+                const p = document.createElement('p')
+                p.innerHTML = atletas[i].nome_atleta
+                leftdiv.appendChild(p)
+                div.appendChild(leftdiv)
+
+
+                const rate = document.createElement('div')
+                rate.className = 'rating-line'
+                rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'            
+                rate.innerHTML =`          
+                        <div class="rating">                        
+                            <progress id="rating-nivel-${atletas[i].id_atleta}" class="rating-bg" value="${atletas[i].nivel}" max="5"></progress>
+                            <svg><use xlink:href="#fivestars"/></svg>
+                        </div>
+                        <h4 style="width:30px;">${Number(atletas[i].nivel).toFixed(2)}</h4>
+                        `
+                div.appendChild(rate)
+            }else{
+                const inp = document.createElement('input')
+                inp.type = 'text'
+                inp.maxLength = 30
+                inp.style = 'height: 30px;align-self: center;'
+                inp.id = `plr-${i}`
+                leftdiv.appendChild(inp)
+                div.appendChild(leftdiv)                
+            }
+            main.appendChild(div)                    
+        
+        }
+
+    }
+
+    mainData.geraJogos.func.fillAtleta()
+
+
+    function grupos(){
+        const sort = document.getElementsByName('rdo-sorteio').value
+        const out = []
+
+
+
+    }
+
+
+
+    document.querySelector('#btnSort').addEventListener('click',()=>{
+        const mode = torn.modelo
+        const atl = document.querySelector('#divAtleta').querySelectorAll('.view-inline')
+
+
+        console.log(atl)
+
+        switch(mode){
+            case 1:
+
+            break
+            case 2:
+
+            break
+            case 3:
+
+            
+
+        }
+
+
+
+    })
+
+
+</script>
+

@@ -676,24 +676,28 @@ DELIMITER $$
         IN Iid_atleta int(11)
     )
 	BEGIN
-		SET @OWNER_HASH = (SELECT US.hash FROM tb_usuario AS US INNER JOIN tb_torneio AS TN ON US.id=TN.id_owner AND TN.id=Iid_torn);
-        SET @tot = (SELECT num_players FROM tb_torneio WHERE id=Iid_torn);
-        SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
+		SET @tot = (SELECT num_players FROM tb_torneio WHERE id=Iid_torn);
+		SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
 		SET @invite = 0;
+		SET @status = (SELECT status FROM td_torneio WHERE id=Iid_torn);
+        IF(@status=0)THEN
         
-		IF (Ihash COLLATE utf8_general_ci = @OWNER_HASH COLLATE utf8_general_ci)THEN
-			IF ((SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta)>0) THEN
-			   DELETE FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta ;  
-               SET @tot_invite = @tot_invite -1;
-			ELSE
-				IF(@tot_invite<@tot)THEN
-					INSERT INTO tb_torn_invite (id_torn, id_atleta) VALUES (Iid_torn,Iid_atleta);
-					SET @invite = 1;
-				END IF;
-			END IF;		
+			SET @OWNER_HASH = (SELECT US.hash FROM tb_usuario AS US INNER JOIN tb_torneio AS TN ON US.id=TN.id_owner AND TN.id=Iid_torn);
+			IF (Ihash COLLATE utf8_general_ci = @OWNER_HASH COLLATE utf8_general_ci)THEN
+				IF ((SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta)>0) THEN
+				   DELETE FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta ;  
+				   SET @tot_invite = @tot_invite -1;
+				ELSE
+					IF(@tot_invite<@tot)THEN
+						INSERT INTO tb_torn_invite (id_torn, id_atleta) VALUES (Iid_torn,Iid_atleta);
+						SET @invite = 1;
+					END IF;
+				END IF;		
+			END IF;
+			SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
+		ELSE 
+			SET @tot_invite = @tot;
         END IF;
-        
-        SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
 		SELECT @invite as OK, (@tot-@tot_invite) AS VAGAS;
 	END $$
 DELIMITER ;
@@ -706,11 +710,14 @@ DELIMITER $$
         IN Iaccept BOOLEAN
     )
 	BEGIN
-		SET @id_atleta = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci=Ihash COLLATE utf8_general_ci);
-		IF(Iaccept)THEN
-			UPDATE tb_torn_invite SET accept=1, ask=0 WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;      
-		ELSE
-			DELETE FROM tb_torn_invite WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;
+		SET @status = (SELECT status FROM td_torneio WHERE id=Iid_torn);
+        IF(@status=0)THEN
+			SET @id_atleta = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci=Ihash COLLATE utf8_general_ci);
+			IF(Iaccept)THEN
+				UPDATE tb_torn_invite SET accept=1, ask=0 WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;      
+			ELSE
+				DELETE FROM tb_torn_invite WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;
+			END IF;
         END IF;
 	END $$
 DELIMITER ;

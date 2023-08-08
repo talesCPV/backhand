@@ -24,8 +24,7 @@
 
         <div id="btnNewTorn" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
         <div id="myTorns"></div>
-
-
+        
 </template>
 <script>
   
@@ -47,7 +46,6 @@
                leftdiv.className = 'torneio'
 
                 div.addEventListener('click',(e)=>{
-                    console.log(e.target.nodeName)
                     if(['DIV','P','IMG'].includes(e.target.nodeName)){
                         window.location.hash = 'T'+torneios[i].id.padStart(10,0)
                         loadHash()
@@ -80,36 +78,15 @@
                     })
                     divBtn.appendChild(btn)
                 }
-/*           
-                const btn2 = document.createElement('button')
-                btn2.innerHTML = 'Visualizar' 
-                btn2.className = 'btn btn-primary'
-
-                btn2.addEventListener('click',()=>{
-//                    openHTML('viewTorn.html','modal',torneios[i])
-                    window.location.hash = 'T'+torneios[i].id.padStart(10,0)
-                        loadHash()                    
-                })
-                divBtn.appendChild(btn2)
-*/                
                 div.appendChild(divBtn)
-
                 div_torn.appendChild(div)
             }            
-            
-
-
         })
-
     }
 
-
     mainData.torneios.func.fillTorn()
-
     document.querySelector('#btnNewTorn').addEventListener('click',()=>{
         openHTML('newTorn.html','modal',{},500)
     })
-
-
 
 </script>
