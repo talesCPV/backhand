@@ -1,0 +1,94 @@
+<title>
+    Aceitar o Convite
+</title>
+<template>
+    <style>
+        .cards{
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cards p{
+            text-indent: 0;
+            text-align: center;
+        }
+
+        .convite, .retira{
+            display: none;
+        }
+
+
+    </style>
+
+
+    <div class="edge cards convite">
+        <p>ACEITA O CONVITE PARA PARTICIPAR DESTE TORNEIO?</p>
+        <div class="line">
+            <button id="btnRecuse" class="btn btn-primary">RECUSAR</button>
+            <button id="btnAccept" class="btn btn-primary">ACEITAR</button>
+        </div>
+    </div>
+
+
+    <div class="edge cards retira">
+        <p>Retirar este atleta do torneio?</p>
+        <div class="line">
+            <button id="btnRetire" class="btn btn-primary">RETIRAR</button>
+        </div>
+    </div>
+
+
+
+
+</template>
+<script>
+
+    const data = mainData.tornConfirm.data
+
+    document.querySelector('.title-tornConfirm').innerHTML = document.querySelector('.title-viewTorn').innerHTML 
+
+    document.querySelector('#btnRecuse').addEventListener('click',()=>{
+        acceptInvite(0)
+    })
+
+    document.querySelector('#btnAccept').addEventListener('click',()=>{
+        acceptInvite(1)
+    })
+
+    document.querySelector('#btnRetire').addEventListener('click',()=>{
+        invite()
+    })
+
+
+    if(mainData.viewTorn.data.id_owner == localStorage.getItem('idUser')){
+        document.querySelector('.retira').style.display = 'flex'
+    }
+
+    if(data.id_atleta == localStorage.getItem('idUser')){
+        document.querySelector('.convite').style.display = 'flex'
+    }
+
+    function invite(accept){
+        const params = new Object;
+            params.hash = localStorage.getItem('hash')
+            params.id_torn = data.id_torn
+            params.id_atleta = data.id_atleta            
+        queryDB(params,41).then((resolve)=>{
+            mainData.viewTorn.func.getTorn()   
+            closeModal(0)                         
+        }) 
+    }
+
+    function acceptInvite(accept){
+        const params = new Object;
+            params.hash = localStorage.getItem('hash')
+            params.id_torn = data.id_torn
+            params.accept = accept
+        queryDB(params,43).then((resolve)=>{
+            mainData.viewTorn.func.getTorn()   
+            closeModal(0)                         
+        }) 
+
+    }
+
+</script>    

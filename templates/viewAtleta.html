@@ -174,22 +174,25 @@
                     div.appendChild(btn)
                 }
             }else if(data.origem == 'torneio'){ // torneio
-                
+                                
                 const btn = document.createElement('button')
                 btn.innerHTML =  mainData.viewTorn.data.id_atleta.includes(friends[i].userID) ?'RETIRAR':'CONVIDAR'
                 btn.className = 'btn btn-primary'
                 btn.addEventListener('click',()=>{
-                    const params = new Object;
+
+                    const ok = mainData.viewTorn.data.id_atleta.includes(friends[i].userID) ? confirm('Retirar o convite a este atleta?') : true
+                    if(ok){
+                        const params = new Object;
                             params.hash = localStorage.getItem('hash')
                             params.id_torn = mainData.viewTorn.data.address
                             params.id_atleta = friends[i].userID
                         queryDB(params,41).then((resolve)=>{
-                            mainData.viewTorn.func.fillAtletas()
-                        })
-                    closeModal(0)
+                            mainData.viewTorn.func.getTorn()
+                            closeModal(0)
+                        })                    
+                    }
                 })
                 div.appendChild(btn)                      
-
             }
 
             div_search.appendChild(div)

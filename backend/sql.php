@@ -43,10 +43,11 @@
         "36" => 'CALL sp_delEquip("x00")',
         "37" => 'CALL sp_newTorn("x00",x01,"x02",x03,x04,x05,x06,"x07");',
         "38" => 'CALL sp_delTorn("x00")',
-        "39" => 'SELECT * FROM tb_torneio WHERE id_owner=x00',
+        "39" => 'SELECT * FROM vw_my_torn WHERE id_atleta=x00 OR id_owner=x00 GROUP BY id',
         "40" => 'SELECT * FROM vw_torn WHERE id=x00',
         "41" => 'CALL sp_inviteTorn("x00",x01,x02)',
-        "42" => 'SELECT * FROM vw_torn_invite WHERE id_torn=x00',
+        "42" => 'SELECT * FROM vw_torn_invite WHERE id_torn=x00;',
+        "43" => 'CALL sp_acceptInviteTorn("x00",x01,x02);',
 
     );
 

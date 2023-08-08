@@ -52,6 +52,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            justify-content: center;
         }
 
         #show-atl{
@@ -63,13 +64,16 @@
             gap: 10px; 
             padding: 15px;
         }
-
-        .mdi-check-bold{
+        .view-inline p{
+            text-indent: 0.5;
+        }
+        .owner-btn{
             display: none;
         }
 
-        .show{
-            display: block !important;
+        #divJogos, #divTabela{
+            min-height: 100px;
+
         }
 
         @media (max-width: 769px) {
@@ -81,6 +85,12 @@
                 align-content: start;
                 flex-wrap: wrap;
             }
+
+            .view-inline p{
+                font-size: 0.8em;
+                text-indent: 0;
+            }
+
         }
 
     </style>
@@ -95,7 +105,7 @@
                         <h4 id="torn-owner"></h4>
                     </div>
                     <div class="line">
-                        <label>criado em </label>
+                        <label>em</label>
                         <h4 id="torn-data"></h4>
                     </div>
     
@@ -124,10 +134,21 @@
                 </div>
             </div>
             <div id="show-atl"></div>
-            <button id="btnInvite" class="btn btn-primary">CONVIDAR</button>
+            <div class="line owner-btn">
+                <button id="btnInvite" class="btn btn-primary">CONVIDAR</button>
+                <button id="btnGerar" class="btn btn-primary">Gerar Jogos</button>
+            </div>
         </div>
     
-        
+        <div id="divTabela" class="edge">
+            <legend>Tabela</legend>
+        </div>
+
+        <div id="divJogos" class="edge">
+            <legend>Jogos</legend>
+        </div>
+
+
     </div>
 
 
@@ -138,6 +159,7 @@
 <script>
 
     mainData.viewTorn.data.id_atleta = []   
+    mainData.viewTorn.data.id_confirm = [] 
 
     mainData.viewTorn.func.getTorn = ()=>{
         const params = new Object;
@@ -152,14 +174,18 @@
 
                 console.log(tornData)
                 mainData.viewTorn.data.num_players = Number(torn.num_players)
-
+                mainData.viewTorn.data.id_owner = torn.id_owner
                 document.querySelector('.title-viewTorn').innerHTML = torn.nome
                 document.querySelector('#torn-owner').innerHTML = torn.OWNER_NOME
                 document.querySelector('#torn-data').innerHTML = tornData.getFormatBR()
                 document.querySelector('#torn-regras').innerText = torn.regras
-                document.querySelector('#atl-tot').innerText = torn.num_players
+                document.querySelector('#atl-tot').innerText = torn.num_players.padStart(2,0)
                 document.querySelector('#atl-conv').innerText = torn.CONVITES.padStart(2,0)
                 document.querySelector('#atl-conf').innerText = torn.ACEITOS.padStart(2,0)
+
+                if(torn.id_owner == localStorage.getItem('idUser')){
+                    document.querySelector('.owner-btn').style.display = 'flex'
+                }
 
                 const img = document.querySelector('#img-logo')
                 img.src = `assets/torn/${torn.id}.jpg?`+ new Date().getTime();
@@ -183,47 +209,78 @@
             const main = document.querySelector('#show-atl')
             main.innerHTML = ''
             mainData.viewTorn.data.id_atleta = []
-            for(let i=0; i< mainData.viewTorn.data.num_players; i++){
+            mainData.viewTorn.data.id_confirm = []
+            for(let i=0; i< atletas.length; i++){
 
-                i<atletas.length ? mainData.viewTorn.data.id_atleta.push(atletas[i].id_atleta) :0
+                mainData.viewTorn.data.id_atleta.push(atletas[i].id_atleta)
+                atletas[i].accept == '1' ? mainData.viewTorn.data.id_confirm.push(atletas[i].id_atleta) :0
+            
                 const div = document.createElement('div')
                 div.className = 'view-inline'
+
+                div.addEventListener('click',()=>{
+
+
+                    if([mainData.viewTorn.data.id_owner,atletas[i].id_atleta].includes(localStorage.getItem('idUser'))){
+                        openHTML('tornConfirm.html','modal',atletas[i],400)
+                    }
+/*
+                        const message = atletas[i].accept == '1' ? 'Desistir do torneio?' : 'Aceitar o Convite?'
+
+                        if(confirm(message)){
+                            const params = new Object;
+                                params.hash = localStorage.getItem('hash')
+                                params.id_torn = Number(mainData.viewTorn.data.address)
+                                params.accept = atletas[i].accept == '1' ? 0 : 1
+                            queryDB(params,43).then((resolve)=>{
+                                fillPerfil(localStorage.getItem('idUser'))
+                                closeModal(0)
+                            }) 
+                        }
+*/                        
+//                    }
+                })
 
                 const leftdiv = document.createElement('div')
                 leftdiv.style.display = 'flex'
                 
                 const img = document.createElement('img')
-                img.src = i<atletas.length ? `assets/users/${atletas[i].id_atleta}.jpg` : 'assets/user.jpeg'
+                img.src = `assets/users/${atletas[i].id_atleta}.jpg`
                 img.className = 'imgUser'
-                img.addEventListener('error',()=>{
-                    img.src = 'assets/user.jpeg'
+                breakImg(img)
+
+                img.addEventListener('click',()=>{
+                    window.location.hash = 'P'+atletas[i].id_atleta.padStart(10,0)
+                    loadHash()
                 })
                 leftdiv.appendChild(img)
 
                 const check = document.createElement('span')
-                check.className = 'mdi mdi-check-bold'
-                check.style = `color:green; position: relative; left:-13; width: 0;`
+                check.className = 'mdi'
+                check.classList.add( atletas[i].accept == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
+                check.style = ` color:${atletas[i].accept == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
                 leftdiv.appendChild(check)
 
                 const p = document.createElement('p')
-                p.innerHTML = i<atletas.length ? atletas[i].nome_atleta : 'Atleta Não Usuário'
+                p.innerHTML = atletas[i].nome_atleta
                 leftdiv.appendChild(p)
                 div.appendChild(leftdiv)
 
-                if(i<atletas.length){
-                    atletas[i].accept == '1' ? check.classList.add('show') :0
-                    const rate = document.createElement('div')
-                    rate.className = 'rating-line'
-                    rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'
-                    rate.innerHTML = `          
-                            <div class="rating">                        
-                                <progress id="perfil-rating" class="rating-bg" value="${atletas[i].nivel}" max="5"></progress>
-                                <svg><use xlink:href="#fivestars"/></svg>
-                            </div>
-                            <h4 style="width:30px;">${Number(atletas[i].nivel).toFixed(2)}</h4>
-                            `
-                    div.appendChild(rate)
-                }
+                const rate = document.createElement('div')
+                rate.className = 'rating-line'
+                rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'
+
+                let ok = localStorage.getItem('idUser') == atletas[i].id_atleta
+                ok = !mainData.data.torn.includes(Number(mainData.viewTorn.data.address).toString()) ? 0 : ok
+
+                rate.innerHTML += `          
+                        <div class="rating">                        
+                            <progress id="rating-nivel-${atletas[i].id_atleta}" class="rating-bg" value="${atletas[i].nivel}" max="5"></progress>
+                            <svg><use xlink:href="#fivestars"/></svg>
+                        </div>
+                        <h4 style="width:30px;">${Number(atletas[i].nivel).toFixed(2)}</h4>
+                        `
+                div.appendChild(rate)
                 main.appendChild(div)                    
             }
         })
@@ -232,9 +289,32 @@
     mainData.viewTorn.func.getTorn()
     
     document.querySelector('#btnInvite').addEventListener('click',()=>{
-        openHTML('viewAtleta.html','modal',{origem:'torneio'})
+        if(mainData.viewTorn.data.id_atleta.length == mainData.viewTorn.data.num_players){
+            alert('Número de vagas encerrada')            
+        }else{
+            openHTML('viewAtleta.html','modal',{origem:'torneio'})
+        }
     })
 
+    document.querySelector('#btnGerar').addEventListener('click',()=>{
+
+        let ok = 0
+
+        if(mainData.viewTorn.data.id_atleta.length > mainData.viewTorn.data.id_confirm.length){
+                alert('Ainda falta a confirmação de alguns participantes!')
+        }else{
+            ok = (mainData.viewTorn.data.id_atleta.length < mainData.viewTorn.data.num_players)?confirm('Ainda existem vagas em aberto, deseja adicionar atletas não usuários?'):true
+        }
+
+        if(ok){
+
+            alert('bora')
+            
+        }else{
+            alert('não')
+        }
+    })
+    
 
 
 </script>

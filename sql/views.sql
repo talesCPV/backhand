@@ -133,7 +133,7 @@ SELECT * FROM vw_friends;
 -- *********************************
 
 -- DROP VIEW vw_perfil;
-CREATE VIEW vw_perfil AS
+-- CREATE VIEW vw_perfil AS
 SELECT US.id, US.nome,US.nivel,
 	(SELECT COUNT(*) FROM vw_friends WHERE hostID = US.id ) AS SEGUINDO, 
     (SELECT COUNT(*) FROM vw_friends WHERE guestID = US.id ) AS SEGUIDORES,
@@ -143,6 +143,8 @@ SELECT US.id, US.nome,US.nivel,
     (SELECT NOME FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_NOME,
     (SELECT NOME_OWNER FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_OWNER,
     (SELECT ATV FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_ATV,
+    (SELECT ALERTA_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS ALERTA_TORN,
+    (SELECT QTD_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS QTD_TORN,
     (SELECT GROUP_CONCAT(SUBSTRING(dia,1,10) SEPARATOR ', ')
 		FROM vw_atv 
         WHERE dia>(NOW() - INTERVAL 28 DAY) 
@@ -153,6 +155,7 @@ SELECT US.id, US.nome,US.nivel,
         AND id_atleta = US.id) AS TREINO_ID            
 	FROM tb_usuario AS US;
     
+SELECT * FROM vw_perfil;    
 
 -- DROP VIEW vw_dashboard_atleta;
 CREATE VIEW vw_dashboard_atleta AS
@@ -214,6 +217,18 @@ SELECT * FROM vw_atv_atleta;
     
 SELECT * FROM vw_alerta;
 
+
+-- DROP VIEW vw_alerta_torn;
+-- CREATE VIEW vw_alerta_torn AS 
+	SELECT id_atleta, GROUP_CONCAT(id_torn SEPARATOR ',') AS ALERTA_TORN, COUNT(id_torn) AS QTD_TORN
+		FROM tb_torn_invite 
+		WHERE accept=0        
+		AND ask=1 
+        GROUP BY id_atleta;
+    
+SELECT * FROM vw_alerta_torn;
+
+
 SELECT * FROM tb_torn_invite;
 SELECT id_torn FROM tb_torn_invite WHERE id_player=3 AND ask=1;
 
@@ -238,7 +253,23 @@ SELECT IVT.*,USR.nome AS nome_atleta, USR.nivel
 	ON IVT.id_atleta = USR.id
     ORDER BY id_torn,nivel DESC;
 
+-- DROP VIEW vw_my_torn;
+-- CREATE VIEW vw_my_torn AS
+	SELECT INV.id_atleta ,TRN.*
+	FROM tb_torneio AS TRN
+	INNER JOIN vw_torn_invite AS INV
+	ON TRN.id = INV.id_torn
+    UNION
+	SELECT id_owner AS id_atleta, id,id_owner,nome, modelo, num_players, num_grupos, playOff, regras, criado
+	FROM tb_torneio 
+    WHERE id NOT IN(SELECT id_torn FROM vw_torn_invite GROUP BY id_torn);
+    
+SELECT * FROM vw_my_torn ;
+
+SELECT * FROM vw_torn_invite WHERE id_torn = 4;
+
 SELECT * FROM vw_torn_invite;
+SELECT * FROM vw_my_torn;
 -- *********************************
 
 SELECT * FROM vw_placarAtiv;

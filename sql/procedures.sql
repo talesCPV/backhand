@@ -698,6 +698,25 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
+ DROP PROCEDURE sp_acceptInviteTorn;
+DELIMITER $$
+	CREATE PROCEDURE sp_acceptInviteTorn(
+		IN Ihash varchar(77),
+		IN Iid_torn int(11),
+        IN Iaccept BOOLEAN
+    )
+	BEGIN
+		SET @id_atleta = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci=Ihash COLLATE utf8_general_ci);
+		IF(Iaccept)THEN
+			UPDATE tb_torn_invite SET accept=1, ask=0 WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;      
+		ELSE
+			DELETE FROM tb_torn_invite WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;
+        END IF;
+	END $$
+DELIMITER ;
+
+CALL sp_acceptInviteTorn("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<","2",1);
+
 CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",1,1);
 CALL sp_newTorn("1",1,"Torneio Teste editado",2,20,3,8);
 CALL sp_delTorn(1);

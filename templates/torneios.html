@@ -12,6 +12,14 @@
             right: 12px;
         }
 
+        .torneio{
+            display: flex;
+        }
+
+        .view-inline{
+            cursor: pointer;
+        }
+
     </style>
 
         <div id="btnNewTorn" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
@@ -36,18 +44,21 @@
                 div.className = 'view-inline'
     
                 const leftdiv = document.createElement('div')
-                leftdiv.style.display = 'flex'
+               leftdiv.className = 'torneio'
+
+                div.addEventListener('click',(e)=>{
+                    console.log(e.target.nodeName)
+                    if(['DIV','P','IMG'].includes(e.target.nodeName)){
+                        window.location.hash = 'T'+torneios[i].id.padStart(10,0)
+                        loadHash()
+                    }
+                })
+
                 const img = document.createElement('img')
                 img.src = `assets/torn/${torneios[i].id}.jpg?`+ new Date().getTime();
                 img.id = `torn-${torneios[i].id}`
                 breakImg(img,'assets/torn/trophy.jpg')
-                               
-                img.addEventListener('click',()=>{
-//                    openHTML('viewTorn.html','modal',torneios[i])
-                    window.location.hash = 'T'+torneios[i].id.padStart(10,0)
-                    loadHash()
-                })
-                
+                                               
                 img.className = 'imgUser'
                 leftdiv.appendChild(img)
 
@@ -69,7 +80,7 @@
                     })
                     divBtn.appendChild(btn)
                 }
-           
+/*           
                 const btn2 = document.createElement('button')
                 btn2.innerHTML = 'Visualizar' 
                 btn2.className = 'btn btn-primary'
@@ -80,6 +91,7 @@
                         loadHash()                    
                 })
                 divBtn.appendChild(btn2)
+*/                
                 div.appendChild(divBtn)
 
                 div_torn.appendChild(div)

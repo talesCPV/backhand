@@ -52,17 +52,12 @@ function fillPerfil(usr){
             const atv = PERFIL.ALERTA_ATV.split(',')
             const nome = PERFIL.ALERTA_NOME.split(',')            
             container.innerHTML = ''
-/*            
-            const legend = document.createElement('li')
-            legend.innerHTML = 'Confirmar Jogos'
-            container.appendChild(legend)
-*/            
+           
             for(let i=0; i<qtd; i++){
                 const data = new Object
                     data.origem = 'confirm'
                 const li = document.createElement('li')
                     li.id = 'alert-'+atv[i]                    
-//                    li.innerHTML = nome[i]
                     li.addEventListener('click',()=>{
                         window.location.hash = 'G'+atv[i].padStart(10,0)
                         loadHash(data)
@@ -82,6 +77,13 @@ function fillPerfil(usr){
                 container.appendChild(li)
             }
             alert.innerText = qtd
+        }
+        if(PERFIL.QTD_TORN != null){
+            document.querySelector('#alert-torn').innerText = PERFIL.QTD_TORN
+            mainData.data.torn =  PERFIL.ALERTA_TORN.split(',')
+        }else{
+            document.querySelector('#alert-torn').innerText = ''
+            mainData.data.torn = []
         }
     }
 
