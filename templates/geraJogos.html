@@ -124,39 +124,130 @@
 
     mainData.geraJogos.func.fillAtleta()
 
+    function geraParams(game,id_1,id_2,nome_1,nome_2,grupo=1){
+        const params = new Object
+            params.id = game
+            params.id_torn = torn.id
+            params.id_P1 = id_1
+            params.id_P2 = id_2
+            params.P1_nome = nome_1
+            params.P2_nome = nome_2
+            params.grupo=grupo
+        return params
+    }
 
-    function grupos(){
-        const sort = document.getElementsByName('rdo-sorteio').value
-        const out = []
+    function grupos(atl){
+        const sort = document.querySelector('input[name="rdo-sorteio"]:checked').value
+        let game = 1
+        let num_gp = 0
+        const grupo = []
+        let values = []
 
+        while(atl.length>0){
+            const i = sort=='1' ? Math.floor(Math.random()*atl.length) : 0
+            grupo.length<=num_gp ? grupo.push([]) : 0
+            grupo[num_gp].push(atl[i])
 
+            atl.splice(i,1)
+            num_gp++
+            num_gp = num_gp>=Number(torn.num_grupos) ? 0 : num_gp
 
+        }
+        for(let i=0; i<grupo.length; i++){
+            values = values.length==0 ? gamesPC(grupo[i],i+1) : values.concat(gamesPC(grupo[i],i+1,values.length)) 
+        }
+        return values
+    }
+
+    function gamesPlayoff(atl){
+        const sort = document.querySelector('input[name="rdo-sorteio"]:checked').value
+        let game = 1
+        let values = []
+
+        if(sort=='1'){
+            while(atl.length>1){
+                let i = Math.floor(Math.random()*atl.length)
+                const atl1 = atl[i]
+                atl.splice(i,1)
+
+                i = Math.floor(Math.random()*atl.length)
+                const atl2 = atl[i]
+                atl.splice(i,1)
+
+                values.push(geraParams(game,atl1.id_atleta,atl2.id_atleta,atl1.nome_atleta,atl2.nome_atleta))
+                game++
+            }
+        }else{
+            while(atl.length>1){
+                let i = atl.length-1
+                values.push(geraParams(game,atl[0].id_atleta,atl[i].id_atleta,atl[0].nome_atleta,atl[i].nome_atleta))
+                atl.splice(i,1)
+                atl.splice(0,1)
+                game++
+            }
+        }
+        return values
+    }
+
+    function gamesPC(atl,grupo='1',game=0){
+        game += 1
+        let values = []
+        for(let i=0; i<atl.length; i++){
+            for(let j=i+1; j<atl.length; j++){
+                values.push(geraParams(game,atl[i].id_atleta,atl[j].id_atleta,atl[i].nome_atleta,atl[j].nome_atleta,grupo))
+                game++
+            }
+        }
+        return values
+    }
+
+    function checkAllNames(){
+        const atl = document.querySelector('#divAtleta').querySelectorAll('input')        
+        const nomeAtl = []
+
+        for(let i=0; i<atletas.length; i++){
+            nomeAtl.push(atletas[i])
+        }
+
+        for(let i=0; i<atl.length; i++){
+            if(atl[i].value.trim()==''){
+                alert('Favor preencher todos os nomes dos atletas avulsos.')
+                atl[i].focus()
+                return {status:false}
+            }else{
+                nomeAtl.push({nome_atleta:atl[i].value,id_atleta:0})
+            }
+        }
+        return {status:true, atletas:nomeAtl}
     }
 
 
 
     document.querySelector('#btnSort').addEventListener('click',()=>{
-        const mode = torn.modelo
-        const atl = document.querySelector('#divAtleta').querySelectorAll('.view-inline')
+        
+        const mode = Number(torn.num_grupos)>=(Number(torn.playOff)/2) ? 1 : Number(torn.modelo)
+        const atl = checkAllNames()
+        let values = []
 
-
-        console.log(atl)
-
-        switch(mode){
-            case 1:
-
-            break
-            case 2:
-
-            break
-            case 3:
-
-            
-
+        if(atl.status){
+            switch(mode){
+                case 1:
+                    values = gamesPlayoff(atl.atletas)
+                break
+                case 2:
+                    values = grupos(atl.atletas)
+                break
+                case 3:
+                    values = gamesPC(atl.atletas)
+            } 
         }
+        console.log(values)
 
-
-
+        if(values.length>0){
+            queryJson(values,3,torn.id).then((txt)=>{
+                console.log(txt)
+            })
+        }  
     })
 
 

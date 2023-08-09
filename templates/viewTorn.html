@@ -189,13 +189,13 @@
                 img.src = `assets/torn/${torn.id}.jpg?`+ new Date().getTime();
                 breakImg(img,'assets/torn/trophy.jpg')
 
-                mainData.viewTorn.func.fillAtletas()
+                mainData.viewTorn.func.fillAtletas(torn)
             })
 
     }
 
-    mainData.viewTorn.func.fillAtletas = ()=>{
-
+    mainData.viewTorn.func.fillAtletas = (torn)=>{
+/*
         const params = new Object;
             params.id = mainData.viewTorn.data.address
 
@@ -207,7 +207,17 @@
             mainData.viewTorn.data.id_atleta = []
             mainData.viewTorn.data.id_confirm = []
             mainData.viewTorn.data.atletas = atletas
-            for(let i=0; i< atletas.length; i++){
+*/            
+
+console.log(torn)                
+
+            const id = torn.ID_ATLETA.split(',')
+            const nome = torn.NOME_ATLETA.split(',')
+            const nivel = torn.NIVEL_ATLETA.split(',')
+            const accept = torn.ACCEPT_ATLETA.split(',')
+
+/*
+            for(let i=0; i< id.length; i++){
 
                 mainData.viewTorn.data.id_atleta.push(atletas[i].id_atleta)
                 atletas[i].accept == '1' ? mainData.viewTorn.data.id_confirm.push(atletas[i].id_atleta) :0
@@ -249,10 +259,7 @@
                 const rate = document.createElement('div')
                 rate.className = 'rating-line'
                 rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'
-/*
-                let ok = localStorage.getItem('idUser') == atletas[i].id_atleta
-                ok = !mainData.data.torn.includes(Number(mainData.viewTorn.data.address).toString()) ? 0 : ok
-*/
+
                 rate.innerHTML += `          
                         <div class="rating">                        
                             <progress id="rating-nivel-${atletas[i].id_atleta}" class="rating-bg" value="${atletas[i].nivel}" max="5"></progress>
@@ -263,7 +270,8 @@
                 div.appendChild(rate)
                 main.appendChild(div)                    
             }
-        })
+*/            
+//        })
     }
 
     mainData.viewTorn.func.getTorn()

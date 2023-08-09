@@ -234,14 +234,22 @@ SELECT id_torn FROM tb_torn_invite WHERE id_player=3 AND ask=1;
 
 -- *********************************
 
-/* DROP VIEW vw_torn;*/
-CREATE VIEW vw_torn AS
+-- DROP VIEW vw_torn;
+ CREATE VIEW vw_torn AS
 	SELECT TRN.*, USR.nome AS OWNER_NOME,
 		(SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=TRN.id) AS CONVITES,
-		(SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=TRN.id AND accept=1) AS ACEITOS
+		(SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=TRN.id AND accept=1) AS ACEITOS,
+        GROUP_CONCAT(ATL.id_atleta  SEPARATOR ',') AS ID_ATLETA,
+        GROUP_CONCAT(ATL.nome_atleta  SEPARATOR ',') AS NOME_ATLETA,
+        GROUP_CONCAT(ATL.nivel_atleta  SEPARATOR ',') AS NIVEL_ATLETA,
+        GROUP_CONCAT(ATL.accept  SEPARATOR ',') AS ACCEPT_ATLETA,
+        ROUND((SUM(NIVEL_ATLETA)/TRN.num_players)*0.2 ,2) AS PREMIO
+
 		FROM tb_torneio AS TRN
 		INNER JOIN tb_usuario AS USR
-		ON TRN.id_owner = USR.id;
+        INNER JOIN tb_torn_atleta AS ATL
+		ON TRN.id_owner = USR.id
+        AND TRN.id = ATL.id_torn;
 
 SELECT * FROM vw_torn;
 

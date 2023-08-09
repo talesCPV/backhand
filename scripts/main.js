@@ -339,6 +339,15 @@ function loadActivity(){
     })
 }
 
+function numJogosPC(N){
+    let out = 0
+    for(let i=0; i<N;i++){
+        out += i
+    }
+    return out
+}
+
+
 /*  ABAS */
 
 function pictab(e){

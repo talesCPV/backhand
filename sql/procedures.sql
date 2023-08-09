@@ -609,46 +609,20 @@ DELIMITER $$
         VALUES (Iid,Iid_owner,Inome,Imodelo,Inum_players,Inum_grupos,IplayOff,Iregras)
         ON DUPLICATE KEY UPDATE
         nome=Inome, regras=Iregras;
-		
-        SET @playOff = IplayOff DIV 2;        
+
         SET @id_torn =Iid;          
 		IF (@edit=0) THEN			    
-			SET @id_torn = (SELECT MAX(id) FROM tb_torneio);
-            SET @num_jogos =  fn_numJogos(Imodelo,Inum_players,Inum_grupos,IplayOff);
-			SET @nJogadorGrupo = (SELECT IFNULL((SELECT Inum_players DIV Inum_grupos),0)); 
-			SET @nRestaJog = (SELECT IFNULL((SELECT Inum_players % Inum_grupos),0));
+			SET @id_torn = (SELECT MAX(id) FROM tb_torneio);            
+            SET @numPlayer = 0;
             
-            SET @numJogo = 1;
-            SET @numGrupo = 1;
-            SET @numJogGrupo = 1;
-            SET @numJogPorGrupo = fn_numJogosPC(@nJogadorGrupo + (SELECT IF(@nRestaJog>0,1,0)));
-            loop_jogos:  LOOP
-            
-				INSERT INTO tb_jogo (id,id_torn,grupo)
-				VALUES (@numJogo,@id_torn,@numGrupo);                   
-                        
-				SET @numJogGrupo = @numJogGrupo+1;
-                IF @numGrupo <= Inum_grupos THEN                
-					IF @numJogGrupo > @numJogPorGrupo THEN
-						SET @numJogGrupo = 1;
-						SET @numGrupo = @numGrupo+1;						
-						SET @nRestaJog = @nRestaJog-1;
-                        SET @numJogPorGrupo = fn_numJogosPC(@nJogadorGrupo + (SELECT IF(@nRestaJog>0,1,0)));
-					END IF;
-				ELSE 
-					IF @numJogGrupo > @playOff THEN
-						SET @numJogGrupo = 1;
-						SET @numGrupo = @numGrupo+1;
-                        IF @playOff > 2 THEN
-							SET @playOff = @playOff DIV 2;
-						END IF;
-					END IF;                
-                END IF;
-            
-				IF  @numJogo >= @num_jogos THEN
-					LEAVE  loop_jogos;
+            loop_players:  LOOP
+                                                
+				IF  @numPlayer >= Inum_players THEN
+					LEAVE  loop_players;
 				ELSE
-					SET @numJogo = @numJogo+1;
+					INSERT INTO tb_torn_atleta (id,id_torn)
+					VALUES (@numPlayer,@id_torn);                   
+					SET @numPlayer = @numPlayer+1;
 				END  IF;
 			END LOOP;
 		END IF;
@@ -668,6 +642,36 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
+
+-- DROP PROCEDURE sp_gameTorn;
+DELIMITER $$
+	CREATE PROCEDURE sp_gameTorn(
+		IN Ihash varchar(77),
+		IN Iid_torn int(11), 
+		IN Ifields VARCHAR(3000),
+		IN Ivalues VARCHAR(3000)
+    )
+BEGIN                
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @torn_owner  = (SELECT id_owner FROM tb_torneio WHERE id COLLATE utf8_general_ci = Iid_torn COLLATE utf8_general_ci);
+		SET @status = (SELECT status FROM tb_torneio WHERE id=Iid_torn);
+        IF(@status=0)THEN
+			IF (@call_owner = @torn_owner) THEN
+				DELETE FROM tb_jogo WHERE id_torn=Iid_torn;
+				SET @query = CONCAT('INSERT INTO tb_jogo ', Ifields, ' VALUES ', Ivalues);
+				PREPARE stmt1 FROM @query;
+				EXECUTE stmt1;
+				DEALLOCATE PREPARE stmt1;
+                
+				UPDATE tb_torneio SET status=1 WHERE id=Iid_torn;
+			END IF; 
+        END IF;
+        SELECT * FROM tb_jogo WHERE id_torn=Iid_torn;
+	END $$
+DELIMITER ;
+
+CALL sp_gameTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",'(id,id_torn,id_P1,id_P2,P1_nome,P2_nome,grupo)','("1","3","2","0","OUTRO JOGADOR","B","1"),("2","3","1","0","TALES CEMBRANELI DANTAS","A","1")');
+
  DROP PROCEDURE sp_inviteTorn;
 DELIMITER $$
 	CREATE PROCEDURE sp_inviteTorn(
@@ -677,30 +681,42 @@ DELIMITER $$
     )
 	BEGIN
 		SET @tot = (SELECT num_players FROM tb_torneio WHERE id=Iid_torn);
-		SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
+		SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_atleta!=0);
 		SET @invite = 0;
-		SET @status = (SELECT status FROM td_torneio WHERE id=Iid_torn);
+		SET @status = (SELECT status FROM tb_torneio WHERE id=Iid_torn);
         IF(@status=0)THEN
         
 			SET @OWNER_HASH = (SELECT US.hash FROM tb_usuario AS US INNER JOIN tb_torneio AS TN ON US.id=TN.id_owner AND TN.id=Iid_torn);
 			IF (Ihash COLLATE utf8_general_ci = @OWNER_HASH COLLATE utf8_general_ci)THEN
-				IF ((SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta)>0) THEN
-				   DELETE FROM tb_torn_invite WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta ;  
+				IF ((SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta)>0) THEN                
+					SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta=Iid_atleta);
+					UPDATE tb_torn_atleta 
+						SET id_atleta=0, nome_atleta=NULL, nivel_atleta=1 
+						WHERE id_torn=Iid_torn AND id=@id_invite;
 				   SET @tot_invite = @tot_invite -1;
 				ELSE
 					IF(@tot_invite<@tot)THEN
-						INSERT INTO tb_torn_invite (id_torn, id_atleta) VALUES (Iid_torn,Iid_atleta);
+						SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_atleta=0 LIMIT 1);
+                        SET @nome_atleta = (SELECT nome FROM tb_usuario WHERE id=Iid_atleta);
+						SET @nivel_atleta = (SELECT nivel FROM tb_usuario WHERE id=Iid_atleta);
+
+						UPDATE tb_torn_atleta 
+							SET id_atleta=Iid_atleta, nome_atleta=@nome_atleta, nivel_atleta=@nivel_atleta 
+                            WHERE id_torn=Iid_torn AND id=@id_invite;
+                            
 						SET @invite = 1;
 					END IF;
 				END IF;		
 			END IF;
-			SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=Iid_torn);
+			SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=Iid_torn);
 		ELSE 
 			SET @tot_invite = @tot;
         END IF;
 		SELECT @invite as OK, (@tot-@tot_invite) AS VAGAS;
 	END $$
 DELIMITER ;
+
+CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",0000000003,3);
 
  DROP PROCEDURE sp_acceptInviteTorn;
 DELIMITER $$

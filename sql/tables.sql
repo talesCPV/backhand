@@ -175,7 +175,6 @@ CREATE TABLE tb_torneio (
 ALTER TABLE tb_torneio
 ADD COLUMN status int DEFAULT 0;
 
-
  DROP TABLE tb_jogo;
 CREATE TABLE tb_jogo (
 	id int NOT NULL,
@@ -193,13 +192,19 @@ CREATE TABLE tb_jogo (
     PRIMARY KEY (id,id_torn)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
- DROP TABLE tb_torn_invite;
-CREATE TABLE tb_torn_invite (
+ DROP TABLE tb_torn_atleta;
+CREATE TABLE tb_torn_atleta (
+	id int NOT NULL,
     id_torn int(11) NOT NULL, 
-    id_atleta int(11) NOT NULL,
+    id_atleta int(11) NOT NULL DEFAULT 0,
+    nome_atleta VARCHAR(30) DEFAULT NULL,
+    nivel_atleta double DEFAULT 1,
     accept BOOLEAN DEFAULT 0,
 	ask BOOLEAN DEFAULT 1,  
 	FOREIGN KEY (id_torn) REFERENCES tb_torneio(id),
 	FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),
-    PRIMARY KEY (id_torn,id_atleta)
+    PRIMARY KEY (id,id_torn)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+ALTER TABLE tb_torn_atleta
+ADD COLUMN nivel_atleta double DEFAULT 1;
