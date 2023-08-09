@@ -46,7 +46,7 @@
     const data = mainData.tornConfirm.data
 
     document.querySelector('.title-tornConfirm').innerHTML = document.querySelector('.title-viewTorn').innerHTML 
-
+    
     document.querySelector('#btnRecuse').addEventListener('click',()=>{
         acceptInvite(0)
     })
@@ -59,8 +59,7 @@
         invite()
     })
 
-
-    if(mainData.viewTorn.data.id_owner == localStorage.getItem('idUser')){
+    if(data.id_owner == localStorage.getItem('idUser')){
         document.querySelector('.retira').style.display = 'flex'
     }
 
@@ -88,7 +87,6 @@
             mainData.viewTorn.func.getTorn()   
             closeModal(0)                         
         }) 
-
     }
 
 </script>    

@@ -158,8 +158,27 @@
 </template>
 <script>
 
-    mainData.viewTorn.data.id_atleta = []   
-    mainData.viewTorn.data.id_confirm = [] 
+    function deployTorn(torn){
+        try{
+            torn.ID_ATLETA = torn.ID_ATLETA.split(',')
+            torn.NOME_ATLETA = torn.NOME_ATLETA.split(',')
+            torn.NIVEL_ATLETA = torn.NIVEL_ATLETA.split(',')
+            torn.ACCEPT_ATLETA = torn.ACCEPT_ATLETA.split(',')
+            torn.num_grupos = Number(torn.num_grupos)
+            torn.num_players = Number(torn.num_players)
+            torn.playOff = Number(torn.playOff)
+        }catch{
+            torn.ID_ATLETA = []
+            torn.NOME_ATLETA = []
+            torn.NIVEL_ATLETA = []
+            torn.ACCEPT_ATLETA = []
+        }
+
+
+        return torn
+    }
+
+
 
     mainData.viewTorn.func.getTorn = ()=>{
         const params = new Object;
@@ -167,7 +186,7 @@
 
             const myPromisse = queryDB(params,40);
             myPromisse.then((resolve)=>{
-                const torn = JSON.parse(resolve)[0]
+                const torn = deployTorn(JSON.parse(resolve)[0])
                 const tornData = new Date(torn.criado)
                 mainData.viewTorn.data.torneio = torn
 
@@ -195,42 +214,20 @@
     }
 
     mainData.viewTorn.func.fillAtletas = (torn)=>{
-/*
-        const params = new Object;
-            params.id = mainData.viewTorn.data.address
+   
+        const main = document.querySelector('#show-atl')
+        main.innerHTML = ''
 
-        const myPromisse = queryDB(params,42);
-        myPromisse.then((resolve)=>{
-            const atletas = JSON.parse(resolve)
-            mainData.viewTorn.data.id_atleta = []
-            mainData.viewTorn.data.id_confirm = []
-            mainData.viewTorn.data.atletas = atletas
-*/            
+        for(let i=0; i<  torn.ID_ATLETA.length; i++){
 
-            const main = document.querySelector('#show-atl')
-            main.innerHTML = ''
-
-
-console.log(torn)                
-
-            const id = torn.ID_ATLETA.split(',')
-            const nome = torn.NOME_ATLETA.split(',')
-            const nivel = torn.NIVEL_ATLETA.split(',')
-            const accept = torn.ACCEPT_ATLETA.split(',')
-
-
-            for(let i=0; i< id.length; i++){
-
-
-                id[i]!='0' ? mainData.viewTorn.data.id_atleta.push(id[i]) :0
-                accept[i]=='1' ? mainData.viewTorn.data.id_confirm.push(id[i]) :0
+            if(torn.ID_ATLETA[i]!='0'){
             
                 const div = document.createElement('div')
                 div.className = 'view-inline'
 
                 div.addEventListener('click',()=>{
-                    if([mainData.viewTorn.data.id_owner,id[i]].includes(localStorage.getItem('idUser'))){
-                        openHTML('tornConfirm.html','modal',atletas[i],400)
+                    if([torn.id_owner, torn.ID_ATLETA[i]].includes(localStorage.getItem('idUser'))){
+                        openHTML('tornConfirm.html','modal',{id_torn:torn.id,id_owner:torn.id_owner,id_atleta:torn.ID_ATLETA[i]},400)
                     }
                 })
 
@@ -238,24 +235,24 @@ console.log(torn)
                 leftdiv.style.display = 'flex'
                 
                 const img = document.createElement('img')
-                img.src = `assets/users/${id[i]}.jpg`
+                img.src = `assets/users/${ torn.ID_ATLETA[i]}.jpg`
                 img.className = 'imgUser'
                 breakImg(img)
 
                 img.addEventListener('click',()=>{
-                    window.location.hash = 'P'+id[i].padStart(10,0)
+                    window.location.hash = 'P'+ torn.ID_ATLETA[i].padStart(10,0)
                     loadHash()
                 })
                 leftdiv.appendChild(img)
 
                 const check = document.createElement('span')
                 check.className = 'mdi'
-                check.classList.add( accept[i] == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
-                check.style = ` color:${accept[i] == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
+                check.classList.add(  torn.ACCEPT_ATLETA[i] == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
+                check.style = ` color:${ torn.ACCEPT_ATLETA[i] == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
                 leftdiv.appendChild(check)
 
                 const p = document.createElement('p')
-                p.innerHTML = nome[i]
+                p.innerHTML =  torn.NOME_ATLETA[i]
                 leftdiv.appendChild(p)
                 div.appendChild(leftdiv)
 
@@ -265,22 +262,21 @@ console.log(torn)
 
                 rate.innerHTML += `          
                         <div class="rating">                        
-                            <progress id="rating-nivel-${id[i]}" class="rating-bg" value="${nivel[i]}" max="5"></progress>
+                            <progress id="rating-nivel-${ torn.ID_ATLETA[i]}" class="rating-bg" value="${ torn.NIVEL_ATLETA[i]}" max="5"></progress>
                             <svg><use xlink:href="#fivestars"/></svg>
                         </div>
-                        <h4 style="width:30px;">${Number(nivel[i]).toFixed(2)}</h4>
+                        <h4 style="width:30px;">${Number( torn.NIVEL_ATLETA[i]).toFixed(2)}</h4>
                         `
                 div.appendChild(rate)
-                main.appendChild(div)                    
-            }
-
-//        })
+                main.appendChild(div)   
+            }                 
+        }
     }
 
     mainData.viewTorn.func.getTorn()
     
     document.querySelector('#btnInvite').addEventListener('click',()=>{
-        if(mainData.viewTorn.data.id_atleta.length == mainData.viewTorn.data.num_players){
+        if(mainData.viewTorn.data.torneio.ID_ATLETA.length >= Number(mainData.viewTorn.data.torneio.num_players)){
             alert('Número de vagas encerrada')            
         }else{
             openHTML('viewAtleta.html','modal',{origem:'torneio'})
@@ -289,10 +285,10 @@ console.log(torn)
 
     document.querySelector('#btnGerar').addEventListener('click',()=>{
         let ok = 0
-        if(mainData.viewTorn.data.id_atleta.length > mainData.viewTorn.data.id_confirm.length){
+        if(mainData.viewTorn.data.torneio.ID_ATLETA.length > mainData.viewTorn.data.torneio.ACCEPT_ATLETA.length){
                 alert('Ainda falta a confirmação de alguns participantes!')
         }else{
-            ok = (mainData.viewTorn.data.id_atleta.length < mainData.viewTorn.data.num_players)?confirm('Ainda existem vagas em aberto, deseja adicionar atletas não usuários manualmente?'):true
+            ok = (mainData.viewTorn.data.torneio.ID_ATLETA.length < mainData.viewTorn.data.torneio.num_players)?confirm('Ainda existem vagas em aberto, deseja adicionar atletas não usuários manualmente?'):true
         }
 
         if(ok){

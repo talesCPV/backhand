@@ -638,7 +638,8 @@ DELIMITER $$
     )
 	BEGIN
 		DELETE FROM tb_jogo WHERE id_torn=Iid;
-		DELETE FROM tb_torneio WHERE id=Iid;        
+		DELETE FROM tb_torn_atleta WHERE id_torn=Iid;
+		DELETE FROM tb_torneio WHERE id=Iid;
 	END $$
 DELIMITER ;
 
@@ -681,7 +682,7 @@ DELIMITER $$
     )
 	BEGIN
 		SET @tot = (SELECT num_players FROM tb_torneio WHERE id=Iid_torn);
-		SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_atleta!=0);
+		SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta IS NOT NULL);
 		SET @invite = 0;
 		SET @status = (SELECT status FROM tb_torneio WHERE id=Iid_torn);
         IF(@status=0)THEN
@@ -691,24 +692,24 @@ DELIMITER $$
 				IF ((SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta)>0) THEN                
 					SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta=Iid_atleta);
 					UPDATE tb_torn_atleta 
-						SET id_atleta=0, nome_atleta=NULL, nivel_atleta=1 
+						SET id_atleta=NULL, nome_atleta=NULL, nivel_atleta=NULL, accept=NULL 
 						WHERE id_torn=Iid_torn AND id=@id_invite;
 				   SET @tot_invite = @tot_invite -1;
 				ELSE
 					IF(@tot_invite<@tot)THEN
-						SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_atleta=0 LIMIT 1);
+						SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta IS NULL LIMIT 1);
                         SET @nome_atleta = (SELECT nome FROM tb_usuario WHERE id=Iid_atleta);
 						SET @nivel_atleta = (SELECT nivel FROM tb_usuario WHERE id=Iid_atleta);
 
 						UPDATE tb_torn_atleta 
-							SET id_atleta=Iid_atleta, nome_atleta=@nome_atleta, nivel_atleta=@nivel_atleta 
+							SET id_atleta=Iid_atleta, nome_atleta=@nome_atleta, nivel_atleta=@nivel_atleta, accept=0 
                             WHERE id_torn=Iid_torn AND id=@id_invite;
                             
 						SET @invite = 1;
 					END IF;
 				END IF;		
 			END IF;
-			SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=Iid_torn);
+			SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta IS NOT NULL);
 		ELSE 
 			SET @tot_invite = @tot;
         END IF;
@@ -726,19 +727,21 @@ DELIMITER $$
         IN Iaccept BOOLEAN
     )
 	BEGIN
-		SET @status = (SELECT status FROM td_torneio WHERE id=Iid_torn);
+		SET @status = (SELECT status FROM tb_torneio WHERE id=Iid_torn);
         IF(@status=0)THEN
 			SET @id_atleta = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci=Ihash COLLATE utf8_general_ci);
 			IF(Iaccept)THEN
-				UPDATE tb_torn_invite SET accept=1, ask=0 WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;      
+				UPDATE tb_torn_atleta SET accept=1, ask=0 WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;      
 			ELSE
-				DELETE FROM tb_torn_invite WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;
+				UPDATE tb_torn_atleta SET accept=0, ask=1 WHERE id_torn=Iid_torn AND id_atleta=@id_atleta;
 			END IF;
         END IF;
 	END $$
 DELIMITER ;
 
-CALL sp_acceptInviteTorn("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<","2",1);
+CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",8,1);
+
+CALL sp_acceptInviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",7,1);
 
 CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",1,1);
 CALL sp_newTorn("1",1,"Torneio Teste editado",2,20,3,8);

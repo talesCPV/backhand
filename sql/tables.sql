@@ -196,10 +196,10 @@ CREATE TABLE tb_jogo (
 CREATE TABLE tb_torn_atleta (
 	id int NOT NULL,
     id_torn int(11) NOT NULL, 
-    id_atleta int(11) NOT NULL DEFAULT 0,
+    id_atleta int(11) DEFAULT NULL,
     nome_atleta VARCHAR(30) DEFAULT NULL,
-    nivel_atleta double DEFAULT 1,
-    accept BOOLEAN DEFAULT 0,
+    nivel_atleta double DEFAULT NULL,
+    accept BOOLEAN DEFAULT NULL,
 	ask BOOLEAN DEFAULT 1,  
 	FOREIGN KEY (id_torn) REFERENCES tb_torneio(id),
 	FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),
