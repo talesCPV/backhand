@@ -202,12 +202,14 @@
         const myPromisse = queryDB(params,42);
         myPromisse.then((resolve)=>{
             const atletas = JSON.parse(resolve)
-            const main = document.querySelector('#show-atl')
-            main.innerHTML = ''
             mainData.viewTorn.data.id_atleta = []
             mainData.viewTorn.data.id_confirm = []
             mainData.viewTorn.data.atletas = atletas
 */            
+
+            const main = document.querySelector('#show-atl')
+            main.innerHTML = ''
+
 
 console.log(torn)                
 
@@ -216,17 +218,18 @@ console.log(torn)
             const nivel = torn.NIVEL_ATLETA.split(',')
             const accept = torn.ACCEPT_ATLETA.split(',')
 
-/*
+
             for(let i=0; i< id.length; i++){
 
-                mainData.viewTorn.data.id_atleta.push(atletas[i].id_atleta)
-                atletas[i].accept == '1' ? mainData.viewTorn.data.id_confirm.push(atletas[i].id_atleta) :0
+
+                id[i]!='0' ? mainData.viewTorn.data.id_atleta.push(id[i]) :0
+                accept[i]=='1' ? mainData.viewTorn.data.id_confirm.push(id[i]) :0
             
                 const div = document.createElement('div')
                 div.className = 'view-inline'
 
                 div.addEventListener('click',()=>{
-                    if([mainData.viewTorn.data.id_owner,atletas[i].id_atleta].includes(localStorage.getItem('idUser'))){
+                    if([mainData.viewTorn.data.id_owner,id[i]].includes(localStorage.getItem('idUser'))){
                         openHTML('tornConfirm.html','modal',atletas[i],400)
                     }
                 })
@@ -235,24 +238,24 @@ console.log(torn)
                 leftdiv.style.display = 'flex'
                 
                 const img = document.createElement('img')
-                img.src = `assets/users/${atletas[i].id_atleta}.jpg`
+                img.src = `assets/users/${id[i]}.jpg`
                 img.className = 'imgUser'
                 breakImg(img)
 
                 img.addEventListener('click',()=>{
-                    window.location.hash = 'P'+atletas[i].id_atleta.padStart(10,0)
+                    window.location.hash = 'P'+id[i].padStart(10,0)
                     loadHash()
                 })
                 leftdiv.appendChild(img)
 
                 const check = document.createElement('span')
                 check.className = 'mdi'
-                check.classList.add( atletas[i].accept == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
-                check.style = ` color:${atletas[i].accept == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
+                check.classList.add( accept[i] == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
+                check.style = ` color:${accept[i] == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
                 leftdiv.appendChild(check)
 
                 const p = document.createElement('p')
-                p.innerHTML = atletas[i].nome_atleta
+                p.innerHTML = nome[i]
                 leftdiv.appendChild(p)
                 div.appendChild(leftdiv)
 
@@ -262,15 +265,15 @@ console.log(torn)
 
                 rate.innerHTML += `          
                         <div class="rating">                        
-                            <progress id="rating-nivel-${atletas[i].id_atleta}" class="rating-bg" value="${atletas[i].nivel}" max="5"></progress>
+                            <progress id="rating-nivel-${id[i]}" class="rating-bg" value="${nivel[i]}" max="5"></progress>
                             <svg><use xlink:href="#fivestars"/></svg>
                         </div>
-                        <h4 style="width:30px;">${Number(atletas[i].nivel).toFixed(2)}</h4>
+                        <h4 style="width:30px;">${Number(nivel[i]).toFixed(2)}</h4>
                         `
                 div.appendChild(rate)
                 main.appendChild(div)                    
             }
-*/            
+
 //        })
     }
 
