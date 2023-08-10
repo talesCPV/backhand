@@ -71,9 +71,9 @@
             display: none;
         }
 
-        #divJogos, #divTabela{
+        #divTabela,#divJogos{
+            display: none;
             min-height: 100px;
-
         }
 
         @media (max-width: 769px) {
@@ -91,6 +91,10 @@
                 text-indent: 0;
             }
 
+            .min {
+                max-width: 10px;
+                padding: 0 5px;
+            }
         }
 
     </style>
@@ -108,7 +112,10 @@
                         <label>em</label>
                         <h4 id="torn-data"></h4>
                     </div>
-    
+                </div>
+                <div class="line">
+                    <label>Prêmio (<span class="mdi mdi-star"></span><span class="mdi mdi-star-half"></span>)</label>
+                    <h4 id="torn-premio"></h4>
                 </div>
                 <div class="line"></div>
                 <label>Regras:</label>
@@ -146,6 +153,7 @@
 
         <div id="divJogos" class="edge">
             <legend>Jogos</legend>
+            <table id="tblJogos"></table>
         </div>
 
 
@@ -167,18 +175,18 @@
             torn.num_grupos = Number(torn.num_grupos)
             torn.num_players = Number(torn.num_players)
             torn.playOff = Number(torn.playOff)
+            torn.status = Number(torn.status)
         }catch{
             torn.ID_ATLETA = []
             torn.NOME_ATLETA = []
             torn.NIVEL_ATLETA = []
             torn.ACCEPT_ATLETA = []
+            torn.status = 0
         }
-
+        torn.ok = 0
 
         return torn
     }
-
-
 
     mainData.viewTorn.func.getTorn = ()=>{
         const params = new Object;
@@ -195,10 +203,19 @@
                 document.querySelector('.title-viewTorn').innerHTML = torn.nome
                 document.querySelector('#torn-owner').innerHTML = torn.OWNER_NOME
                 document.querySelector('#torn-data').innerHTML = tornData.getFormatBR()
+                document.querySelector('#torn-premio').innerText = torn.PREMIO
                 document.querySelector('#torn-regras').innerText = torn.regras
-                document.querySelector('#atl-tot').innerText = torn.num_players.padStart(2,0)
+                document.querySelector('#atl-tot').innerText = (torn.num_players).toString().padStart(2,0)
                 document.querySelector('#atl-conv').innerText = torn.CONVITES.padStart(2,0)
                 document.querySelector('#atl-conf').innerText = torn.ACEITOS.padStart(2,0)
+
+                if(torn.status > 0){
+                    if(torn.modelo !='1'){
+                        document.querySelector('#divTabela').style.display = 'flex'
+                    }
+                    document.querySelector('#divJogos').style.display = 'flex'
+                    mainData.viewTorn.func.fillJogos()
+                }
 
                 if(torn.id_owner == localStorage.getItem('idUser')){
                     document.querySelector('.owner-btn').style.display = 'flex'
@@ -214,64 +231,82 @@
     }
 
     mainData.viewTorn.func.fillAtletas = (torn)=>{
-   
+   console.log(torn)
         const main = document.querySelector('#show-atl')
         main.innerHTML = ''
 
+        torn.ok=0
         for(let i=0; i<  torn.ID_ATLETA.length; i++){
+            torn.ok += torn.ACCEPT_ATLETA[i]=='1' ? 1 : 0
 
-            if(torn.ID_ATLETA[i]!='0'){
+            const div = document.createElement('div')
+            div.className = 'view-inline'
+
+            div.addEventListener('click',()=>{
+                if([torn.id_owner, torn.ID_ATLETA[i]].includes(localStorage.getItem('idUser'))){
+                    openHTML('tornConfirm.html','modal',{id_torn:torn.id,id_owner:torn.id_owner,id_atleta:torn.ID_ATLETA[i]},400)
+                }
+            })
+
+            const leftdiv = document.createElement('div')
+            leftdiv.style.display = 'flex'
             
-                const div = document.createElement('div')
-                div.className = 'view-inline'
+            const img = document.createElement('img')
+            img.src = `assets/users/${ torn.ID_ATLETA[i]}.jpg`
+            img.className = 'imgUser'
+            breakImg(img)
 
-                div.addEventListener('click',()=>{
-                    if([torn.id_owner, torn.ID_ATLETA[i]].includes(localStorage.getItem('idUser'))){
-                        openHTML('tornConfirm.html','modal',{id_torn:torn.id,id_owner:torn.id_owner,id_atleta:torn.ID_ATLETA[i]},400)
-                    }
-                })
+            img.addEventListener('click',()=>{
+                window.location.hash = 'P'+ torn.ID_ATLETA[i].padStart(10,0)
+                loadHash()
+            })
+            leftdiv.appendChild(img)
 
-                const leftdiv = document.createElement('div')
-                leftdiv.style.display = 'flex'
-                
-                const img = document.createElement('img')
-                img.src = `assets/users/${ torn.ID_ATLETA[i]}.jpg`
-                img.className = 'imgUser'
-                breakImg(img)
+            const check = document.createElement('span')
+            check.className = 'mdi'
+            check.classList.add(  torn.ACCEPT_ATLETA[i] == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
+            check.style = ` color:${ torn.ACCEPT_ATLETA[i] == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
+            leftdiv.appendChild(check)
 
-                img.addEventListener('click',()=>{
-                    window.location.hash = 'P'+ torn.ID_ATLETA[i].padStart(10,0)
-                    loadHash()
-                })
-                leftdiv.appendChild(img)
+            const p = document.createElement('p')
+            p.innerHTML =  torn.NOME_ATLETA[i]
+            leftdiv.appendChild(p)
+            div.appendChild(leftdiv)
 
-                const check = document.createElement('span')
-                check.className = 'mdi'
-                check.classList.add(  torn.ACCEPT_ATLETA[i] == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
-                check.style = ` color:${ torn.ACCEPT_ATLETA[i] == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
-                leftdiv.appendChild(check)
+            const rate = document.createElement('div')
+            rate.className = 'rating-line'
+            rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'
 
-                const p = document.createElement('p')
-                p.innerHTML =  torn.NOME_ATLETA[i]
-                leftdiv.appendChild(p)
-                div.appendChild(leftdiv)
-
-                const rate = document.createElement('div')
-                rate.className = 'rating-line'
-                rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'
-
-                rate.innerHTML += `          
-                        <div class="rating">                        
-                            <progress id="rating-nivel-${ torn.ID_ATLETA[i]}" class="rating-bg" value="${ torn.NIVEL_ATLETA[i]}" max="5"></progress>
-                            <svg><use xlink:href="#fivestars"/></svg>
-                        </div>
-                        <h4 style="width:30px;">${Number( torn.NIVEL_ATLETA[i]).toFixed(2)}</h4>
-                        `
-                div.appendChild(rate)
-                main.appendChild(div)   
-            }                 
+            rate.innerHTML += `          
+                    <div class="rating">                        
+                        <progress id="rating-nivel-${ torn.ID_ATLETA[i]}" class="rating-bg" value="${ torn.NIVEL_ATLETA[i]}" max="5"></progress>
+                        <svg><use xlink:href="#fivestars"/></svg>
+                    </div>
+                    <h4 style="width:30px;">${Number( torn.NIVEL_ATLETA[i]).toFixed(2)}</h4>
+                    `
+            div.appendChild(rate)
+            main.appendChild(div)   
+                        
         }
     }
+
+    mainData.viewTorn.func.fillJogos = ()=>{
+        const params = new Object;
+                params.id = mainData.viewTorn.data.address
+
+            const myPromisse = queryDB(params,45);
+            myPromisse.then((resolve)=>{
+                const jogos = JSON.parse(resolve)
+                const tbl = document.querySelector('#tblJogos')
+                console.log(jogos)
+                
+                tbl.head('Data, Jogador A, |min,X|min, |min,Jogador B,','Upp,Upp,str,let,str,Upp')    
+                for(let i=0; i<jogos.length; i++){
+                    tbl.plot(jogos[i],'data,P1_nome,P1_score|min,X|min,P2_score|min,P2_nome','dat,Upp,int,let,int,Upp') 
+                }
+            })
+    }
+
 
     mainData.viewTorn.func.getTorn()
     
@@ -285,7 +320,7 @@
 
     document.querySelector('#btnGerar').addEventListener('click',()=>{
         let ok = 0
-        if(mainData.viewTorn.data.torneio.ID_ATLETA.length > mainData.viewTorn.data.torneio.ACCEPT_ATLETA.length){
+        if(mainData.viewTorn.data.torneio.ID_ATLETA.length > mainData.viewTorn.data.torneio.ok){
                 alert('Ainda falta a confirmação de alguns participantes!')
         }else{
             ok = (mainData.viewTorn.data.torneio.ID_ATLETA.length < mainData.viewTorn.data.torneio.num_players)?confirm('Ainda existem vagas em aberto, deseja adicionar atletas não usuários manualmente?'):true

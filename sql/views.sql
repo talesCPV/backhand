@@ -143,8 +143,8 @@ SELECT US.id, US.nome,US.nivel,
     (SELECT NOME FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_NOME,
     (SELECT NOME_OWNER FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_OWNER,
     (SELECT ATV FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_ATV,
-    (SELECT ALERTA_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS ALERTA_TORN,
-    (SELECT QTD_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS QTD_TORN,
+    (SELECT ALERTA_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS ALERTA_TORN_ID,
+    (SELECT QTD_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS ALERTA_TORN_QTD,
     (SELECT GROUP_CONCAT(SUBSTRING(dia,1,10) SEPARATOR ', ')
 		FROM vw_atv 
         WHERE dia>(NOW() - INTERVAL 28 DAY) 
@@ -221,58 +221,61 @@ SELECT * FROM vw_alerta;
 -- DROP VIEW vw_alerta_torn;
 -- CREATE VIEW vw_alerta_torn AS 
 	SELECT id_atleta, GROUP_CONCAT(id_torn SEPARATOR ',') AS ALERTA_TORN, COUNT(id_torn) AS QTD_TORN
-		FROM tb_torn_invite 
-		WHERE accept=0        
+		FROM tb_torn_atleta 
+		WHERE accept=0
 		AND ask=1 
         GROUP BY id_atleta;
     
-SELECT * FROM vw_alerta_torn;
+SELECT * FROM vw_alerta_torn ;
 
 
-SELECT * FROM tb_torn_invite;
+SELECT * FROM tb_torn_atleta ;
+
 SELECT id_torn FROM tb_torn_invite WHERE id_player=3 AND ask=1;
 
 -- *********************************
 
 -- DROP VIEW vw_torn;
- CREATE VIEW vw_torn AS
+-- CREATE VIEW vw_torn AS
 	SELECT TRN.*, USR.nome AS OWNER_NOME,
-		(SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=TRN.id) AS CONVITES,
-		(SELECT COUNT(*) FROM tb_torn_invite WHERE id_torn=TRN.id AND accept=1) AS ACEITOS,
+		(SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=TRN.id AND id_atleta IS NOT NULL) AS CONVITES,
+		(SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=TRN.id AND accept=1) AS ACEITOS,
         GROUP_CONCAT(ATL.id_atleta  SEPARATOR ',') AS ID_ATLETA,
         GROUP_CONCAT(ATL.nome_atleta  SEPARATOR ',') AS NOME_ATLETA,
         GROUP_CONCAT(ATL.nivel_atleta  SEPARATOR ',') AS NIVEL_ATLETA,
         GROUP_CONCAT(ATL.accept  SEPARATOR ',') AS ACCEPT_ATLETA,
-        ROUND((SUM(NIVEL_ATLETA)/TRN.num_players)*0.2 ,2) AS PREMIO
-
+        ROUND(SUM(IFNULL(NIVEL_ATLETA,1)/TRN.num_players)*0.2 ,2) AS PREMIO
 		FROM tb_torneio AS TRN
 		INNER JOIN tb_usuario AS USR
         INNER JOIN tb_torn_atleta AS ATL
 		ON TRN.id_owner = USR.id
-        AND TRN.id = ATL.id_torn;
+        AND TRN.id = ATL.id_torn
+        GROUP BY id;
 
 SELECT * FROM vw_torn;
 
--- DROP VIEW vw_torn_invite;
+ DROP VIEW vw_torn_invite;
 -- CREATE VIEW vw_torn_invite AS
 SELECT IVT.*,USR.nome AS nome_atleta, USR.nivel
-	FROM tb_torn_invite AS IVT
+	FROM tb_torn_atleta AS IVT
 	INNER JOIN tb_usuario AS USR
 	ON IVT.id_atleta = USR.id
     ORDER BY id_torn,nivel DESC;
 
 -- DROP VIEW vw_my_torn;
 -- CREATE VIEW vw_my_torn AS
-	SELECT INV.id_atleta ,TRN.*
+	SELECT ATL.id_atleta ,TRN.*
 	FROM tb_torneio AS TRN
-	INNER JOIN vw_torn_invite AS INV
-	ON TRN.id = INV.id_torn
-    UNION
-	SELECT id_owner AS id_atleta, id,id_owner,nome, modelo, num_players, num_grupos, playOff, regras, criado
-	FROM tb_torneio 
-    WHERE id NOT IN(SELECT id_torn FROM vw_torn_invite GROUP BY id_torn);
+	INNER JOIN tb_torn_atleta AS ATL
+	ON TRN.id = ATL.id_torn
+    AND ATL.id_atleta IS NOT NULL
+	UNION
+	SELECT TRN.id_owner AS id_atleta, TRN.*
+	FROM tb_torneio AS TRN GROUP BY id;
     
 SELECT * FROM vw_my_torn ;
+
+SELECT * FROM tb_torn_atleta  ;
 
 SELECT * FROM vw_torn_invite WHERE id_torn = 4;
 

@@ -528,7 +528,6 @@ DELIMITER ;
 
 CALL sp_usersByName(4,"%%",0,10);
 
-
 -- DROP PROCEDURE sp_addEquip;
 DELIMITER $$
 	CREATE PROCEDURE sp_addEquip(
@@ -673,6 +672,43 @@ DELIMITER ;
 
 CALL sp_gameTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",'(id,id_torn,id_P1,id_P2,P1_nome,P2_nome,grupo)','("1","3","2","0","OUTRO JOGADOR","B","1"),("2","3","1","0","TALES CEMBRANELI DANTAS","A","1")');
 
+
+ DROP PROCEDURE sp_fillPlayerTorn;
+DELIMITER $$
+	CREATE PROCEDURE sp_fillPlayerTorn(
+		IN Ihash varchar(77),
+		IN Iid_torn int(11),         
+		IN Ivalues VARCHAR(3000)
+    )
+BEGIN                
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @torn_owner  = (SELECT id_owner FROM tb_torneio WHERE id COLLATE utf8_general_ci = Iid_torn COLLATE utf8_general_ci);					
+        IF (@call_owner = @torn_owner) THEN
+        
+			SET @i = 1;
+			loop_players:  LOOP
+				SET @qtd = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta IS NULL);                       
+				IF  (@qtd=0) THEN
+					LEAVE  loop_players;
+				ELSE
+					SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta IS NULL LIMIT 1);
+					SET @nome_atleta = (SELECT fn_split(Ivalues,@i));
+
+					UPDATE tb_torn_atleta 
+						SET id_atleta=0, nome_atleta=@nome_atleta, nivel_atleta=1, accept=1, ask=0
+						WHERE id_torn=Iid_torn AND id=@id_invite;
+					
+                    SET @i = @i+1;
+				END  IF;
+			END LOOP;
+		END IF; 
+    
+        SELECT * FROM tb_torn_atleta WHERE id_torn=Iid_torn;
+	END $$
+DELIMITER ;
+
+CALL sp_fillPlayerTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",8,"A,B,C,D,E,F,G");
+
  DROP PROCEDURE sp_inviteTorn;
 DELIMITER $$
 	CREATE PROCEDURE sp_inviteTorn(
@@ -681,16 +717,16 @@ DELIMITER $$
         IN Iid_atleta int(11)
     )
 	BEGIN
-		SET @tot = (SELECT num_players FROM tb_torneio WHERE id=Iid_torn);
+		SET @tot = (SELECT num_players FROM tb_torneio WHERE id=Iid_torn LIMIT 1);
 		SET @tot_invite = (SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta IS NOT NULL);
 		SET @invite = 0;
-		SET @status = (SELECT status FROM tb_torneio WHERE id=Iid_torn);
+		SET @status = (SELECT status FROM tb_torneio WHERE id=Iid_torn LIMIT 1);
         IF(@status=0)THEN
         
-			SET @OWNER_HASH = (SELECT US.hash FROM tb_usuario AS US INNER JOIN tb_torneio AS TN ON US.id=TN.id_owner AND TN.id=Iid_torn);
+			SET @OWNER_HASH = (SELECT US.hash FROM tb_usuario AS US INNER JOIN tb_torneio AS TN ON US.id=TN.id_owner AND TN.id=Iid_torn LIMIT 1);
 			IF (Ihash COLLATE utf8_general_ci = @OWNER_HASH COLLATE utf8_general_ci)THEN
 				IF ((SELECT COUNT(*) FROM tb_torn_atleta WHERE id_torn = Iid_torn AND id_atleta = Iid_atleta)>0) THEN                
-					SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta=Iid_atleta);
+					SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta=Iid_atleta LIMIT 1);
 					UPDATE tb_torn_atleta 
 						SET id_atleta=NULL, nome_atleta=NULL, nivel_atleta=NULL, accept=NULL 
 						WHERE id_torn=Iid_torn AND id=@id_invite;
@@ -698,8 +734,8 @@ DELIMITER $$
 				ELSE
 					IF(@tot_invite<@tot)THEN
 						SET @id_invite = (SELECT id FROM tb_torn_atleta WHERE id_torn=Iid_torn AND id_atleta IS NULL LIMIT 1);
-                        SET @nome_atleta = (SELECT nome FROM tb_usuario WHERE id=Iid_atleta);
-						SET @nivel_atleta = (SELECT nivel FROM tb_usuario WHERE id=Iid_atleta);
+                        SET @nome_atleta = (SELECT nome FROM tb_usuario WHERE id=Iid_atleta LIMIT 1);
+						SET @nivel_atleta = (SELECT nivel FROM tb_usuario WHERE id=Iid_atleta LIMIT 1);
 
 						UPDATE tb_torn_atleta 
 							SET id_atleta=Iid_atleta, nome_atleta=@nome_atleta, nivel_atleta=@nivel_atleta, accept=0 
@@ -718,6 +754,8 @@ DELIMITER $$
 DELIMITER ;
 
 CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",0000000003,3);
+
+CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",8,3);
 
  DROP PROCEDURE sp_acceptInviteTorn;
 DELIMITER $$

@@ -56,13 +56,13 @@
 </template>
 <script>
     const torn = mainData.viewTorn.data.torneio
-
+console.log(torn)
     mainData.geraJogos.func.fillAtleta = ()=>{
 
         const main = document.querySelector('#divAtleta')
             main.innerHTML = ''
 
-        for(let i=0; i<mainData.viewTorn.data.num_players; i++){
+        for(let i=0; i<torn.num_players; i++){
                     
             const div = document.createElement('div')
             div.className = 'view-inline'
@@ -76,7 +76,7 @@
             leftdiv.appendChild(h)
 
             const img = document.createElement('img')
-            img.src =  i<atletas.length ?`assets/users/${atletas[i].id_atleta}.jpg` : ''
+            img.src =  i<torn.ID_ATLETA.length ?`assets/users/${torn.ID_ATLETA[i]}.jpg` : ''
             img.className = 'imgUser'
             breakImg(img)
 
@@ -86,24 +86,22 @@
             })
             leftdiv.appendChild(img)
 
-
-            if(i<atletas.length){
+            if(i<torn.ID_ATLETA.length){
 
                 const p = document.createElement('p')
-                p.innerHTML = atletas[i].nome_atleta
+                p.innerHTML = torn.NOME_ATLETA[i]
                 leftdiv.appendChild(p)
                 div.appendChild(leftdiv)
-
 
                 const rate = document.createElement('div')
                 rate.className = 'rating-line'
                 rate.style = 'display: flex; gap:15px; align-items: center; width:auto;'            
                 rate.innerHTML =`          
                         <div class="rating">                        
-                            <progress id="rating-nivel-${atletas[i].id_atleta}" class="rating-bg" value="${atletas[i].nivel}" max="5"></progress>
+                            <progress id="rating-nivel-${torn.ID_ATLETA[i]}" class="rating-bg" value="${torn.ID_ATLETA[i]}" max="5"></progress>
                             <svg><use xlink:href="#fivestars"/></svg>
                         </div>
-                        <h4 style="width:30px;">${Number(atletas[i].nivel).toFixed(2)}</h4>
+                        <h4 style="width:30px;">${Number(torn.NIVEL_ATLETA[i]).toFixed(2)}</h4>
                         `
                 div.appendChild(rate)
             }else{
@@ -116,9 +114,7 @@
                 div.appendChild(leftdiv)                
             }
             main.appendChild(div)                    
-        
         }
-
     }
 
     mainData.geraJogos.func.fillAtleta()
@@ -150,11 +146,12 @@
             atl.splice(i,1)
             num_gp++
             num_gp = num_gp>=Number(torn.num_grupos) ? 0 : num_gp
-
         }
+
         for(let i=0; i<grupo.length; i++){
             values = values.length==0 ? gamesPC(grupo[i],i+1) : values.concat(gamesPC(grupo[i],i+1,values.length)) 
         }
+
         return values
     }
 
@@ -162,7 +159,6 @@
         const sort = document.querySelector('input[name="rdo-sorteio"]:checked').value
         let game = 1
         let values = []
-
         if(sort=='1'){
             while(atl.length>1){
                 let i = Math.floor(Math.random()*atl.length)
@@ -172,19 +168,19 @@
                 i = Math.floor(Math.random()*atl.length)
                 const atl2 = atl[i]
                 atl.splice(i,1)
-
-                values.push(geraParams(game,atl1.id_atleta,atl2.id_atleta,atl1.nome_atleta,atl2.nome_atleta))
+                values.push(geraParams(game,atl1.id,atl2.id,atl1.nome,atl2.nome))
                 game++
             }
         }else{
             while(atl.length>1){
                 let i = atl.length-1
-                values.push(geraParams(game,atl[0].id_atleta,atl[i].id_atleta,atl[0].nome_atleta,atl[i].nome_atleta))
+                values.push(geraParams(game,atl[0].id,atl[i].id,atl[0].nome,atl[i].nome))
                 atl.splice(i,1)
                 atl.splice(0,1)
                 game++
             }
         }
+        console.log(values)
         return values
     }
 
@@ -193,7 +189,7 @@
         let values = []
         for(let i=0; i<atl.length; i++){
             for(let j=i+1; j<atl.length; j++){
-                values.push(geraParams(game,atl[i].id_atleta,atl[j].id_atleta,atl[i].nome_atleta,atl[j].nome_atleta,grupo))
+                values.push(geraParams(game,atl[i].id,atl[j].id,atl[i].nome,atl[j].nome,grupo))
                 game++
             }
         }
@@ -202,22 +198,29 @@
 
     function checkAllNames(){
         const atl = document.querySelector('#divAtleta').querySelectorAll('input')        
-        const nomeAtl = []
+        const out = new Object
+            out.atleta = []
+            out.status = true
+            out.convidados = ''
 
-        for(let i=0; i<atletas.length; i++){
-            nomeAtl.push(atletas[i])
+        for(let i=0; i<torn.NOME_ATLETA.length; i++){
+            out.atleta.push({nome:torn.NOME_ATLETA[i],id:torn.ID_ATLETA[i]})
+            out.cut = i
         }
 
         for(let i=0; i<atl.length; i++){
             if(atl[i].value.trim()==''){
                 alert('Favor preencher todos os nomes dos atletas avulsos.')
                 atl[i].focus()
-                return {status:false}
+                out.status=false
+                return out
             }else{
-                nomeAtl.push({nome_atleta:atl[i].value,id_atleta:0})
+                out.atleta.push({nome:atl[i].value.trim().toUpperCase(),id:0})
+                out.convidado += ','+atl[i].value.trim().toUpperCase()
             }
         }
-        return {status:true, atletas:nomeAtl}
+        out.convidado = out.convidado.substring(1,out.convidado.length)
+        return out
     }
 
 
@@ -231,23 +234,34 @@
         if(atl.status){
             switch(mode){
                 case 1:
-                    values = gamesPlayoff(atl.atletas)
+                    values = gamesPlayoff(atl.atleta)
                 break
                 case 2:
-                    values = grupos(atl.atletas)
+                    values = grupos(atl.atleta)
                 break
                 case 3:
-                    values = gamesPC(atl.atletas)
+                    values = gamesPC(atl.atleta)
             } 
         }
         console.log(values)
 
         if(values.length>0){
-            queryJson(values,3,torn.id).then((txt)=>{
-                console.log(txt)
+
+            const params = new Object;
+                params.hash =  localStorage.getItem('hash')
+                params.id_torn = torn.id
+                params.values = atl.convidado
+
+            const myPromisse = queryDB(params,44)
+            myPromisse.then((resolve)=>{
+                queryJson(values,3,torn.id).then((txt)=>{
+                    console.log(txt)
+                    mainData.viewTorn.func.getTorn()
+                    closeModal(0)
+                })
             })
         }  
-    })
+    })  
 
 
 </script>

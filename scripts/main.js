@@ -41,53 +41,6 @@ function showUserPic(){
 
 function fillPerfil(usr){
 
-    function alertas(PERFIL){        
-        const container = document.querySelector('.alert-badge')
-        const alert =  document.querySelector('#alert')
-        container.innerText = ''
-        alert.innerText = ''
- 
-        if(PERFIL.ALERTA_QTD != null){
-            const qtd = parseInt(PERFIL.ALERTA_QTD)
-            const atv = PERFIL.ALERTA_ATV.split(',')
-            const nome = PERFIL.ALERTA_NOME.split(',')            
-            container.innerHTML = ''
-           
-            for(let i=0; i<qtd; i++){
-                const data = new Object
-                    data.origem = 'confirm'
-                const li = document.createElement('li')
-                    li.id = 'alert-'+atv[i]                    
-                    li.addEventListener('click',()=>{
-                        window.location.hash = 'G'+atv[i].padStart(10,0)
-                        loadHash(data)
-                    })
-
-                    const div = document.createElement('div')
-                    div.className = 'sub-menu-item'
-                    const label = document.createElement('label')
-                    label.innerText = 'Partida'
-                    div.appendChild(label)
-                    const p = document.createElement('p')
-                    p.innerText = nome[i]
-                    div.appendChild(p)
-
-                    li.appendChild(div)
-
-                container.appendChild(li)
-            }
-            alert.innerText = qtd
-        }
-        if(PERFIL.QTD_TORN != null){
-            document.querySelector('#alert-torn').innerText = PERFIL.QTD_TORN
-            mainData.data.torn =  PERFIL.ALERTA_TORN.split(',')
-        }else{
-            document.querySelector('#alert-torn').innerText = ''
-            mainData.data.torn = []
-        }
-    }
-
-
     const params = new Object;
         params.id =  usr
 
@@ -107,8 +60,28 @@ function fillPerfil(usr){
         document.querySelector('.perfil-nome').innerText = json[0].nome
         document.querySelector('.perfil-nivel').innerText = json[0].nivel
         document.querySelector('.rating-bg').value = json[0].nivel
-        alertas(json[0])
 
+        try{
+            json[0].ALERTA_QTD = parseInt(json[0].ALERTA_QTD)
+            json[0].ALERTA_ATV = json[0].ALERTA_ATV.split(',')
+            json[0].ALERTA_NOME = json[0].ALERTA_NOME.split(',')
+        }catch{
+            json[0].ALERTA_QTD = ''
+            json[0].ALERTA_ATV = []
+            json[0].ALERTA_NOME = []
+        }
+
+        try{
+            json[0].ALERTA_TORN_QTD = parseInt(json[0].ALERTA_TORN_QTD)
+            json[0].ALERTA_TORN_ID = json[0].ALERTA_TORN_ID.split(',')
+        }catch{
+            json[0].ALERTA_TORN_QTD = ''
+            json[0].ALERTA_TORN_ID = ''
+        }
+
+        mainData.data.perfil = json[0]
+        document.querySelector('#alert').innerText = json[0].ALERTA_QTD
+        document.querySelector('#alert-torn').innerText = json[0].ALERTA_TORN_QTD
     })
 }
 

@@ -73,7 +73,8 @@
             params.id_torn = data.id_torn
             params.id_atleta = data.id_atleta            
         queryDB(params,41).then((resolve)=>{
-            mainData.viewTorn.func.getTorn()   
+            mainData.viewTorn.func.getTorn()
+            fillPerfil(localStorage.getItem('idUser'))
             closeModal(0)                         
         }) 
     }
@@ -84,7 +85,8 @@
             params.id_torn = data.id_torn
             params.accept = accept
         queryDB(params,43).then((resolve)=>{
-            mainData.viewTorn.func.getTorn()   
+            mainData.viewTorn.func.getTorn() 
+            fillPerfil(localStorage.getItem('idUser'))  
             closeModal(0)                         
         }) 
     }

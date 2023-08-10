@@ -1,0 +1,88 @@
+<title>
+    Notificações
+</title>
+<template>
+    <style>
+        .cards{
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cards p{
+            text-indent: 0;
+            text-align: center;
+        }
+
+        .convite, .retira{
+            display: flex;
+        }
+
+        .view-inline{
+            cursor: pointer;
+        }
+
+
+    </style>
+
+
+    <div class="edge cards confirm">
+        <p>Confirma os resultados?</p>
+        <div id="alert-results"></div>
+    </div>
+
+
+
+</template>
+<script>
+
+    mainData.alerts.func.showConfirm = ()=>{
+
+        const PERFIL = mainData.data.perfil
+        const main = document.querySelector('#alert-results')
+        main.innerHTML=''
+
+
+        if(PERFIL.ALERTA_QTD != 0){
+           
+            for(let i=0; i<PERFIL.ALERTA_QTD; i++){
+  
+                const div = document.createElement('div')
+                div.className = 'view-inline'
+        
+                const leftdiv = document.createElement('div')
+                leftdiv.className = 'activity'
+
+                div.addEventListener('click',(e)=>{
+                    if(['DIV','P','IMG'].includes(e.target.nodeName)){
+                        window.location.hash = 'G'+PERFIL.ALERTA_ATV[i].padStart(10,0)
+                        loadHash({origem : 'confirm'})
+                    }
+                })
+
+                const p = document.createElement('p')
+                p.innerHTML = PERFIL.ALERTA_NOME[i]
+                leftdiv.appendChild(p)
+                div.appendChild(leftdiv)
+            
+                const divBtn = document.createElement('div')
+/*
+                const btn = document.createElement('button')
+                btn.innerHTML = 'CONFIRMAR'
+                btn.className = 'btn btn-primary'
+
+                btn.addEventListener('click',()=>{
+//                    openHTML('newTorn.html','modal',torneios[i],500)
+                })
+                divBtn.appendChild(btn)
+*/
+                div.appendChild(divBtn)
+                main.appendChild(div)                
+            }            
+        }
+    }
+
+
+    mainData.alerts.func.showConfirm()
+
+
+</script>    

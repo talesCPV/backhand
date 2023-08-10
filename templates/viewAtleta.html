@@ -188,6 +188,7 @@
                             params.id_atleta = friends[i].userID
                         queryDB(params,41).then((resolve)=>{
                             mainData.viewTorn.func.getTorn()
+                            fillPerfil(localStorage.getItem('idUser'))
                             closeModal(0)
                         })                    
                     }

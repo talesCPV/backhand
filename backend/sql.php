@@ -48,6 +48,9 @@
         "41" => 'CALL sp_inviteTorn("x00",x01,x02)',
         "42" => 'SELECT * FROM vw_torn_invite WHERE id_torn=x00;',
         "43" => 'CALL sp_acceptInviteTorn("x00",x01,x02);',
+        "44" => 'CALL sp_fillPlayerTorn("x00",x01,"x02");',
+        "45" => 'SELECT * FROM tb_jogo WHERE id_torn=x00 ORDER BY grupo;',
+
 
     );
 
@@ -56,6 +59,7 @@
         "1" => "CALL sp_AtvAtl(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
         "2" => "CALL sp_sets(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
         "3" => "CALL sp_gameTorn(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
+        
 
     );
 

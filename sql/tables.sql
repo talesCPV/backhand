@@ -183,6 +183,8 @@ CREATE TABLE tb_jogo (
     id_P2 int(11) DEFAULT NULL,
     P1_nome varchar(30) DEFAULT NULL,
     P2_nome varchar(30) DEFAULT NULL,    
+    P1_score int DEFAULT 0,
+    P2_score int DEFAULT 0,
 	id_Ativ int(11) DEFAULT NULL,
     grupo int DEFAULT 1,
     data date DEFAULT NULL,    
@@ -191,6 +193,11 @@ CREATE TABLE tb_jogo (
 	FOREIGN KEY (id_P2) REFERENCES tb_usuario(id),
     PRIMARY KEY (id,id_torn)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+ALTER TABLE tb_jogo
+ADD COLUMN data date DEFAULT NULL;
+
+
 
  DROP TABLE tb_torn_atleta;
 CREATE TABLE tb_torn_atleta (
@@ -205,6 +212,3 @@ CREATE TABLE tb_torn_atleta (
 	FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),
     PRIMARY KEY (id,id_torn)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
-
-ALTER TABLE tb_torn_atleta
-ADD COLUMN nivel_atleta double DEFAULT 1;

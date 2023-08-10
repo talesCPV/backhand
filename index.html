@@ -187,7 +187,7 @@
                 <li class="only-login hide-menu"><a onclick="torneio()" class="menu-mobile"><span class="mdi mdi-tournament"></span><span id="alert-torn" class="badge"></span><div></div> </a></li>
                 <li class="only-login hide-menu"><a onclick="social()" class="menu-mobile"><i class="fas fa-user-friends"></i><div></div> </a></li>
                 <li class="only-login hide-menu"><a onclick="addOne()" class="menu-mobile"><span class="mdi mdi-plus-circle-outline"></span><div></div> </a></li>
-                <li class="only-login hide-menu" ><a  class="menu-mobile" style="display: flex; gap: 5px;" class="parent-sub-menu"><span class="mdi mdi-bell-outline"></span><span id="alert" class="badge"></span><div></div>  </a>
+                <li class="only-login hide-menu"><a onclick="showAlert()" class="menu-mobile" style="display: flex; gap: 5px;" class="parent-sub-menu"><span class="mdi mdi-bell-outline"></span><span id="alert" class="badge"></span><div></div>  </a>
                   <ul class="sub-menu alert-badge"></ul>
                 </li>
                 <li class="only-login hide-menu"><a onclick="viewUser()" class="menu-mobile"><img class="imgUser" id="imgUser" src="assets/user.jpeg"><div></div></a></li>
@@ -294,6 +294,13 @@
       function torneio(){
         openHTML('torneios.html','modal',null)
       }
+
+      function showAlert(){
+        if(mainData.data.perfil.ALERTA_QTD!=null){
+          openHTML('alerts.html','modal',null,400)
+        }
+      }
+
 
       function login(){
         if(localStorage.getItem('idUser') == null){
