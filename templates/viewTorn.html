@@ -11,6 +11,9 @@
             width: 100%;
         }
 
+        table{
+            width: 100%;
+        }
 
         legend{
             position: relative;
@@ -71,8 +74,15 @@
             display: none;
         }
 
+        .th-title{
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255);
+        }
+
         #divTabela,#divJogos{
             display: none;
+            flex-direction: column;
+            align-items: center;
             min-height: 100px;
         }
 
@@ -91,10 +101,6 @@
                 text-indent: 0;
             }
 
-            .min {
-                max-width: 10px;
-                padding: 0 5px;
-            }
         }
 
     </style>
@@ -290,6 +296,17 @@
         }
     }
 
+    function fatoracao(N){
+        let resto = 0
+        let count = 0
+        while(resto==0){
+            resto = N%2
+            N=N/2
+            count++
+        }
+        return count-1
+    }
+
     mainData.viewTorn.func.fillJogos = ()=>{
         const params = new Object;
                 params.id = mainData.viewTorn.data.address
@@ -300,8 +317,32 @@
                 const tbl = document.querySelector('#tblJogos')
                 console.log(jogos)
                 
-                tbl.head('Data, Jogador A, |min,X|min, |min,Jogador B,','Upp,Upp,str,let,str,Upp')    
+                const model = mainData.viewTorn.data.torneio.modelo
+                let last_grp = ''
+
+                tbl.head('Data, Jogador A,|min,X|min,|min,Jogador B,','Upp,Upp,str,let,str,Upp')
                 for(let i=0; i<jogos.length; i++){
+                    const grp = Number(jogos[i].grupo) 
+                    if(grp!=last_grp ){
+                        last_grp = grp
+                        switch (model){
+                            case '1':
+                                const fases = ['FINAL','SEMI FINAL','QUARTAS DE FINAL','OITAVAS DE FINAL']
+                                const index = fatoracao(mainData.viewTorn.data.torneio.playOff)-grp
+                                const fase_nome = index>fases.length ? 'Fase '+ grp : fases[index]
+
+                            console.log(index)
+
+                                tbl.innerHTML += `<tr><th class="th-title" colspan="6"> ${fase_nome}</th></tr>`
+                            break
+                            case '2':
+                                tbl.innerHTML += `<tr><th class="th-title" colspan="6"> Grupo ${String.fromCharCode(64+grp)}</th></tr>`
+                            break
+                        }
+                    }
+
+
+
                     tbl.plot(jogos[i],'data,P1_nome,P1_score|min,X|min,P2_score|min,P2_nome','dat,Upp,int,let,int,Upp') 
                 }
             })

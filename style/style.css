@@ -280,7 +280,6 @@ input[type="text"],input[type="number"],select{
   display: none;
 }
 
-
 .min{
   max-width: 10px;
   padding: 0 5px;
@@ -425,7 +424,14 @@ input[type="text"],input[type="number"],select{
   }
 
   table{
-    max-width: 90vw;
+/*    max-width: 90vw;*/
+  }
+
+  table td{
+    min-width: auto;
+    padding: 10px 5px;
+    text-align: center;
+    font-size: 0.8em;
   }
 
   .panel{
@@ -438,6 +444,12 @@ input[type="text"],input[type="number"],select{
 
   .right-panel{
     height: auto;
+  }
+
+  .min{
+
+    font-size: 0.8em;
+
   }
 
   .dashboard{
