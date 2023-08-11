@@ -58,7 +58,7 @@ DELIMITER $$
 		IN Iid int(11) 
     )
 	BEGIN			            
-		DELETE FROM tb_quadra WHERE id=Iid;                                    
+		DELETE FROM tb_quadra WHERE id=Iid;
 	END $$
 DELIMITER ;
 
@@ -647,6 +647,7 @@ DELIMITER $$
 	BEGIN
 		DELETE FROM tb_jogo WHERE id_torn=Iid;
 		DELETE FROM tb_torn_atleta WHERE id_torn=Iid;
+		DELETE FROM tb_torn_quadra WHERE id_torn=Iid;
 		DELETE FROM tb_torneio WHERE id=Iid;
 	END $$
 DELIMITER ;
