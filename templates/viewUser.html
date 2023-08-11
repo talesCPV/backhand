@@ -153,10 +153,10 @@
                     const params = new Object;
                         params.hash = localStorage.getItem('hash')
                         params.id = courts[i].id
-                    queryDB(params,8).then((resolve)=>{
+                    queryDB(params,7).then((resolve)=>{
 //                        console.log(resolve)
+                        div.style.display = 'none'     
                     })
-                    div.style.display = 'none'     
                 })
 
                 div.appendChild(btn)

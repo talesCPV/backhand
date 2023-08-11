@@ -40,6 +40,12 @@
             display: none;
         }
 
+        .torn-courts{
+            min-height: 100px;
+            border: solid 1px;
+            border-radius: 10px;
+        }
+
     </style>
 
         <div class="frm-torn">
@@ -67,6 +73,11 @@
                 <input type="text" id="edtNumPlayer" inputmode="decimal" onkeyup="valInt(this)" value="4">
             </div>
 
+            <div id="divNumGrupo" class="flex-col">
+                <label for="edtNumGrupo">Num. de Grupos</label>
+                <input type="text" id="edtNumGrupo" inputmode="decimal" onkeyup="valInt(this)" value="0">
+            </div>
+
             <div id="divPlayOff" class="flex-col">
                 <label for="cmbPlayOff">PlayOff</label>
                 <select id="cmbPlayOff">
@@ -79,9 +90,12 @@
                 </select>
             </div>
 
-            <div id="divNumGrupo" class="flex-col">
-                <label for="edtNumGrupo">Num. de Grupos</label>
-                <input type="text" id="edtNumGrupo" inputmode="decimal" onkeyup="valInt(this)" value="0">
+            <div class="flex-col">
+                <label for="tblQuadras">Quadras</label>
+                <div class="edge torn-courts">
+                    <div id="btnAddCourt" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
+                    <table id="tblQuadras"></table>
+                </div>
             </div>
 
             <label for="edtObs">Obs:</label>
@@ -94,6 +108,8 @@
 </template>
 <script>
   
+
+    mainData.newTorn.data.tblQuadras = document.querySelector('#tblQuadras')
     const data = mainData.newTorn.data
     const edit = Object.keys(data).length?1:0
     let id = 'DEFAULT'
@@ -149,6 +165,9 @@
         }
     }
 
+    document.querySelector('#btnAddCourt').addEventListener('click',()=>{
+        openHTML('findCourts.html','modal',{origem:'torn'})
+    })
 
 
     document.querySelector('#cmbModTorn').addEventListener('change',()=>{

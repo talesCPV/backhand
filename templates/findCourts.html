@@ -73,22 +73,37 @@
                 div.appendChild(leftdiv)
 
                 const btn = document.createElement('button')
-                btn.innerHTML = parseInt(courts[i].MYCOURT) ? 'REMOVER' : 'ADICIONAR'
                 btn.className = 'btn btn-primary'
-                btn.id = 'btnAddDel-'+i
 
-                btn.addEventListener('click',()=>{
-                    const params = new Object;
+                console.log(mainData.findCourts.data.origem)
+                if(mainData.findCourts.data.origem == 'torn'){
+                    btn.innerHTML = 'ADICIONAR'
+                    btn.id = 'btnCourts-'+i
+                    btn.addEventListener('click',()=>{
+                        const params = new Object;
                         params.hash = localStorage.getItem('hash')
+                        params.id_torn = 1
                         params.id_court = courts[i].id
-                        queryDB(params,parseInt(courts[i].MYCOURT) ? 8 : 7).then((resolve)=>{
+                        queryDB(params,7).then((resolve)=>{
                             viewCourts()
                             
                         })
+                    })
+                }else{
+                    btn.innerHTML = parseInt(courts[i].MYCOURT) ? 'REMOVER' : 'ADICIONAR'
+                    btn.id = 'btnAddDel-'+i
+                    btn.addEventListener('click',()=>{
+                        const params = new Object;
+                        params.hash = localStorage.getItem('hash')
+                        params.id_court = courts[i].id
+                        queryDB(params,7).then((resolve)=>{
+                            viewCourts()
+                            
+                        })
+                    })
+                }
 
-                })
-
-                div.appendChild(btn)
+                div.appendChild(btn)                
                 div_search.appendChild(div)
             }
         })

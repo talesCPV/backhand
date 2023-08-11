@@ -8,8 +8,8 @@
         "4" => 'CALL sp_insertQuadra("x00","x01","x02","x03","x04")',
         "5" => 'CALL sp_delQuadra("x00")',
         "6" => 'SELECT * FROM vw_minhasQuadras WHERE id_usuario = "x00";',
-        "7" => 'CALL sp_insertMinhasQuadras("x00","x01");',
-        "8" => 'CALL sp_delMinhasQuadras("x00","x01");',
+        "7" => 'CALL sp_minhasQuadras("x00","x01");',
+        "8" => 'CALL sp_tornQuadras("x00",x01,x02);',
         "9" => 'SELECT DB.*, (SELECT fn_calcDist(DB.lat,DB.lng,x00,x01)) AS distance 
             FROM vw_dashboard AS DB
             WHERE (SELECT fn_calcDist(DB.lat,DB.lng,x00,x01))<= x02

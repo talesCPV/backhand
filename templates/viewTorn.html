@@ -216,16 +216,19 @@
                 document.querySelector('#atl-conf').innerText = torn.ACEITOS.padStart(2,0)
 
                 if(torn.status > 0){
+                    document.querySelector('.owner-btn').style.display = 'none'
                     if(torn.modelo !='1'){
                         document.querySelector('#divTabela').style.display = 'flex'
                     }
                     document.querySelector('#divJogos').style.display = 'flex'
                     mainData.viewTorn.func.fillJogos()
+                }else{
+                    if(torn.id_owner == localStorage.getItem('idUser')){
+                        document.querySelector('.owner-btn').style.display = 'flex'
+                    }
+
                 }
 
-                if(torn.id_owner == localStorage.getItem('idUser')){
-                    document.querySelector('.owner-btn').style.display = 'flex'
-                }
 
                 const img = document.querySelector('#img-logo')
                 img.src = `assets/torn/${torn.id}.jpg?`+ new Date().getTime();
@@ -249,7 +252,7 @@
             div.className = 'view-inline'
 
             div.addEventListener('click',()=>{
-                if([torn.id_owner, torn.ID_ATLETA[i]].includes(localStorage.getItem('idUser'))){
+                if([torn.id_owner, torn.ID_ATLETA[i]].includes(localStorage.getItem('idUser')) && torn.status == 0  ){
                     openHTML('tornConfirm.html','modal',{id_torn:torn.id,id_owner:torn.id_owner,id_atleta:torn.ID_ATLETA[i]},400)
                 }
             })
@@ -296,17 +299,6 @@
         }
     }
 
-    function fatoracao(N){
-        let resto = 0
-        let count = 0
-        while(resto==0){
-            resto = N%2
-            N=N/2
-            count++
-        }
-        return count-1
-    }
-
     mainData.viewTorn.func.fillJogos = ()=>{
         const params = new Object;
                 params.id = mainData.viewTorn.data.address
@@ -327,13 +319,7 @@
                         last_grp = grp
                         switch (model){
                             case '1':
-                                const fases = ['FINAL','SEMI FINAL','QUARTAS DE FINAL','OITAVAS DE FINAL']
-                                const index = fatoracao(mainData.viewTorn.data.torneio.playOff)-grp
-                                const fase_nome = index>fases.length ? 'Fase '+ grp : fases[index]
-
-                            console.log(index)
-
-                                tbl.innerHTML += `<tr><th class="th-title" colspan="6"> ${fase_nome}</th></tr>`
+                                tbl.innerHTML += `<tr><th class="th-title" colspan="6"> ${nomeEtapa(mainData.viewTorn.data.torneio.playOff,grp)}</th></tr>`
                             break
                             case '2':
                                 tbl.innerHTML += `<tr><th class="th-title" colspan="6"> Grupo ${String.fromCharCode(64+grp)}</th></tr>`
@@ -372,6 +358,14 @@
         }
     })
     
+
+    document.querySelector('#tblJogos').addEventListener('click',(e)=>{
+        data = e.target.parentNode.data
+        id_owner = mainData.viewTorn.data.torneio.id_owner
+        if([id_owner,data.id_P1,data.id_P2].includes(localStorage.getItem('idUser'))){
+            openHTML('addResultTorn.html','modal',data,500)
+        }
+    })
 
 
 </script>

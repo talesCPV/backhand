@@ -1,0 +1,73 @@
+<title>
+    Resultado do Jogo
+</title>
+<template>
+    <style>
+        .cards{
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .cards p{
+            text-indent: 0;
+            text-align: center;
+        }
+
+        .convite, .retira{
+            display: flex;
+        }
+
+        input{
+            padding: 5px;
+        }
+
+        .game-score{
+            margin: 10px;
+            border: solid 1px;
+            border-radius: 10px;
+            min-height: 100px;
+        }
+
+        #tblScore td, #tblScore th{
+            width: 33.3%;
+        }
+
+
+    </style>
+
+
+    <div class="edge cards confirm">
+        <label for="edt-data">Data</label>
+        <input type="date" id="edt-data">
+
+        <label for="edt-hora">Hora</label>
+        <input type="time" id="edt-hora">
+
+        <p>Resultado</p>
+
+        <div class="game-score">
+            <div id="btnAddSet" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
+            <table id="tblScore"></table>
+        </div>
+        <button id="btnSaveScore" class="btn btn-primary">SALVAR</button>
+    </div>
+
+   
+
+</template>
+<script>
+
+    const data = mainData.addResultTorn.data
+    mainData.addResultTorn.data.tbl = document.querySelector('#tblScore')
+
+    console.log(data)
+    
+    document.querySelector('.title-addResultTorn').innerHTML = `JOGO ${data.id.padStart(2,0)} / ${nomeEtapa(mainData.viewTorn.data.torneio.playOff,data.grupo).padStart(2,0)}`
+    document.querySelector('#tblScore').innerHTML = `<tr><th>${data.P1_nome}</th><th>vs</th><th>${data.P2_nome}</th></tr>` 
+
+    document.querySelector('#btnAddSet').addEventListener('click',()=>{
+        openHTML('addTornScore.html','modal',data,500)
+    })
+
+</script>    

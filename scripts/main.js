@@ -112,6 +112,23 @@ function loadHash(data = {}){
     }
 }
 
+function nomeEtapa(NUM_JOG,FASE){
+    function fatoracao(N){
+        let resto = 0
+        let count = 0
+        while(resto==0){
+            resto = N%2
+            N=N/2
+            count++
+        }
+        return count-1
+    }
+
+    const fases = ['FINAL','SEMI FINAL','QUARTAS DE FINAL','OITAVAS DE FINAL']
+    const index = fatoracao(Number(NUM_JOG))-Number(FASE)
+    return index>fases.length ? 'Fase '+ FASE : fases[index]
+}
+
 function removeHash() { 
     history.pushState("", document.title, window.location.pathname + window.location.search);
 }

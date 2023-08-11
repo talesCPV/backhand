@@ -1,0 +1,46 @@
+<title>Set Score</title>
+<template>
+    <style>
+        .input-score{
+            width: 40px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+    </style>
+
+    <div class="edge cards">
+
+        <div class="line">
+
+            <p id="p1-nome"></p>
+            <input id="score_1" class="input-score" type="text" inputmode="decimal" onkeyup="valInt(this)">
+            <p>x</p>
+            <input id="score_2" class="input-score" type="text" inputmode="decimal" onkeyup="valInt(this)">
+            <p id="p2-nome"></p>
+
+        </div>
+        <button id="btnAddSetScore" class="btn btn-primary">Adicionar Set</button>
+    </div>
+
+</template>
+<script>
+    const data = mainData.addTornScore.data
+    document.querySelector('#p1-nome').innerHTML = data.P1_nome
+    document.querySelector('#p2-nome').innerHTML = data.P2_nome
+
+    document.querySelector('#btnAddSetScore').addEventListener('click',()=>{
+        const score_1 = Number(document.querySelector('#score_1').value.trim())
+        const score_2 = Number(document.querySelector('#score_2').value.trim())
+
+        if(!(score_1<=0 && score_2<0) && ((score_1>=6 || score_2>=6))){
+            const tr =  document.createElement('tr')
+            tr.innerHTML = `<td>${score_1}</td><td>x</td><td>${score_2}</td>`
+            mainData.addResultTorn.data.tbl.appendChild(tr)
+        }else{
+            alert('Placar inconsistente para um SET oficial!')
+        }
+        closeModal(0)
+    })
+
+
+</script>

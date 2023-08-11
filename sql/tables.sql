@@ -160,7 +160,7 @@ CREATE TABLE tb_equip_manut (
 CREATE TABLE tb_torneio (
 	id int(11) NOT NULL AUTO_INCREMENT,
     id_owner int(11) NOT NULL, 
-    nome varchar(50) DEFAULT NULL,
+    nome varchar(50) NOT NULL DEFAULT NULL,
     modelo int DEFAULT 1,    
     num_players int DEFAULT 4,
     num_grupos int DEFAULT 0,
@@ -169,11 +169,12 @@ CREATE TABLE tb_torneio (
     criado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status int DEFAULT 0,
 	FOREIGN KEY (id_owner) REFERENCES tb_usuario(id),
+	FOREIGN KEY (id_quadras) REFERENCES tb_quadra(id),
     PRIMARY KEY (id)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 ALTER TABLE tb_torneio
-ADD COLUMN status int DEFAULT 0;
+ADD COLUMN id_quadras int(11) NOT NULL;
 
  DROP TABLE tb_jogo;
 CREATE TABLE tb_jogo (
@@ -197,8 +198,6 @@ CREATE TABLE tb_jogo (
 ALTER TABLE tb_jogo
 ADD COLUMN data date DEFAULT NULL;
 
-
-
  DROP TABLE tb_torn_atleta;
 CREATE TABLE tb_torn_atleta (
 	id int NOT NULL,
@@ -211,4 +210,13 @@ CREATE TABLE tb_torn_atleta (
 	FOREIGN KEY (id_torn) REFERENCES tb_torneio(id),
 	FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),
     PRIMARY KEY (id,id_torn)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+-- DROP TABLE tb_torn_quadra;
+CREATE TABLE tb_torn_quadra (
+    id_torn int(11) NOT NULL,
+    id_quadra int(11) NOT NULL, 
+	FOREIGN KEY (id_torn) REFERENCES tb_torn(id),
+	FOREIGN KEY (id_quadra) REFERENCES tb_quadra(id),    
+    PRIMARY KEY (id_torn,id_quadra)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

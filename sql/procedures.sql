@@ -62,40 +62,49 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
--- DROP PROCEDURE sp_insertMinhasQuadras;
+-- DROP PROCEDURE sp_minhasQuadras;
 DELIMITER $$
-	CREATE PROCEDURE sp_insertMinhasQuadras(
+	CREATE PROCEDURE sp_minhasQuadras(
 		IN Ihash varchar(77),
 		IN Iid_quadra int(11)
     )
-	BEGIN			            
-		DECLARE Iid_usuario INT(11);
-		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
-
-		INSERT INTO tb_minhasquadras (id_usuario,id_quadra)
-        VALUES (Iid_usuario,Iid_quadra);
-        
-        SELECT TRUE AS MYCOURT;
+	BEGIN
+		SET @out = TRUE;
+		SET @id_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+		IF((SELECT COUNT(*) FROM tb_minhasquadras WHERE id_usuario=@id_usuario AND id_quadra=Iid_quadra)>0) THEN
+			DELETE FROM tb_minhasquadras WHERE id_usuario=@id_usuario AND id_quadra=Iid_quadra;
+            SET @out = FALSE;
+        ELSE 
+			INSERT INTO tb_minhasquadras (id_usuario,id_quadra)
+			VALUES (@id_usuario,Iid_quadra);
+        END IF;
+    
+        SELECT @out AS MYCOURT;
 	END $$
 DELIMITER ;
 
--- DROP PROCEDURE sp_delMinhasQuadras;
+-- DROP PROCEDURE sp_tornQuadras;
 DELIMITER $$
-	CREATE PROCEDURE sp_delMinhasQuadras(
+	CREATE PROCEDURE sp_tornQuadras(
 		IN Ihash varchar(77),
+		IN Iid_torn int(11),
 		IN Iid_quadra int(11)
     )
-	BEGIN			        
-		DECLARE Iid_usuario INT(11);
-		SET Iid_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
-
-		DELETE FROM tb_minhasquadras WHERE id_usuario=Iid_usuario AND id_quadra=Iid_quadra;
-        
-		SELECT FALSE AS MYCOURT;
-
+	BEGIN
+		SET @id_usuario = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1);
+        SET @id_owner = (SELECT id_owner FROM tb_torneio WHERE id = Iid_torn LIMIT 1);
+		IF(@id_usuario = @id_owner) THEN    
+			IF((SELECT COUNT(*) FROM tb_torn_quadra WHERE id_torn=Iid_torn AND id_quadra=Iid_quadra)>0)THEN
+				DELETE FROM tb_torn_quadra WHERE id_torn=Iid_torn AND id_quadra=Iid_quadra;
+			ELSE 
+				INSERT INTO tb_torn_quadra (id_torn,id_quadra)
+				VALUES (Iid_torn,Iid_quadra);
+			END IF;
+        END IF;
+    
+        SELECT * FROM tb_torn_quadra WHERE id_torn=Iid_torn;
 	END $$
 DELIMITER ;
-
 
 -- DROP PROCEDURE sp_findQuadra;
 DELIMITER $$
@@ -776,6 +785,34 @@ DELIMITER $$
         END IF;
 	END $$
 DELIMITER ;
+
+-- DROP PROCEDURE sp_setGame;
+DELIMITER $$
+	CREATE PROCEDURE sp_setGame(
+		IN Ihash varchar(77),
+		IN Iid int(11),
+		IN Iid_torn int(11), 
+		IN Iid_P1 int(11),
+		IN Iid_P2 int(11),
+		IN IP1_score int,
+		IN IP2_score int,
+		IN Iid_Ativ int(11)
+    )
+	BEGIN			 
+	
+		SET @OWNER_HASH = (SELECT US.hash FROM tb_usuario AS US INNER JOIN tb_torneio AS TN ON US.id=TN.id_owner AND TN.id=Iid_torn LIMIT 1);
+			IF (Ihash COLLATE utf8_general_ci = @OWNER_HASH COLLATE utf8_general_ci)THEN
+				
+                UPDATE tb_jogo SET P1_score=IP1_score, P2_score=IP2_score WHERE id=Iid AND id_torn=Iid_torn;
+                
+            
+            END IF;
+
+		SELECT * FROM tb_jogo WHERE id=Iid AND id_torn=Iid_torn;
+        
+	END $$
+DELIMITER ;
+
 
 CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",8,1);
 
