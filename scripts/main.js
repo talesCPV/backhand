@@ -393,19 +393,19 @@ function noSpace(V){
     return out
 }
 
-function getNum(V){
+function getNum(V, int=true){
     const ok_chr = ['1','2','3','4','5','6','7','8','9','0'];
-    let out = '0'
+    let out = int ? '0' : ''
     for(let i=0; i< V.length; i++){
         if(ok_chr.includes(V[i])){
             out+=V[i]
         }
     }
-    return parseInt(out)
+    return int ? parseInt(out) : out
 }
 
 function getFone(V){
-    let num = getNum(V)
+    let num = getNum(V,0)
     let out = '';
     for(i=0;i<num.length;i++){
         chr = num.substring(i,i+1);
