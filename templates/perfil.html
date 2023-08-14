@@ -176,8 +176,12 @@
             const treinos = json[0].TREINOS!=null?json[0].TREINOS.split(','):0
             const treinos_id = json[0].TREINO_ID!=null?json[0].TREINO_ID.split(','):0
 
-            for(let i=0; i<treinos.length; i++){                
-                document.getElementById(treinos[i].trim()).classList.add('day-trainning')
+            for(let i=0; i<treinos.length; i++){          
+                try{
+                    document.getElementById(treinos[i].trim()).classList.add('day-trainning')
+                }catch{
+//
+                }
             }
 
             const pic = document.querySelector('#pic-perfil')

@@ -46,6 +46,10 @@
             border-radius: 10px;
         }
 
+        #tblQuadras{
+            width: 100%;
+        }
+
     </style>
 
         <div class="frm-torn">
@@ -110,8 +114,19 @@
   
 
     mainData.newTorn.data.tblQuadras = document.querySelector('#tblQuadras')
+
+    mainData.newTorn.func.fillCourts = (data)=>{
+        mainData.newTorn.data.tblQuadras.innerHTML=''
+        for(let i=0; i<data.NOME_QUADRA.length; i++){
+            const tr =  document.createElement('tr')
+            tr.innerHTML = `<td>${data.NOME_QUADRA[i]}</td>`
+            tr.data = data
+            mainData.newTorn.data.tblQuadras.appendChild(tr)
+        }
+    }
+
     const data = mainData.newTorn.data
-    const edit = Object.keys(data).length?1:0
+    const edit = Object.keys(data).length>1?1:0
     let id = 'DEFAULT'
     let imgExist = false
 
@@ -130,6 +145,8 @@
         document.querySelector('#cmbPlayOff').disabled = true
         changeModel(data.modelo)
       
+        mainData.newTorn.func.fillCourts(data)
+
         const showEdit = document.querySelectorAll('.show-edit')
         for(let i=0; i<showEdit.length; i++){
             showEdit[i].style.display = 'block'
@@ -192,7 +209,7 @@
     })
 
     document.querySelector('#btnTorn').addEventListener('click',()=>{
-        
+     
         let numPlayers = parseInt(document.querySelector('#edtNumPlayer').value)
         let numGrupo = parseInt(document.querySelector('#edtNumGrupo').value)
         const playOff = parseInt(document.querySelector('#cmbPlayOff').value)
@@ -204,7 +221,10 @@
         let motivo = nome==''? 'O campo nome é obrigatório' :''
 
         ok = numPlayers<4 ?false:ok
-        motivo =  numPlayers<4 ? 'O número de jogadores deve ser igual ou superior a 4' :''
+        motivo =  numPlayers<4 ? 'O número de jogadores deve ser igual ou superior a 4' :motivo
+
+        ok = mainData.newTorn.data.tblQuadras.rows.length==0 ? false : ok
+        motivo = mainData.newTorn.data.tblQuadras.rows.length==0 ? 'Precisa selecionar pelo menos uma quadra para o torneio.' : motivo
 
         switch (mode){
             case '1':
@@ -234,6 +254,23 @@
                 if(document.querySelector('#up_file').files.length){
                     uploadImage('up_file','/../assets/torn/',json[0].id+'.jpg')
                 }
+
+                if(!edit){
+                    const row = mainData.newTorn.data.tblQuadras.rows
+                    const params_courts = []
+                    for(let i=0; i<row.length; i++){                        
+                        const params = new Object
+                        params.id_torn = json[0].id
+                        params.id_quadra = row[i].data.id
+                        params_courts.push(params)
+                    }
+                    if(row.length>0){
+                        queryJson(params_courts,4,json[0].id).then((txt)=>{
+                            console.log(txt)
+                        })
+                    }
+                }
+
                 mainData.torneios.func.fillTorn()
                 closeModal('')
             })

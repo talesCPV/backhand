@@ -35,10 +35,19 @@
         const myPromisse = queryDB(params,39)
         myPromisse.then((resolve)=>{                       
             const torneios = JSON.parse(resolve)
-            
+                       
             const div_torn = document.querySelector('#myTorns') 
             div_torn.innerHTML = ''
             for(let i=0; i<torneios.length; i++){      
+
+                try{
+                    torneios[i].ID_QUADRA = torneios[i].ID_QUADRA.split(',')
+                    torneios[i].NOME_QUADRA = torneios[i].NOME_QUADRA.split(',')
+                }catch{
+                    torneios[i].ID_QUADRA = []
+                    torneios[i].NOME_QUADRA = []
+                }
+
                 const div = document.createElement('div')
                 div.className = 'view-inline'
     

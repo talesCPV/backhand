@@ -26,21 +26,45 @@ CREATE VIEW vw_dashboard AS
 SELECT * FROM vw_dashboard;    
     
 -- ********************************
---  DROP VIEW vw_atvAtl;
-CREATE VIEW vw_atvAtl AS
-    SELECT ATL.id_ativ, 
-		GROUP_CONCAT(US.nick SEPARATOR ',') AS ATLETAS,        
-		GROUP_CONCAT(ATL.id_atleta SEPARATOR ',') AS ID_ATLETAS,
-        GROUP_CONCAT(ATL.team SEPARATOR ',') AS LADO,
-        GROUP_CONCAT(ATL.confirm SEPARATOR ',') AS CONFIRM,
-        GROUP_CONCAT(ATL.ask SEPARATOR ',') AS ASK,
-        ROUND(SUM(US.nivel),2) AS PESO
-		FROM tb_ativ_atleta AS ATL
-        INNER JOIN tb_usuario AS US
-        ON US.id = ATL.id_atleta
-		GROUP BY ATL.id_ativ;
+-- DROP VIEW vw_atvAtl;
+-- CREATE VIEW vw_atvAtl AS
+    SELECT id_ativ, 
+		GROUP_CONCAT(nick SEPARATOR ',') AS ATLETAS,        
+		GROUP_CONCAT(id_atleta SEPARATOR ',') AS ID_ATLETAS,
+        GROUP_CONCAT(team SEPARATOR ',') AS LADO,
+        GROUP_CONCAT(confirm SEPARATOR ',') AS CONFIRM,
+        GROUP_CONCAT(ask SEPARATOR ',') AS ASK,
+        ROUND(SUM(nivel),2) AS PESO
+		FROM vw_allAtivAtleta
+		GROUP BY id_ativ;
     
 SELECT * FROM vw_atvAtl;    
+    
+-- DROP VIEW vw_allAtivAtleta;
+-- CREATE VIEW vw_allAtivAtleta AS    
+SELECT ATL.id_ativ, US.nick, ATL.id_atleta, ATL.ativ_owner, ATL.team, ATL.confirm, ATL.ask, US.nivel, US.nome
+FROM tb_ativ_atleta AS ATL
+INNER JOIN tb_usuario AS US
+ON US.id = ATL.id_atleta
+UNION
+SELECT id_ativ, nome AS nick, 0 AS id_atleta, 0 AS ativ_owner, team, 1 AS confirm, 0 AS ask, 1 AS nivel, nome FROM tb_ativ_guest;
+    
+SELECT * FROM vw_allAtivAtleta;    
+
+-- *********************************
+
+-- NÃO EXISTE MAIS, SUBSTITUIDA POR vw_allAtivAtleta
+/*     
+ DROP VIEW vw_atv_atleta;
+-- CREATE VIEW vw_atv_atleta AS    
+	SELECT AA.*, US.nome 
+		FROM tb_ativ_atleta AS AA
+		INNER JOIN tb_usuario AS US
+		ON US.id = AA.id_atleta 
+		ORDER BY AA.team ASC;
+        
+SELECT * FROM vw_atv_atleta;        
+*/
     
 -- ********************************
 
@@ -143,8 +167,8 @@ SELECT US.id, US.nome,US.nivel,
     (SELECT NOME FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_NOME,
     (SELECT NOME_OWNER FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_OWNER,
     (SELECT ATV FROM vw_alerta WHERE id_atleta = US.id) AS ALERTA_ATV,
-    (SELECT ALERTA_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS ALERTA_TORN_ID,
-    (SELECT QTD_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS ALERTA_TORN_QTD,
+    (SELECT ALERTA_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS ALERTA_TORN,
+    (SELECT QTD_TORN FROM vw_alerta_torn WHERE id_atleta = US.id) AS QTD_TORN,
     (SELECT GROUP_CONCAT(SUBSTRING(dia,1,10) SEPARATOR ', ')
 		FROM vw_atv 
         WHERE dia>(NOW() - INTERVAL 28 DAY) 
@@ -185,18 +209,6 @@ SELECT * FROM tb_ativ_atleta WHERE id_atleta = 2 AND (confirm = 1 OR ativ_owner 
 
 -- *********************************
 
--- DROP VIEW vw_atv_atleta;
-
-CREATE VIEW vw_atv_atleta AS    
-	SELECT AA.*, US.nome 
-		FROM tb_ativ_atleta AS AA
-		INNER JOIN tb_usuario AS US
-		ON US.id = AA.id_atleta 
-		ORDER BY AA.team ASC;
-        
-SELECT * FROM vw_atv_atleta;        
-
--- *********************************
 
 -- DROP VIEW vw_alerta;
 /*CREATE VIEW vw_alerta AS    */
@@ -220,7 +232,8 @@ SELECT * FROM vw_alerta;
 
 -- DROP VIEW vw_alerta_torn;
 -- CREATE VIEW vw_alerta_torn AS 
-	SELECT id_atleta, GROUP_CONCAT(id_torn SEPARATOR ',') AS ALERTA_TORN, COUNT(id_torn) AS QTD_TORN
+	SELECT id_atleta, GROUP_CONCAT(id_torn SEPARATOR ',') AS ALERTA_TORN,
+    COUNT(id_torn) AS QTD_TORN
 		FROM tb_torn_atleta 
 		WHERE accept=0
 		AND ask=1 
@@ -244,7 +257,7 @@ SELECT id_torn FROM tb_torn_invite WHERE id_player=3 AND ask=1;
         GROUP_CONCAT(ATL.nome_atleta  SEPARATOR ',') AS NOME_ATLETA,
         GROUP_CONCAT(ATL.nivel_atleta  SEPARATOR ',') AS NIVEL_ATLETA,
         GROUP_CONCAT(ATL.accept  SEPARATOR ',') AS ACCEPT_ATLETA,
-        ROUND(SUM(IFNULL(NIVEL_ATLETA,1)/TRN.num_players)*0.2 ,2) AS PREMIO
+        ROUND((SUM(NIVEL_ATLETA)/TRN.num_players)*0.2 ,2) AS PREMIO
 		FROM tb_torneio AS TRN
 		INNER JOIN tb_usuario AS USR
         INNER JOIN tb_torn_atleta AS ATL
@@ -272,15 +285,20 @@ SELECT IVT.*,USR.nome AS nome_atleta, USR.nivel
 	UNION
 	SELECT TRN.id_owner AS id_atleta, TRN.*
 	FROM tb_torneio AS TRN GROUP BY id;
-    
-SELECT * FROM vw_my_torn ;
+   
+-- *********************************
 
-SELECT * FROM tb_torn_atleta  ;
+-- DROP VIEW vw_torn_courts;
+-- CREATE VIEW vw_torn_courts AS
+ SELECT 
+        TQD.id_torn AS id_torn,
+        GROUP_CONCAT(TQD.id_quadra SEPARATOR ',') AS ID_QUADRA,
+        GROUP_CONCAT(QDR.nome SEPARATOR ',') AS NOME_QUADRA
+    FROM tb_torn_quadra AS TQD
+	JOIN tb_quadra AS QDR 
+    ON QDR.id = TQD.id_quadra
+    GROUP BY TQD.id_torn;
 
-SELECT * FROM vw_torn_invite WHERE id_torn = 4;
-
-SELECT * FROM vw_torn_invite;
-SELECT * FROM vw_my_torn;
 -- *********************************
 
 SELECT * FROM vw_placarAtiv;
@@ -293,7 +311,9 @@ SELECT * FROM vw_perfil;
 SELECT * FROM vw_alerta;
 SELECT * FROM vw_torn;
 SELECT * FROM vw_torn_invite;
-
+SELECT * FROM vw_my_torn ;
+SELECT * FROM vw_torn_courts;
+SELECT * FROM vw_atvAtl;
 -- ****************************************
 SELECT * FROM vw_placarAtiv UNION ALL SELECT * FROM vw_noSets ORDER BY id ASC;
 
@@ -303,9 +323,5 @@ SELECT US.nome, US.lat, US.lng, (SELECT fn_calcDist(-23,-45,US.lat,US.lng)) AS D
 FROM tb_usuario AS US;
 
 SELECT fn_calcDist(-23,-45,-23.5,-45.5);
-/*       
-SELECT EQP.* 
-FROM tb_equip AS EQP
-INNER JOIN (SELECT * FROM ) AS MNT
-*/
- UPDATE tb_torn_invite SET accept=1 WHERE id_torn=1 AND id_atleta=1;
+
+SELECT * FROM vw_perfil WHERE id = 1;

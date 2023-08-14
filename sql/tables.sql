@@ -65,6 +65,7 @@ CREATE TABLE tb_atividades (
   dia datetime NOT NULL,
   duracao DOUBLE NOT NULL,
   ranking BOOLEAN DEFAULT FALSE,
+  amistoso BOOLEAN DEFAULT TRUE,
   peso double DEFAULT 0,
   nao_usuario varchar(50) DEFAULT NULL,
   FOREIGN KEY (id_usuario) REFERENCES tb_usuario(id),
@@ -75,14 +76,24 @@ CREATE TABLE tb_atividades (
 )ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 ALTER TABLE tb_atividades
-ADD COLUMN nao_usuario varchar(50) DEFAULT NULL;
+ADD COLUMN amistoso BOOLEAN DEFAULT TRUE;
+
+ DROP TABLE tb_ativ_guest;
+CREATE TABLE tb_ativ_guest (
+	id int(11) NOT NULL,
+    id_ativ int(11) NOT NULL,
+    team varchar(1) NOT NULL DEFAULT "A", 
+    nome varchar(30) NOT NULL,
+	FOREIGN KEY (id_ativ) REFERENCES tb_atividades(id),
+    PRIMARY KEY (id,id_ativ)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- DROP TABLE tb_ativ_atleta;
 CREATE TABLE tb_ativ_atleta (
   id_ativ int(11) NOT NULL,
   id_atleta int(11) NOT NULL,
   ativ_owner BOOLEAN DEFAULT FALSE,
-  team varchar(1) DEFAULT "A",
+  team varchar(1) NOT NULL DEFAULT "A",
   confirm BOOLEAN DEFAULT FALSE,
   ask BOOLEAN DEFAULT TRUE,
   FOREIGN KEY (id_atleta) REFERENCES tb_usuario(id),
@@ -220,3 +231,4 @@ CREATE TABLE tb_torn_quadra (
 	FOREIGN KEY (id_quadra) REFERENCES tb_quadra(id),    
     PRIMARY KEY (id_torn,id_quadra)
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+

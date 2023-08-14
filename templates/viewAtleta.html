@@ -23,6 +23,14 @@
             overflow-y: scroll;
         }
 
+        .divConvidado{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: space-between;
+            padding-right: 10px;
+            display: none;
+        }
 
     </style>
 
@@ -32,6 +40,13 @@
         <div class="edtbtn">
             <input type="text" id="edtNomeAtleta">
             <button id="btnSearchAtleta"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="divConvidado">
+            <div>
+                <label for="">Convidado</label>
+                <input type="text" id="edtConvidado">    
+            </div>
+            <button id="btnConvidado" class="btn btn-primary" style="min-width: 100px;">ADICIONAR</button>
         </div>
         <div id="searchFriends"></div>
 
@@ -124,6 +139,7 @@
                 while(repeatUser(friends[i].userID)){
                     i++
                 }
+                document.querySelector('.divConvidado').style.display ='flex'
             }
 
             const div = document.createElement('div')
@@ -199,5 +215,15 @@
             div_search.appendChild(div)
         }
     }
+
+    document.querySelector('#btnConvidado').addEventListener('click',()=>{
+        const conv = new Object
+            conv.userID = 0
+            conv.nome = '#'+document.querySelector('#edtConvidado').value.trim().toUpperCase()
+
+        mainData.newActivity.data[data.time].push(conv)
+        mainData.newActivity.func.fillTime(data.time)
+        closeModal(0)
+    })
 
 </script>

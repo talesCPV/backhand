@@ -14,11 +14,11 @@
             FROM vw_dashboard AS DB
             WHERE (SELECT fn_calcDist(DB.lat,DB.lng,x00,x01))<= x02
             LIMIT x03,x04;',
-        "10" => 'CALL sp_insertAtividades("x00","x01","x02","x03","x04","x05","x06","x07");',
+        "10" => 'CALL sp_insertAtividades("x00","x01","x02","x03","x04","x05","x06","x07","x08");',
         "11" => 'CALL sp_delAtividades("x00");',
         "12" => 'SELECT * FROM tb_sport',
         "13" => 'SELECT * FROM tb_evento',
-        "14" => 'SELECT * FROM vw_atv_atleta WHERE id_ativ="x00" ORDER BY id_ativ, ativ_owner DESC;',
+        "14" => 'SELECT * FROM vw_allAtivAtleta WHERE id_ativ="x00" ORDER BY id_ativ, ativ_owner DESC;',
         "15" => 'SELECT * FROM tb_sets WHERE id_atividade="x00" ORDER BY id ASC;',
         "16" => 'DELETE FROM tb_sets WHERE AND id_atividade="x01"',
         "17" => 'CALL sp_delSets("x00","x01");',
@@ -59,6 +59,8 @@
         "1" => "CALL sp_AtvAtl(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
         "2" => "CALL sp_sets(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
         "3" => "CALL sp_gameTorn(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
+        "4" => "CALL sp_addcourts_torn(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
+        "5" => "CALL sp_atvGuest(\"@OWNER\",@CLAUSE,'(@FIELDS)','(@VALUES)');",
         
 
     );

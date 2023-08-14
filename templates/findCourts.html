@@ -6,9 +6,8 @@
             height: 30vh;
         }
         
-        .courtForm > *{
+        .courtForm  input{
             width: 100%;
-            padding: 10px;
         }
 
         #cmbViewMyCourts{
@@ -20,7 +19,7 @@
     <div class="form courtForm">
 
         <div>
-            <div class="edtbtn" style="width: 100%;">
+            <div class="edtbtn" style="width: 100%;padding: 10px;">
                 <input id="edtSearch" type="text">
                 <button id="btnSearch">  <i class="fas fa-search"></i></button>
                 <button id="btnNewCourt"><i class="fas fa-plus-circle"></i></button>
@@ -75,19 +74,37 @@
                 const btn = document.createElement('button')
                 btn.className = 'btn btn-primary'
 
-                console.log(mainData.findCourts.data.origem)
                 if(mainData.findCourts.data.origem == 'torn'){
-                    btn.innerHTML = 'ADICIONAR'
+                    const edit = Object.keys(mainData.newTorn.data).length>1?1:0
+                    btn.innerHTML = edit? mainData.newTorn.data.ID_QUADRA.includes(courts[i].id)?'REMOVER': 'ADICIONAR' : 'ADICIONAR'
                     btn.id = 'btnCourts-'+i
                     btn.addEventListener('click',()=>{
-                        const params = new Object;
-                        params.hash = localStorage.getItem('hash')
-                        params.id_torn = 1
-                        params.id_court = courts[i].id
-                        queryDB(params,7).then((resolve)=>{
-                            viewCourts()
-                            
-                        })
+                        if(edit){
+                            const params = new Object;
+                            params.hash = localStorage.getItem('hash')
+                            params.id_torn = mainData.newTorn.data.id
+                            params.id_court = courts[i].id
+                            queryDB(params,8).then((resolve)=>{
+                                const torneio = JSON.parse(resolve)[0]
+                                try{
+                                    torneio.ID_QUADRA = torneio.ID_QUADRA.split(',')
+                                    torneio.NOME_QUADRA = torneio.NOME_QUADRA.split(',')
+                                }catch{
+                                    torneio.ID_QUADRA = []
+                                    torneio.NOME_QUADRA = []
+                                }
+                                mainData.newTorn.func.fillCourts(torneio)
+                                closeModal(0)
+                                
+                            })
+                        }else{
+                            const tr =  document.createElement('tr')
+                            tr.innerHTML = `<td>${courts[i].nome}</td>`
+                            tr.data = {id:courts[i].id,nome:courts[i].nome}
+                            mainData.newTorn.data.tblQuadras.appendChild(tr)
+                            closeModal(0)
+                        }
+ 
                     })
                 }else{
                     btn.innerHTML = parseInt(courts[i].MYCOURT) ? 'REMOVER' : 'ADICIONAR'
@@ -97,7 +114,7 @@
                         params.hash = localStorage.getItem('hash')
                         params.id_court = courts[i].id
                         queryDB(params,7).then((resolve)=>{
-                            viewCourts()
+                            closeModal(0)
                             
                         })
                     })

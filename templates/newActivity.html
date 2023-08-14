@@ -207,6 +207,11 @@
 
     }
 
+    function checkAmistoso(){
+        let out = true
+
+        return out
+    }
 
     function refreshData(){
         data.nome = document.querySelector('#edtDesc').value.toUpperCase().trim()
@@ -248,9 +253,9 @@
 
         refreshData()
         const tipo = document.querySelector('#cmbTipo').value.trim()
-        const jogo = (tipo=='1' && mainData.newActivity.data.sets.length > 0)
 
-        if(goon('edtDesc,edtData,edtHora,edtTempo') && jogo){
+        if(goon('edtDesc,edtData,edtHora,edtTempo')){
+
             const nome = document.querySelector('#edtDesc').value.trim().toUpperCase()
             const dt = document.querySelector('#edtData').value.trim()+" "+document.querySelector('#edtHora').value.trim()+':00'            
             const temp = parseInt(document.querySelector('#edtTempo').value.split(':')[0])*60 + parseInt(document.querySelector('#edtTempo').value.split(':')[1])
@@ -266,7 +271,8 @@
                 params.data = dt
                 params.duracao = temp
                 params.id_quadra = quad
-
+                params.amistoso = checkAmistoso()
+                
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
                 const json = JSON.parse(resolve)             
@@ -279,10 +285,6 @@
                 closeModal(0)
                 closeModal(0)
             })
-        }else{
-            if(tipo=='1'){
-                alert('Para jogo oficial você deve adicionar pelo menos um set completo, ou selecione treino ou aula')
-            }
         }
 
     })
@@ -349,23 +351,38 @@
 
         const players = mainData.newActivity.data.timeA.concat(mainData.newActivity.data.timeB)
         const teamAsize = mainData.newActivity.data.timeA.length
-        const params = []
+        const params_players = []
+        const params_guest = []
 
         for(let i=0; i<players.length; i++){
-         
+            
             const pr = new Object;
-                pr.id_ativ = idAtv
+            pr.id_ativ = idAtv
+            pr.team = i<teamAsize ? 'A':'B'
+
+            if(players[i].nome.substr(0,1)=='#'){
+                pr.id=i
+                pr.nome = players[i].nome
+                params_guest.push(pr)
+            }else{
                 pr.id_atleta = players[i].userID
-                pr.team = i<teamAsize ? 'A':'B'
                 pr.ativ_owner = i==0?1:0
                 pr.confirm = i==0?1:0
                 pr.ask = i==0?0:ask
-            params.push(pr)
+                params_players.push(pr)                
+            }
         }
 
-        queryJson(params,1,idAtv).then((txt)=>{
-//            console.log(txt)
+        queryJson(params_players,1,idAtv).then((txt)=>{
+            console.log(txt)
+            queryJson(params_guest,5,idAtv).then((txt_)=>{
+                console.log(txt_)
+            })
+
         })
+
+
+
 
     }
 
@@ -399,6 +416,8 @@
                 
                 mainData.newActivity.data.timeA = []
                 mainData.newActivity.data.timeB = []
+
+console.log(json)                
 
                 for(let i=0; i<json.length; i++){                    
                     const player = json[i]

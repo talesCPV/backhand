@@ -102,9 +102,11 @@ DELIMITER $$
 			END IF;
         END IF;
     
-        SELECT * FROM tb_torn_quadra WHERE id_torn=Iid_torn;
+		SELECT * FROM vw_my_torn WHERE id_atleta=@id_usuario OR id_owner=@id_usuario AND id=Iid_torn GROUP BY id;
 	END $$
 DELIMITER ;
+
+CALL sp_tornQuadras("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",8,2);
 
 -- DROP PROCEDURE sp_findQuadra;
 DELIMITER $$
@@ -155,14 +157,15 @@ DELIMITER $$
 		IN Iid_evento int(11),
 		IN Idia datetime,
 		IN Iduracao DOUBLE,
-		IN Iid_quadra int(11)
+		IN Iid_quadra int(11),
+		IN Iamistoso BOOLEAN
     )
 	BEGIN			       
     
 		DECLARE lastID INT(11);
     
-		INSERT INTO tb_atividades (id,id_usuario,nome,id_sport,id_evento,dia,duracao,id_quadra)
-        VALUES (Iid,Iid_usuario,Inome,Iid_sport,Iid_evento,Idia,Iduracao,Iid_quadra)
+		INSERT INTO tb_atividades (id,id_usuario,nome,id_sport,id_evento,dia,duracao,id_quadra, amistoso)
+        VALUES (Iid,Iid_usuario,Inome,Iid_sport,Iid_evento,Idia,Iduracao,Iid_quadra,Iamistoso)
 		ON DUPLICATE KEY 
         UPDATE nome=Inome, id_sport=Iid_sport, id_evento=Iid_evento, dia=Idia, duracao=Iduracao, id_quadra=Iid_quadra;        
 		
@@ -188,37 +191,6 @@ DELIMITER $$
     )
 	BEGIN
 		UPDATE tb_atividades SET peso=Ipeso WHERE id=Iid;
-	END $$
-DELIMITER ;
-
--- DROP PROCEDURE sp_AtvAtl;
-DELIMITER $$
-CREATE PROCEDURE sp_AtvAtl(
-		IN Ihash varchar(77),
-		IN IidAtv int(11), 
-		IN Ifields VARCHAR(3000),
-		IN Ivalues VARCHAR(3000)
-    )
-BEGIN    
-    
-		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
-		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = IidAtv COLLATE utf8_general_ci);
-        	
-		IF (@call_owner = @atv_owner) THEN
-        
-            CALL sp_clearAtvAtl(IidAtv);
-			
-			SET @query = CONCAT('INSERT INTO tb_ativ_atleta ', Ifields, ' VALUES ', Ivalues);
-
-			PREPARE stmt1 FROM @query;
-			EXECUTE stmt1;
-			DEALLOCATE PREPARE stmt1;
-        
-		END IF; 
-    
-        
-        SELECT * FROM tb_ativ_atleta WHERE id_ativ=IidAtv;
-        
 	END $$
 DELIMITER ;
 
@@ -814,6 +786,69 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
+
+-- DROP PROCEDURE sp_AtvAtl;
+DELIMITER $$
+CREATE PROCEDURE sp_AtvAtl(
+		IN Ihash varchar(77),
+		IN Iid_ativ int(11), 
+		IN Ifields VARCHAR(3000),
+		IN Ivalues VARCHAR(3000)
+    )
+BEGIN    
+    
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = Iid_ativ COLLATE utf8_general_ci);
+        	
+		IF (@call_owner = @atv_owner) THEN
+        
+            CALL sp_clearAtvAtl(Iid_ativ);
+			
+			SET @query = CONCAT('INSERT INTO tb_ativ_atleta ', Ifields, ' VALUES ', Ivalues);
+
+			PREPARE stmt1 FROM @query;
+			EXECUTE stmt1;
+			DEALLOCATE PREPARE stmt1;
+        
+		END IF; 
+    
+        
+        SELECT * FROM tb_ativ_atleta WHERE id_ativ=Iid_ativ;
+        
+	END $$
+DELIMITER ;
+
+
+
+ DROP PROCEDURE sp_atvGuest;
+DELIMITER $$
+CREATE PROCEDURE sp_atvGuest(	 
+		IN Ihash varchar(77),
+		IN Iid_ativ int(11), 
+		IN Ifields VARCHAR(3000),
+		IN Ivalues VARCHAR(3000)
+    )
+BEGIN                
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = Iid_ativ COLLATE utf8_general_ci);
+        	
+		IF (@call_owner = @atv_owner) THEN
+        
+			DELETE FROM tb_ativ_guest WHERE id_ativ=Iid_ativ;
+			
+			SET @query = CONCAT('INSERT INTO tb_ativ_guest ', Ifields, ' VALUES ', Ivalues);
+
+			PREPARE stmt1 FROM @query;
+			EXECUTE stmt1;
+			DEALLOCATE PREPARE stmt1;
+			
+		END IF; 
+
+        SELECT * FROM tb_ativ_guest WHERE id_ativ=Iid_ativ;
+	END $$
+DELIMITER ;
+
+CALL sp_ativ_guest("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",25,'(id_ativ,team,id,nome)','("25","B","3","#MURILO")');
 
 CALL sp_inviteTorn("p#~[#/*~[*6p?#/?iM/pT#86/[TT#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M=i8(T#p?/[*wF6b1~M",8,1);
 

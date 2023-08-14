@@ -26,7 +26,7 @@
 
 
     <div class="edge cards confirm">
-        <p>Confirma os resultados?</p>
+        <p id="alert-message">Confirma os resultados?</p>
         <div id="alert-results"></div>
     </div>
 
@@ -78,6 +78,8 @@
                 div.appendChild(divBtn)
                 main.appendChild(div)                
             }            
+        }else{
+            document.querySelector('#alert-message').innerText = 'Nenhuma notificação pendente!'
         }
     }
 
