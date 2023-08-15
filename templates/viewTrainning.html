@@ -78,6 +78,7 @@
        const myPromisse = queryDB(params,28);
        myPromisse.then((resolve)=>{
            const json = JSON.parse(resolve)
+           mainData.viewTrainning.data.activity = json[0]
            fillGame(json[0])
        })
     }
@@ -86,39 +87,55 @@
 
         const placar = parseInt(data.SETS_P1)+parseInt(data.SETS_P2) > 0
         function usrImg(div,time){
+            console.log(time)        
             div.innerHTML = ''
-            for(let i=0; i<time.length; i++){
+            for(let i=0; i<time.id.length; i++){
+                
+
                 const img = document.createElement('img')
                 img.className = 'imgUser'
-                img.src = `assets/users/${time[i]}.jpg`
+                img.src = `assets/users/${time.id[i]}.jpg`
                 img.style.position = 'relative'
-                img.style.left = i*5
                 breakImg(img)
                 img.addEventListener('click',()=>{
-                    window.location.hash = 'P'+time[i].toString().padStart(10,0)
+                    window.location.hash = 'P'+time.id[i].toString().padStart(10,0)
                     loadHash()
-                })
+                })                
                 div.appendChild(img)
+
+                if(!Number(mainData.viewTrainning.data.activity.amistoso)){
+                    const check = document.createElement('span')
+                    check.className = 'mdi'
+                    check.classList.add(time.confirm[i] == '1' ? 'mdi-check-bold' : 'mdi-help')
+                    check.style = ` color:${ time.confirm[i] == '1' ?'green':'red'} ; position: relative;left:-10px; top:-20px;`
+                    div.appendChild(check)
+                }
             }            
         }
 
-        let timeA = {nome:'',id:[]}
-        let timeB = {nome:'',id:[]}
+        let timeA = {nome:'',id:[],confirm:[],ask:[]}
+        let timeB = {nome:'',id:[],confirm:[],ask:[]}
         const nome_atl = data.ATLETAS.split(',')
         const id_atl = data.ID_ATLETAS.split(',')
         const times = data.LADO.split(',')
+        const conf = data.CONFIRM.split(',')
+        const ask = data.ASK.split(',')
         for(let j=0; j<nome_atl.length; j++){
             if(times[j].trim()=='A'){
                 timeA.nome += (timeA.nome.length>0 ?', ':'') +  nome_atl[j].trim()
                 timeA.id.push(parseInt(id_atl[j]))
+                timeA.confirm.push(parseInt(conf[j]))
+                timeA.ask.push(parseInt(ask[j]))
             }else{
                 timeB.nome += (timeB.nome.length>0 ?', ':'') +  nome_atl[j].trim()
                 timeB.id.push(parseInt(id_atl[j]))
+                timeB.confirm.push(parseInt(conf[j]))
+                timeB.ask.push(parseInt(ask[j]))
             }           
         }  
 
-        usrImg(document.querySelector('#timeA'),timeA.id)
-        usrImg(document.querySelector('#timeB'),timeB.id)
+        usrImg(document.querySelector('#timeA'),timeA)
+        usrImg(document.querySelector('#timeB'),timeB)
 
         document.querySelector('.title-viewTrainning').innerHTML = `${data.EVENTO} ${data.id_evento=='1'? data.ranking=='1'?'(RANQUEADA)':'(AMISTOSA)':''}`
         document.querySelector('#atv-atleta').innerHTML = placar? `${data.SETS_P1} x ${data.SETS_P2}`:'<span class="mdi mdi-tennis"></span>'

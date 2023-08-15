@@ -209,6 +209,19 @@ CREATE TABLE tb_jogo (
 ALTER TABLE tb_jogo
 ADD COLUMN data date DEFAULT NULL;
 
+-- DROP TABLE tb_torn_gamesets;
+CREATE TABLE tb_torn_gamesets (
+	id int NOT NULL,
+    id_torn int(11) NOT NULL,
+    id_jogo int(11) NOT NULL,
+    P1_score int DEFAULT 0,
+    P2_score int DEFAULT 0,
+	FOREIGN KEY (id_torn) REFERENCES tb_torneio(id),
+	FOREIGN KEY (id_jogo) REFERENCES tb_jogo(id),
+    PRIMARY KEY (id,id_torn, id_jogo)
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+
  DROP TABLE tb_torn_atleta;
 CREATE TABLE tb_torn_atleta (
 	id int NOT NULL,

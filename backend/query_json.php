@@ -40,7 +40,7 @@
         $query = str_replace("@FIELDS", $fields,$query); // fields
         $query = str_replace("@VALUES", $values,$query); // values
 
-        echo $query;
+//        echo $query;
 
         $result = mysqli_query($conexao, $query);
         if(is_object($result)){

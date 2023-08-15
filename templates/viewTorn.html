@@ -240,7 +240,7 @@
     }
 
     mainData.viewTorn.func.fillAtletas = (torn)=>{
-   console.log(torn)
+   
         const main = document.querySelector('#show-atl')
         main.innerHTML = ''
 
@@ -273,7 +273,7 @@
 
             const check = document.createElement('span')
             check.className = 'mdi'
-            check.classList.add(  torn.ACCEPT_ATLETA[i] == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
+            check.classList.add(torn.ACCEPT_ATLETA[i] == '1' ? 'mdi-check-bold' : 'mdi-chat-question')
             check.style = ` color:${ torn.ACCEPT_ATLETA[i] == '1' ?'green':'red'} ; position: relative; left:-13; width: 0;`
             leftdiv.appendChild(check)
 
@@ -307,8 +307,6 @@
             myPromisse.then((resolve)=>{
                 const jogos = JSON.parse(resolve)
                 const tbl = document.querySelector('#tblJogos')
-                console.log(jogos)
-                
                 const model = mainData.viewTorn.data.torneio.modelo
                 let last_grp = ''
 

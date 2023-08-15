@@ -207,9 +207,24 @@
 
     }
 
-    function checkAmistoso(){
-        let out = true
+    function checkAmistoso(tipo){
 
+        let out = tipo=='1'? 0 : 1
+        
+        const players = mainData.newActivity.data.timeA.concat(mainData.newActivity.data.timeB)
+        out = players.length >=2 ? out : 1
+
+        const sets = mainData.newActivity.data.sets
+        const score = {P1:0,P2:0}
+        for(let i=0; i<sets.length; i++){
+            if(sets[i].p1 >=6 ||sets[i].p2>=6){
+                score.P1 += sets[i].p1>sets[i].p2? 1 : 0
+                score.P2 += sets[i].p1<sets[i].p2? 1 : 0
+            }
+        }
+        out = (score.P1!=score.P2 && (score.P1>=2 ||score.P2>=2)) ? out : 1
+
+        console.log(out)
         return out
     }
 
@@ -239,9 +254,7 @@
             }           
         }  
 
-
         const form = document.getElementById(mainData.data.formID)
-
         form.querySelector('.head-activity-atleta').innerHTML = data.NOME_ATLETA
         form.querySelector('#nome').innerHTML = data.nome
         form.querySelector('.map-label').innerHTML = data.QUADRA
@@ -271,7 +284,7 @@
                 params.data = dt
                 params.duracao = temp
                 params.id_quadra = quad
-                params.amistoso = checkAmistoso()
+                params.amistoso = checkAmistoso(tipo)
                 
             const myPromisse = queryDB(params,10);
             myPromisse.then((resolve)=>{
@@ -279,14 +292,11 @@
                 edit ?  updateData(data) : 0
                 if(id=="DEFAULT"||json[0].ranking=="0"){
                     addSets(json[0].id)
-                    addPlayers(json[0].id,tipo=='1')
+                    addPlayers(json[0].id,!params.amistoso)
                 }
-
-                closeModal(0)
                 closeModal(0)
             })
         }
-
     })
 
     mainData.newActivity.func.fillSets = ()=>{

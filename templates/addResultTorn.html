@@ -44,10 +44,12 @@
         <label for="edt-hora">Hora</label>
         <input type="time" id="edt-hora">
 
-        <p>Resultado</p>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <p>Resultado</p>
+            <div id="btnAddSet" class="btn-icon" style="right: 150px;"><span class="mdi mdi-plus-circle-outline"></span></div>
+        </div>
 
         <div class="game-score">
-            <div id="btnAddSet" class="btn-icon"><span class="mdi mdi-plus-circle-outline"></span></div>
             <table id="tblScore"></table>
         </div>
         <button id="btnSaveScore" class="btn btn-primary">SALVAR</button>
@@ -68,6 +70,50 @@
 
     document.querySelector('#btnAddSet').addEventListener('click',()=>{
         openHTML('addTornScore.html','modal',data,500)
+    })
+
+    document.querySelector('#btnSaveScore').addEventListener('click',()=>{
+        const sets = document.querySelector('#tblScore').rows
+        const placar = {p1:0,p2:0}
+        if(sets.length >1){
+            let outSets = ''
+            for(let i=1; i<sets.length; i++){
+                const score_01 = Number(sets[i].cells[0].innerHTML)
+                const score_02 = Number(sets[i].cells[2].innerHTML)
+                outSets += i>1 ? ',' : ''
+                outSets += `(${i},${data.id_torn},${data.id},${score_01},${score_02})`
+                placar.p1 += score_01>score_02 ? 1:0
+                placar.p2 += score_01<score_02 ? 1:0
+            }
+            const params = new Object;
+                params.hash = localStorage.getItem('hash')
+                params.id_torn = data.id_torn
+                params.id_jogo = data.id
+                params.values = outSets
+
+            const myPromisse = queryDB(params,46);
+            myPromisse.then((resolve)=>{
+                console.log(resolve)
+            })
+            console.log(outSets)
+        }
+
+        const params = new Object;
+            params.hash = localStorage.getItem('hash')
+            params.id_torn = data.id_torn
+            params.id_jogo = data.id_jogo
+            params.p1_score = placar.p1
+            params.p2_score = placar.p2
+            params.data = document.querySelector('#edt-data').value
+
+        const myPromisse = queryDB(params,47);
+        myPromisse.then((resolve)=>{
+            console.log(resolve)
+        })
+
+
+
+
     })
 
 </script>    

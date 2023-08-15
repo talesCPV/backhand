@@ -184,14 +184,15 @@
               <p id="usr"></p>
             </div>
             <ul class="menu-items">
-                <li class="only-login hide-menu"><a onclick="torneio()" class="menu-mobile"><span class="mdi mdi-tournament"></span><span id="alert-torn" class="badge"></span><div></div> </a></li>
-                <li class="only-login hide-menu"><a onclick="social()" class="menu-mobile"><i class="fas fa-user-friends"></i><div></div> </a></li>
-                <li class="only-login hide-menu"><a onclick="addOne()" class="menu-mobile"><span class="mdi mdi-plus-circle-outline"></span><div></div> </a></li>
-                <li class="only-login hide-menu"><a onclick="showAlert()" class="menu-mobile" style="display: flex; gap: 5px;" class="parent-sub-menu"><span class="mdi mdi-bell-outline"></span><span id="alert" class="badge"></span><div></div>  </a>
+                <li class="only-login hide-menu" title="Torneios"><a onclick="torneio()" class="menu-mobile"><span class="mdi mdi-tournament"></span><span id="alert-torn" class="badge"></span><div></div> </a></li>
+                <li class="only-login hide-menu" title="Social"><a onclick="social()" class="menu-mobile"><i class="fas fa-user-friends"></i><div></div> </a></li>
+                <li class="only-login hide-menu" title="Nova Atividade"><a onclick="addOne()" class="menu-mobile"><span class="mdi mdi-plus-circle-outline"></span><div></div> </a></li>
+                <li class="only-login hide-menu" title="Alertas"><a onclick="showAlert()" class="menu-mobile" style="display: flex; gap: 5px;" class="parent-sub-menu"><span class="mdi mdi-bell-outline"></span><span id="alert" class="badge"></span><div></div>  </a>
                   <ul class="sub-menu alert-badge"></ul>
                 </li>
-                <li class="only-login hide-menu"><a onclick="viewUser()" class="menu-mobile"><img class="imgUser" id="imgUser" src="assets/user.jpeg"><div></div></a></li>
+                <li class="only-login hide-menu" title="Configurações"><a onclick="viewUser()" class="menu-mobile"><img class="imgUser" id="imgUser" src="assets/user.jpeg"><div></div></a></li>
                 <li><a id="log-inout" onclick="login()">Inscreva-se <div>sair</div></a></li> 
+                <li class="only-logout" title="Disclaimer"><a onclick="disclaimer()" class="menu-mobile"><span class="mdi mdi-help-circle-outline"></span><div></div> </a></li>
             </ul>
             <p></p>
         </div>
@@ -275,10 +276,17 @@
           document.querySelector('#log-inout').innerHTML = '<i class="fas fa-power-off"></i>'
         }
 
-        const menu = document.querySelectorAll('.only-login')
-        for(let i=0; i<menu.length; i++){
-            hide ? menu[i].classList.add('hide-menu') : menu[i].classList.remove('hide-menu')
+        const menu_in = document.querySelectorAll('.only-login')
+        for(let i=0; i<menu_in.length; i++){
+            hide ? menu_in[i].classList.add('hide-menu') : menu_in[i].classList.remove('hide-menu')
         }
+
+        const menu_out = document.querySelectorAll('.only-logout')
+        for(let i=0; i<menu_out.length; i++){
+            hide ? menu_out[i].classList.remove('hide-menu') : menu_out[i].classList.add('hide-menu') 
+        }
+
+
       }
 
       if(localStorage.getItem('log')){
@@ -289,6 +297,10 @@
       }else{
         openHTML('noLogin.html','screen')
         openScreen()      
+      }
+
+      function disclaimer(){
+        openHTML('disclaimer.html','modal',null,400)
       }
 
       function torneio(){

@@ -308,6 +308,61 @@ BEGIN
 	END $$
 DELIMITER ;
 
+-- DROP PROCEDURE sp_torn_gamesets;
+DELIMITER $$
+CREATE PROCEDURE sp_torn_gamesets(
+		IN Ihash varchar(77),
+		IN IidTorn int(11), 
+        IN IidJogo int(11),
+		IN Ivalues VARCHAR(3000)
+    )
+BEGIN                
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @torn_owner  = (SELECT id_owner FROM tb_torneio WHERE id=IidTorn);
+		SET @id_P1 = (SELECT id_P1 FROM tb_jogo WHERE id=IidJogo AND id_torn=IidTorn);
+		SET @id_P2 = (SELECT id_P2 FROM tb_jogo WHERE id=IidJogo AND id_torn=IidTorn);
+
+		IF (@call_owner IN (@torn_owner,@id_p1,@id_p2)) THEN
+			DELETE FROM tb_torn_gamesets WHERE id_jogo=IidJogo AND id_torn=IidTorn;			
+			SET @query = CONCAT('INSERT INTO tb_torn_gamesets (id,id_torn,id_jogo,P1_score,P2_score) VALUES ', Ivalues);
+			PREPARE stmt1 FROM @query;
+			EXECUTE stmt1;
+			DEALLOCATE PREPARE stmt1;
+		END IF; 
+        
+        SELECT * FROM tb_torn_gamesets WHERE id=IidJogo AND id_torn=IidTorn;
+
+	END $$
+DELIMITER ;
+
+-- DROP PROCEDURE sp_tornJogoUpdate;
+DELIMITER $$
+	CREATE PROCEDURE sp_tornJogoUpdate(
+		IN Ihash varchar(77),
+		IN Iid_torn int(11), 
+		IN Iid_jogo int(11),
+		IN Ip1_score int(11),
+		IN Ip2_score int(11),
+        IN Idata datetime
+    )
+	BEGIN			            
+    
+		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+		SET @torn_owner  = (SELECT id_owner FROM tb_torneio WHERE id=Iid_torn);
+		SET @id_P1 = (SELECT id_P1 FROM tb_jogo WHERE id=Iid_jogo AND id_torn=Iid_torn);
+		SET @id_P2 = (SELECT id_P2 FROM tb_jogo WHERE id=Iid_jogo AND id_torn=Iid_torn);
+
+		IF (@call_owner IN (@torn_owner,@id_p1,@id_p2)) THEN
+			UPDATE tb_jogo SET P1_score=Ip1_score, P2_score=Ip2_score, data=Idata WHERE id=Iid_jogo AND id_torn=Iid_torn;
+        END IF;
+        
+        SELECT * FROM tb_jogo WHERE id=Iid_jogo AND id_torn=Iid_torn;
+        
+	END $$
+DELIMITER ;
+
+
+
 -- DROP PROCEDURE sp_insertSets;
 DELIMITER $$
 	CREATE PROCEDURE sp_insertSets(
