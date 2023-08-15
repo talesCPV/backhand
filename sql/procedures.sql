@@ -335,6 +335,9 @@ BEGIN
 	END $$
 DELIMITER ;
 
+CALL sp_torn_gamesets("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",17,(1,17,1,6,1),(2,17,1,6,3),"x03");
+
+
 -- DROP PROCEDURE sp_tornJogoUpdate;
 DELIMITER $$
 	CREATE PROCEDURE sp_tornJogoUpdate(
@@ -361,7 +364,7 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
-
+CALL sp_tornJogoUpdate("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",17,2,0,2023-08-15);
 
 -- DROP PROCEDURE sp_insertSets;
 DELIMITER $$
@@ -675,6 +678,7 @@ DELIMITER $$
 		DELETE FROM tb_jogo WHERE id_torn=Iid;
 		DELETE FROM tb_torn_atleta WHERE id_torn=Iid;
 		DELETE FROM tb_torn_quadra WHERE id_torn=Iid;
+		DELETE FROM tb_torn_gamesets WHERE id_torn=Iid;
 		DELETE FROM tb_torneio WHERE id=Iid;
 	END $$
 DELIMITER ;
