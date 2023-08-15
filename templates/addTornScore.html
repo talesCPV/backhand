@@ -24,6 +24,9 @@
 
 </template>
 <script>
+
+    document.querySelector('#score_1').focus()
+
     const data = mainData.addTornScore.data
     document.querySelector('#p1-nome').innerHTML = data.P1_nome
     document.querySelector('#p2-nome').innerHTML = data.P2_nome
@@ -35,7 +38,6 @@
         if(!(score_1<=0 && score_2<0) && ((score_1>=6 || score_2>=6))){
             const tr =  document.createElement('tr')
             tr.innerHTML = `<td>${score_1}</td><td>x</td><td>${score_2}</td>`
-//            tr.score = {}
             mainData.addResultTorn.data.tbl.appendChild(tr)
         }else{
             alert('Placar inconsistente para um SET oficial!')

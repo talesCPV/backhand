@@ -61,12 +61,36 @@
 <script>
 
     const data = mainData.addResultTorn.data
+    const now = new Date
     mainData.addResultTorn.data.tbl = document.querySelector('#tblScore')
+
+
+    document.querySelector('#edt-data').value = now.getFormatDate()
+    document.querySelector('#edt-hora').value = now.getFullTime()
 
     console.log(data)
     
-    document.querySelector('.title-addResultTorn').innerHTML = `JOGO ${data.id.padStart(2,0)} / ${nomeEtapa(mainData.viewTorn.data.torneio.playOff,data.grupo).padStart(2,0)}`
+    document.querySelector('.title-addResultTorn').innerHTML = `JOGO ${data.id_jogo.padStart(2,0)} / ${nomeEtapa(mainData.viewTorn.data.torneio.playOff,data.grupo).padStart(2,0)}`
     document.querySelector('#tblScore').innerHTML = `<tr><th>${data.P1_nome}</th><th>vs</th><th>${data.P2_nome}</th></tr>` 
+
+    try{
+        set_A = data.P1_SET.split(',')
+        set_B = data.P2_SET.split(',')
+
+        for(let i=0; i<set_A.length; i++){
+            const tr =  document.createElement('tr')
+            tr.innerHTML = `<td>${set_A[i]}</td><td>x</td><td>${set_B[i]}</td>`
+            mainData.addResultTorn.data.tbl.appendChild(tr)
+        }
+    }catch{
+//        
+    }
+
+    document.querySelector('#tblScore').addEventListener('click',(e)=>{
+        const tr = e.target.parentNode
+        tr.rowIndex>0 ? tr.parentNode.removeChild(tr) :0
+    })
+
 
     document.querySelector('#btnAddSet').addEventListener('click',()=>{
         openHTML('addTornScore.html','modal',data,500)
@@ -81,21 +105,21 @@
                 const score_01 = Number(sets[i].cells[0].innerHTML)
                 const score_02 = Number(sets[i].cells[2].innerHTML)
                 outSets += i>1 ? ',' : ''
-                outSets += `(${i},${data.id_torn},${data.id},${score_01},${score_02})`
+                outSets += `(${i},${data.id_torn},${data.id_jogo},${score_01},${score_02})`
                 placar.p1 += score_01>score_02 ? 1:0
                 placar.p2 += score_01<score_02 ? 1:0
             }
             const params = new Object;
                 params.hash = localStorage.getItem('hash')
                 params.id_torn = data.id_torn
-                params.id_jogo = data.id
+                params.id_jogo = data.id_jogo
                 params.values = outSets
 
             const myPromisse = queryDB(params,46);
             myPromisse.then((resolve)=>{
                 console.log(resolve)
             })
-            console.log(outSets)
+            
         }
 
         const params = new Object;
@@ -104,15 +128,14 @@
             params.id_jogo = data.id_jogo
             params.p1_score = placar.p1
             params.p2_score = placar.p2
-            params.data = document.querySelector('#edt-data').value
+            params.data = document.querySelector('#edt-data').value+' '+document.querySelector('#edt-hora').value+':00'
 
         const myPromisse = queryDB(params,47);
         myPromisse.then((resolve)=>{
             console.log(resolve)
+            mainData.viewTorn.func.fillJogos()
+            closeModal(0)
         })
-
-
-
 
     })
 

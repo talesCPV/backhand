@@ -49,7 +49,7 @@
         "42" => 'SELECT * FROM vw_torn_invite WHERE id_torn=x00;',
         "43" => 'CALL sp_acceptInviteTorn("x00",x01,x02);',
         "44" => 'CALL sp_fillPlayerTorn("x00",x01,"x02");',
-        "45" => 'SELECT * FROM tb_jogo WHERE id_torn=x00 ORDER BY grupo;',
+        "45" => 'SELECT * FROM vw_torn_jogo WHERE id_torn=x00 ORDER BY grupo;',
         "46" => 'CALL sp_torn_gamesets("x00",x01,x02,"x03");',
         "47" => 'CALL sp_tornJogoUpdate("x00",x01,x02,x03,x04,"x05")',
 

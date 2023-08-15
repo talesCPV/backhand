@@ -51,19 +51,24 @@ SELECT id_ativ, nome AS nick, 0 AS id_atleta, 0 AS ativ_owner, team, 1 AS confir
 SELECT * FROM vw_allAtivAtleta;    
 
 -- *********************************
+     
+-- DROP VIEW vw_torn_jogo;
+-- CREATE VIEW vw_torn_jogo AS    
+	SELECT JG.id AS id_jogo, JG.id_torn,JG.P1_nome,JG.P2_nome,JG.id_p1, JG.id_P2, JG.grupo,JG.id_Ativ, JG.data,
+    (SELECT COUNT(*) FROM tb_torn_gamesets WHERE id_torn=JG.id_torn AND id_jogo = JG.id AND P1_score>P2_score )AS P1_SCORE,
+    (SELECT COUNT(*) FROM tb_torn_gamesets WHERE id_torn=JG.id_torn AND id_jogo = JG.id AND P1_score<P2_score )AS P2_SCORE,
+    (SELECT GROUP_CONCAT( P1_score  SEPARATOR ',') FROM tb_torn_gamesets WHERE id_torn=JG.id_torn AND id_jogo = JG.id ORDER BY id) AS P1_SET,
+    (SELECT GROUP_CONCAT( P2_score  SEPARATOR ',') FROM tb_torn_gamesets WHERE id_torn=JG.id_torn AND id_jogo = JG.id ORDER BY id) AS P2_SET
+    FROM tb_jogo AS JG
+    ORDER BY grupo, id_jogo;
 
--- NÃO EXISTE MAIS, SUBSTITUIDA POR vw_allAtivAtleta
-/*     
- DROP VIEW vw_atv_atleta;
--- CREATE VIEW vw_atv_atleta AS    
-	SELECT AA.*, US.nome 
-		FROM tb_ativ_atleta AS AA
-		INNER JOIN tb_usuario AS US
-		ON US.id = AA.id_atleta 
-		ORDER BY AA.team ASC;
-        
-SELECT * FROM vw_atv_atleta;        
-*/
+
+	SELECT * FROM vw_torn_jogo WHERE id_torn=17 ORDER BY grupo;
+    SELECT * FROM tb_jogo WHERE id_torn=17 ORDER BY grupo;
+    SELECT * FROM tb_torn_gamesets WHERE id_torn=17;
+	SELECT COUNT(*) FROM tb_torn_gamesets WHERE id_torn=17 AND id_jogo = 2 AND P1_score>P2_score;
+      
+
     
 -- ********************************
 

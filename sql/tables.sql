@@ -207,7 +207,7 @@ CREATE TABLE tb_jogo (
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 ALTER TABLE tb_jogo
-ADD COLUMN data date DEFAULT NULL;
+ADD COLUMN data datetime DEFAULT NULL;
 
 -- DROP TABLE tb_torn_gamesets;
 CREATE TABLE tb_torn_gamesets (
