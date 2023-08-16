@@ -208,16 +208,21 @@ CREATE PROCEDURE sp_updatePlayer(
 		EXECUTE stmt1;
 		DEALLOCATE PREPARE stmt1;
 
-        SELECT * FROM tb_usuario WHERE id IN(Iplayer);
+		SET @query = CONCAT('SELECT * FROM tb_usuario WHERE id IN (', Iplayer,')');
+
+		PREPARE stmt1 FROM @query;
+		EXECUTE stmt1;
+		DEALLOCATE PREPARE stmt1;
+        
 	END $$
 DELIMITER ;
 
-CALL sp_updatePlayer(-0.1,"1,2");
+CALL sp_updatePlayer(1,"1,2");
 
 CALL sp_AtvAtl(1,1,"A",TRUE);
 SELECT * FROM tb_ativ_atleta;
 
--- DROP PROCEDURE sp_editAtvAtl;
+ DROP PROCEDURE sp_editAtvAtl;
 DELIMITER $$
 	CREATE PROCEDURE sp_editAtvAtl(
 		IN IidAtv int(11),
@@ -226,22 +231,23 @@ DELIMITER $$
 		IN Iask BOOLEAN        
     )
 	BEGIN			   		
-		SET @IidAtl = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);        
-        UPDATE tb_ativ_atleta SET confirm=Iconfirm, ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;  
-        SET @peso = (SELECT (SUM(USR.nivel* 0.05)) 
+		SET @IidAtl = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
+        SET @rank = (SELECT NOT amistoso FROM tb_atividades WHERE id=IidAtv);
+        UPDATE tb_ativ_atleta SET confirm=Iconfirm, ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;
+        SET @peso = (SELECT (SUM(USR.nivel* 0.05))
 						FROM tb_ativ_atleta AS ATV
 						INNER JOIN tb_usuario AS USR
-						ON ATV.id_atleta = USR.id 
+						ON ATV.id_atleta = USR.id
 						WHERE ATV.id_ativ=IidAtv);
 		SET @winner = (SELECT WINNER FROM vw_winners WHERE id_ativ=IidAtv);
         SET @loser = (SELECT LOSER FROM vw_winners WHERE id_ativ=IidAtv);
-        
+
 		IF ((SELECT COUNT(*) FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND ativ_owner=0 AND confirm=0)=0) THEN        
 			UPDATE tb_atividades SET ranking=1, peso=@peso WHERE id=IidAtv;
-            
-			CALL sp_updatePlayer(@peso,@winner);
-			CALL sp_updatePlayer(-@peso,@loser);
-            
+            IF(@rank) THEN
+				CALL sp_updatePlayer(@peso,@winner);
+				CALL sp_updatePlayer(ROUND(@peso*-0.5 ,2),@loser);
+            END IF;
 		ELSE
 			UPDATE tb_atividades SET ranking=0 WHERE id=IidAtv; 
 		END IF; 

@@ -193,6 +193,7 @@
                 <li class="only-login hide-menu" title="Configurações"><a onclick="viewUser()" class="menu-mobile"><img class="imgUser" id="imgUser" src="assets/user.jpeg"><div></div></a></li>
                 <li><a id="log-inout" onclick="login()">Inscreva-se <div>sair</div></a></li> 
                 <li class="only-logout" title="Disclaimer"><a onclick="disclaimer()" class="menu-mobile"><span class="mdi mdi-help-circle-outline"></span><div></div> </a></li>
+                <li class="only-logout" title="Login"><a onclick="forceLogin()" class="menu-mobile"><span class="mdi mdi-login"></span><div></div> </a></li>
             </ul>
             <p></p>
         </div>
@@ -285,11 +286,9 @@
         for(let i=0; i<menu_out.length; i++){
             hide ? menu_out[i].classList.remove('hide-menu') : menu_out[i].classList.add('hide-menu') 
         }
-
-
       }
-
-      if(localStorage.getItem('log')){
+      
+      if(localStorage.getItem('log')=='true'){
         openHTML('dashboard.html','screen')
         fillPerfil(localStorage.getItem('idUser'))
         loadActivity()
@@ -297,6 +296,15 @@
       }else{
         openHTML('noLogin.html','screen')
         openScreen()      
+      }
+
+      function forceLogin(){
+        localStorage.clear();
+        document.querySelector('#footer').style.display = 'none'
+        document.querySelector('.dashboard').style.width = '100%'
+        document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
+        openHTML('noLogin.html','screen')
+        openScreen()
       }
 
       function disclaimer(){
@@ -313,18 +321,12 @@
         }
       }
 
-
       function login(){
         if(localStorage.getItem('idUser') == null){
           openHTML('newUser.html','modal',null,500)           
         }else{      
           if(confirm('sair do backhand?')){
-            localStorage.clear();
-            document.querySelector('#footer').style.display = 'none'
-            document.querySelector('.dashboard').style.width = '100%'
-            document.querySelector('#log-inout').innerHTML = 'Inscreva-se'
-            openHTML('noLogin.html','screen')
-            openScreen()
+            forceLogin()
           }  
         }
       }

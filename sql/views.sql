@@ -1,3 +1,20 @@
+-- ****************************************
+
+SELECT * FROM vw_placarAtiv;
+SELECT * FROM vw_dashboard;
+SELECT * FROM vw_placarAtiv;
+SELECT * FROM vw_noSets;
+SELECT * FROM vw_placar;
+SELECT * FROM vw_friends;
+SELECT * FROM vw_perfil;
+SELECT * FROM vw_alerta;
+SELECT * FROM vw_torn;
+SELECT * FROM vw_torn_invite;
+SELECT * FROM vw_my_torn ;
+SELECT * FROM vw_torn_courts;
+SELECT * FROM vw_atvAtl;
+SELECT * FROM vw_winners;
+
 -- ********************************
 --  DROP VIEW vw_dashboard;
  CREATE VIEW vw_dashboard AS	
@@ -305,20 +322,7 @@ SELECT IVT.*,USR.nome AS nome_atleta, USR.nivel
 
 -- *********************************
 
-SELECT * FROM vw_placarAtiv;
-SELECT * FROM vw_dashboard;
-SELECT * FROM vw_placarAtiv;
-SELECT * FROM vw_noSets;
-SELECT * FROM vw_placar;
-SELECT * FROM vw_friends;
-SELECT * FROM vw_perfil;
-SELECT * FROM vw_alerta;
-SELECT * FROM vw_torn;
-SELECT * FROM vw_torn_invite;
-SELECT * FROM vw_my_torn ;
-SELECT * FROM vw_torn_courts;
-SELECT * FROM vw_atvAtl;
--- ****************************************
+
 SELECT * FROM vw_placarAtiv UNION ALL SELECT * FROM vw_noSets ORDER BY id ASC;
 
 SELECT * from vw_message WHERE id_atividade = 22;
