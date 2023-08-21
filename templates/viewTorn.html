@@ -86,6 +86,15 @@
             min-height: 100px;
         }
 
+        table td{
+            min-width: auto;
+        }
+
+        .min{
+            max-width: none !important;
+        }
+
+
         @media (max-width: 769px) {
             .edge label{
                 font-size: 0.8em;
@@ -155,6 +164,7 @@
     
         <div id="divTabela" class="edge">
             <legend>Tabela</legend>
+            <table id="tblTabela"></table>
         </div>
 
         <div id="divJogos" class="edge">
@@ -222,6 +232,7 @@
                     }
                     document.querySelector('#divJogos').style.display = 'flex'
                     mainData.viewTorn.func.fillJogos()
+                    mainData.viewTorn.func.fillTabela()
                 }else{
                     if(torn.id_owner == localStorage.getItem('idUser')){
                         document.querySelector('.owner-btn').style.display = 'flex'
@@ -301,7 +312,7 @@
 
     mainData.viewTorn.func.fillJogos = ()=>{
         const params = new Object;
-                params.id = mainData.viewTorn.data.address
+            params.id = mainData.viewTorn.data.address
 
             const myPromisse = queryDB(params,45);
             myPromisse.then((resolve)=>{
@@ -315,21 +326,64 @@
                     const grp = Number(jogos[i].grupo) 
                     if(grp!=last_grp ){
                         last_grp = grp
+                        const tr = document.createElement('tr')
+                        const th = document.createElement('th')
+                            th.className = 'th-title'
+                            th.colSpan = '6'
                         switch (model){
                             case '1':
-                                tbl.innerHTML += `<tr><th class="th-title" colspan="6"> ${nomeEtapa(mainData.viewTorn.data.torneio.playOff,grp)}</th></tr>`
+                                th.innerHTML = nomeEtapa(mainData.viewTorn.data.torneio.playOff,grp)
                             break
                             case '2':
-                                tbl.innerHTML += `<tr><th class="th-title" colspan="6"> Grupo ${String.fromCharCode(64+grp)}</th></tr>`
+                                th.innerHTML = String.fromCharCode(64+grp)
                             break
                         }
+                        tr.appendChild(th)
+                        tbl.appendChild(tr)
                     }
-
-
 
                     tbl.plot(jogos[i],'data,P1_nome,P1_SCORE|min,X|min,P2_SCORE|min,P2_nome','dat,Upp,int,let,int,Upp') 
                 }
+
+
             })
+    }
+
+    mainData.viewTorn.func.fillTabela = ()=>{
+    
+        const params = new Object;
+            params.id = mainData.viewTorn.data.address
+
+        const myPromisse = queryDB(params,48);
+        myPromisse.then((resolve)=>{
+            const player = JSON.parse(resolve)
+            const divTabela = document.querySelector('#divJogos')
+            const tbl = document.querySelector('#tblTabela')
+            const model = mainData.viewTorn.data.torneio.modelo
+            let last_grp = ''
+            let pos = 0
+
+console.log(player)                
+            tbl.innerHTML = ''
+            for(let i=0; i<player.length; i++){
+                const grp = Number(player[i].grupo) 
+                if(grp!=last_grp ){
+                    last_grp = grp
+                    const tr = document.createElement('tr')
+                    const th = document.createElement('th')
+                        th.className = 'th-title'
+                        th.colSpan = '11'
+                        th.innerHTML = 'GRUPO '+String.fromCharCode(64+grp)
+                    tr.appendChild(th)
+                    tbl.appendChild(tr)
+                    tbl.head('Pos|min,Nome,J|min,V|min,D|min,S+|min,S-|min,SS|min,G+|min,G-|min,SG|min',false)
+                    pos=0
+
+                }
+                pos++
+                tbl.plot(player[i], `${pos},nome,JOGOS|min,WIN|min,LOSE|min,SET_PRO|min,SET_CONTRA|min,SET_SALDO|min,GAME_PRO|min,GAME_CONTRA|min,GAME_SALDO|min`,'let,Upp,int,int,int,int,int,int,int,int,int') 
+            }
+        })
     }
 
 
@@ -358,8 +412,10 @@
     
 
     document.querySelector('#tblJogos').addEventListener('click',(e)=>{
+
         data = e.target.parentNode.data
         id_owner = mainData.viewTorn.data.torneio.id_owner
+        console.log([id_owner, data])
         if([id_owner,data.id_P1,data.id_P2].includes(localStorage.getItem('idUser'))){
             openHTML('addResultTorn.html','modal',data,500)
         }

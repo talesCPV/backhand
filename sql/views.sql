@@ -14,6 +14,7 @@ SELECT * FROM vw_my_torn ;
 SELECT * FROM vw_torn_courts;
 SELECT * FROM vw_atvAtl;
 SELECT * FROM vw_winners;
+SELECT * FROM vw_tabela;
 
 -- ********************************
 --  DROP VIEW vw_dashboard;
@@ -81,12 +82,44 @@ SELECT * FROM vw_allAtivAtleta;
 
 
 	SELECT * FROM vw_torn_jogo WHERE id_torn=17 ORDER BY grupo;
-    SELECT * FROM tb_jogo WHERE id_torn=17 ORDER BY grupo;
+    SELECT * FROM tb_jogo WHERE id_torn=19 ORDER BY grupo;
     SELECT * FROM tb_torn_gamesets WHERE id_torn=17;
 	SELECT COUNT(*) FROM tb_torn_gamesets WHERE id_torn=17 AND id_jogo = 2 AND P1_score>P2_score;
-      
+  -- ********************************   
+  
+ DROP VIEW vw_jogo;
+ CREATE VIEW vw_jogo AS    
+  SELECT JG.*, (SELECT IFNULL(SUM(P1_score),0) FROM tb_torn_gamesets WHERE id_jogo=JG.id AND id_torn=JG.id_torn)AS P1_GAME,
+  (SELECT IFNULL(SUM(P2_score),0) FROM tb_torn_gamesets WHERE id_jogo=JG.id AND id_torn=JG.id_torn)AS P2_GAME
+  FROM tb_jogo AS JG;
+  
+  SELECT * FROM vw_jogo WHERE id_torn=19;
+  
+ DROP VIEW vw_scores;
+ CREATE VIEW vw_scores AS   
+	SELECT id, id_torn,grupo,id_P1 AS id_player, P1_nome AS nome, 
+		SUM(IF(P1_score>P2_score,1,0))AS WIN, SUM(IF(P1_score<P2_score,1,0))AS LOSE, SUM(P1_score) AS SET_PRO, SUM(P2_score) AS SET_CONTRA,
+        SUM(P1_GAME) AS GAME_PRO, SUM(P2_GAME) AS GAME_CONTRA
+		FROM vw_jogo 
+		GROUP BY id_torn,id_P1
+	UNION
+	SELECT id, id_torn,grupo,id_P2 AS id_player, P2_nome AS nome,
+		SUM(IF(P2_score>P1_score,1,0))AS WIN, SUM(IF(P2_score<P1_score,1,0))AS LOSE, SUM(P2_score) AS SET_PRO, SUM(P1_score) AS SET_CONTRA,
+        SUM(P2_GAME) AS GAME_PRO, SUM(P1_GAME) AS GAME_CONTRA
+		FROM vw_jogo 
+		GROUP BY id_torn,id_P2;
 
-    
+SELECT * FROM vw_scores WHERE id_torn=19;
+
+-- DROP VIEW vw_tabela;
+-- CREATE VIEW vw_tabela AS 		
+	SELECT id, id_torn,grupo,id_player, nome, SUM(WIN)AS WIN,SUM(LOSE)AS LOSE, SUM(WIN + LOSE)AS JOGOS,  SUM(SET_PRO) AS SET_PRO, SUM(SET_CONTRA) AS SET_CONTRA, SUM(SET_PRO - SET_CONTRA) AS SET_SALDO,
+    SUM(GAME_PRO) AS GAME_PRO, SUM(GAME_CONTRA) AS GAME_CONTRA, SUM(GAME_PRO - GAME_CONTRA) AS GAME_SALDO
+    FROM vw_scores 
+    GROUP BY id_torn,id_player 
+    ORDER BY id_torn, grupo, WIN DESC, SET_SALDO DESC, GAME_SALDO DESC;
+        
+SELECT * FROM vw_tabela WHERE id_torn=19 ORDER BY grupo, WIN DESC,SET_PRO DESC, SET_CONTRA ASC;      
 -- ********************************
 
 CREATE VIEW vw_minhasQuadras AS    

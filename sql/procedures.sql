@@ -167,7 +167,7 @@ DELIMITER $$
 		INSERT INTO tb_atividades (id,id_usuario,nome,id_sport,id_evento,dia,duracao,id_quadra, amistoso)
         VALUES (Iid,Iid_usuario,Inome,Iid_sport,Iid_evento,Idia,Iduracao,Iid_quadra,Iamistoso)
 		ON DUPLICATE KEY 
-        UPDATE nome=Inome, id_sport=Iid_sport, id_evento=Iid_evento, dia=Idia, duracao=Iduracao, id_quadra=Iid_quadra;        
+        UPDATE nome=Inome, id_sport=Iid_sport, id_evento=Iid_evento, dia=Idia, duracao=Iduracao, id_quadra=Iid_quadra, amistoso=Iamistoso;        
 		
         SET lastID = (SELECT IF(Iid="DEFAULT",LAST_INSERT_ID(),Iid));
         
@@ -180,6 +180,8 @@ DELIMITER $$
         
 	END $$
 DELIMITER ;
+
+CALL sp_insertAtividades("30","2","E","1","1","2023-08-14 20:27:00","60","2","0");
 
 SELECT * FROM tb_atividades;
 
@@ -202,27 +204,24 @@ CREATE PROCEDURE sp_updatePlayer(
     )
 	BEGIN    
     
+-- 		UPDATE tb_usuario SET nivel = ROUND(nivel+Ipeso,2) WHERE id IN (Iplayer);
+    
 		SET @query = CONCAT('UPDATE tb_usuario SET nivel = ROUND(nivel+', Ipeso, ',2) WHERE id IN (', Iplayer,')');
 
 		PREPARE stmt1 FROM @query;
 		EXECUTE stmt1;
 		DEALLOCATE PREPARE stmt1;
 
-		SET @query = CONCAT('SELECT * FROM tb_usuario WHERE id IN (', Iplayer,')');
-
-		PREPARE stmt1 FROM @query;
-		EXECUTE stmt1;
-		DEALLOCATE PREPARE stmt1;
-        
+        SELECT * FROM tb_usuario WHERE id IN(Iplayer);
 	END $$
 DELIMITER ;
 
-CALL sp_updatePlayer(1,"1,2");
+CALL sp_updatePlayer(-0.1,"1,2");
 
 CALL sp_AtvAtl(1,1,"A",TRUE);
 SELECT * FROM tb_ativ_atleta;
 
- DROP PROCEDURE sp_editAtvAtl;
+-- DROP PROCEDURE sp_editAtvAtl;
 DELIMITER $$
 	CREATE PROCEDURE sp_editAtvAtl(
 		IN IidAtv int(11),
@@ -231,23 +230,22 @@ DELIMITER $$
 		IN Iask BOOLEAN        
     )
 	BEGIN			   		
-		SET @IidAtl = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
-        SET @rank = (SELECT NOT amistoso FROM tb_atividades WHERE id=IidAtv);
-        UPDATE tb_ativ_atleta SET confirm=Iconfirm, ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;
-        SET @peso = (SELECT (SUM(USR.nivel* 0.05))
+		SET @IidAtl = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);        
+        UPDATE tb_ativ_atleta SET confirm=Iconfirm, ask = Iask WHERE id_ativ=IidAtv AND id_atleta=@IidAtl;  
+        SET @peso = (SELECT (SUM(USR.nivel* 0.05)) 
 						FROM tb_ativ_atleta AS ATV
 						INNER JOIN tb_usuario AS USR
-						ON ATV.id_atleta = USR.id
+						ON ATV.id_atleta = USR.id 
 						WHERE ATV.id_ativ=IidAtv);
 		SET @winner = (SELECT WINNER FROM vw_winners WHERE id_ativ=IidAtv);
         SET @loser = (SELECT LOSER FROM vw_winners WHERE id_ativ=IidAtv);
-
+        
 		IF ((SELECT COUNT(*) FROM tb_ativ_atleta WHERE id_ativ=IidAtv AND ativ_owner=0 AND confirm=0)=0) THEN        
 			UPDATE tb_atividades SET ranking=1, peso=@peso WHERE id=IidAtv;
-            IF(@rank) THEN
-				CALL sp_updatePlayer(@peso,@winner);
-				CALL sp_updatePlayer(ROUND(@peso*-0.5 ,2),@loser);
-            END IF;
+            
+			CALL sp_updatePlayer(@peso,@winner);
+			CALL sp_updatePlayer(-@peso,@loser);
+            
 		ELSE
 			UPDATE tb_atividades SET ranking=0 WHERE id=IidAtv; 
 		END IF; 
@@ -313,64 +311,6 @@ BEGIN
         
 	END $$
 DELIMITER ;
-
--- DROP PROCEDURE sp_torn_gamesets;
-DELIMITER $$
-CREATE PROCEDURE sp_torn_gamesets(
-		IN Ihash varchar(77),
-		IN IidTorn int(11), 
-        IN IidJogo int(11),
-		IN Ivalues VARCHAR(3000)
-    )
-BEGIN                
-		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
-		SET @torn_owner  = (SELECT id_owner FROM tb_torneio WHERE id=IidTorn);
-		SET @id_P1 = (SELECT id_P1 FROM tb_jogo WHERE id=IidJogo AND id_torn=IidTorn);
-		SET @id_P2 = (SELECT id_P2 FROM tb_jogo WHERE id=IidJogo AND id_torn=IidTorn);
-
-		IF (@call_owner IN (@torn_owner,@id_p1,@id_p2)) THEN
-			DELETE FROM tb_torn_gamesets WHERE id_jogo=IidJogo AND id_torn=IidTorn;			
-			SET @query = CONCAT('INSERT INTO tb_torn_gamesets (id,id_torn,id_jogo,P1_score,P2_score) VALUES ', Ivalues);
-			PREPARE stmt1 FROM @query;
-			EXECUTE stmt1;
-			DEALLOCATE PREPARE stmt1;
-		END IF; 
-        
-        SELECT * FROM tb_torn_gamesets WHERE id=IidJogo AND id_torn=IidTorn;
-
-	END $$
-DELIMITER ;
-
-CALL sp_torn_gamesets("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",17,(1,17,1,6,1),(2,17,1,6,3),"x03");
-
-
--- DROP PROCEDURE sp_tornJogoUpdate;
-DELIMITER $$
-	CREATE PROCEDURE sp_tornJogoUpdate(
-		IN Ihash varchar(77),
-		IN Iid_torn int(11), 
-		IN Iid_jogo int(11),
-		IN Ip1_score int(11),
-		IN Ip2_score int(11),
-        IN Idata datetime
-    )
-	BEGIN			            
-    
-		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
-		SET @torn_owner  = (SELECT id_owner FROM tb_torneio WHERE id=Iid_torn);
-		SET @id_P1 = (SELECT id_P1 FROM tb_jogo WHERE id=Iid_jogo AND id_torn=Iid_torn);
-		SET @id_P2 = (SELECT id_P2 FROM tb_jogo WHERE id=Iid_jogo AND id_torn=Iid_torn);
-
-		IF (@call_owner IN (@torn_owner,@id_p1,@id_p2)) THEN
-			UPDATE tb_jogo SET P1_score=Ip1_score, P2_score=Ip2_score, data=Idata WHERE id=Iid_jogo AND id_torn=Iid_torn;
-        END IF;
-        
-        SELECT * FROM tb_jogo WHERE id=Iid_jogo AND id_torn=Iid_torn;
-        
-	END $$
-DELIMITER ;
-
-CALL sp_tornJogoUpdate("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",17,2,0,2023-08-15);
 
 -- DROP PROCEDURE sp_insertSets;
 DELIMITER $$
@@ -684,7 +624,6 @@ DELIMITER $$
 		DELETE FROM tb_jogo WHERE id_torn=Iid;
 		DELETE FROM tb_torn_atleta WHERE id_torn=Iid;
 		DELETE FROM tb_torn_quadra WHERE id_torn=Iid;
-		DELETE FROM tb_torn_gamesets WHERE id_torn=Iid;
 		DELETE FROM tb_torneio WHERE id=Iid;
 	END $$
 DELIMITER ;
@@ -860,11 +799,10 @@ CREATE PROCEDURE sp_AtvAtl(
 		IN Ifields VARCHAR(3000),
 		IN Ivalues VARCHAR(3000)
     )
-BEGIN    
-    
+BEGIN        
 		SET @call_owner = (SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci);
 		SET @atv_owner  = (SELECT id_usuario FROM tb_atividades WHERE id COLLATE utf8_general_ci = Iid_ativ COLLATE utf8_general_ci);
-        	
+        
 		IF (@call_owner = @atv_owner) THEN
         
             CALL sp_clearAtvAtl(Iid_ativ);

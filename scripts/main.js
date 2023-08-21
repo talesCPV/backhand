@@ -113,6 +113,8 @@ function loadHash(data = {}){
 }
 
 function nomeEtapa(NUM_JOG,FASE){
+
+    const torn = mainData.viewTorn.data.torneio
     function fatoracao(N){
         let resto = 0
         let count = 0

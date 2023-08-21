@@ -138,20 +138,27 @@
         const grupo = []
         let values = []
 
+        for(let i=1; i<=Number(torn.num_grupos); i++){
+            grupo.push([])
+        }
+
         while(atl.length>0){
             const i = sort=='1' ? Math.floor(Math.random()*atl.length) : 0
-            grupo.length<=num_gp ? grupo.push([]) : 0
+//            grupo.length<=num_gp ? grupo.push([]) : 0
             grupo[num_gp].push(atl[i])
-
             atl.splice(i,1)
+
             num_gp++
             num_gp = num_gp>=Number(torn.num_grupos) ? 0 : num_gp
         }
+
+console.log(grupo)
 
         for(let i=0; i<grupo.length; i++){
             values = values.length==0 ? gamesPC(grupo[i],i+1) : values.concat(gamesPC(grupo[i],i+1,values.length)) 
         }
 
+console.log(values)
         return values
     }
 
@@ -214,7 +221,7 @@
                 out.status=false
                 return out
             }else{
-                out.atleta.push({nome:atl[i].value.trim().toUpperCase(),id:0})
+                out.atleta.push({nome:atl[i].value.trim().toUpperCase(),id:-1*i})
                 out.convidado += ','+atl[i].value.trim().toUpperCase()
             }
         }
@@ -222,28 +229,25 @@
         return out
     }
 
-
-
     document.querySelector('#btnSort').addEventListener('click',()=>{
-        
+    
         const mode = Number(torn.num_grupos)>=(Number(torn.playOff)/2) ? 1 : Number(torn.modelo)
         const atl = checkAllNames()
 
         let values = []
 
         if(atl.status){
-            switch(mode){
-                case 1:
+            switch(torn.modelo){
+                case '1':              
                     values = gamesPlayoff(atl.atleta)
                 break
-                case 2:
+                case '2':
                     values = grupos(atl.atleta)
                 break
-                case 3:
+                case '3':
                     values = gamesPC(atl.atleta)
             } 
         }
-        
 
         if(values.length>0){
 
@@ -261,6 +265,7 @@
                 })
             })
         }  
+        
     })  
 
 

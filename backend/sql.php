@@ -52,6 +52,7 @@
         "45" => 'SELECT * FROM vw_torn_jogo WHERE id_torn=x00 ORDER BY grupo;',
         "46" => 'CALL sp_torn_gamesets("x00",x01,x02,"x03");',
         "47" => 'CALL sp_tornJogoUpdate("x00",x01,x02,x03,x04,"x05")',
+        "48" => 'SELECT * FROM vw_tabela WHERE id_torn=x00 ORDER BY grupo, WIN DESC, SET_SALDO DESC, GAME_SALDO DESC;'
 
     );
 

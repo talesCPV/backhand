@@ -155,8 +155,8 @@ HTMLTableElement.prototype.plot = function(obj, fields,type='',file=false, mark=
     this.appendChild(tr)
 }
 
-HTMLTableElement.prototype.head = function(hd){
-    this.innerHTML = ''
+HTMLTableElement.prototype.head = function(hd,clear=true){
+    this.innerHTML = clear ? '' : this.innerHTML
     hd = hd.split(',')
     const tr = document.createElement('tr')
     for(let i=0; i<hd.length; i++){
