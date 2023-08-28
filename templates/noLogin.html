@@ -25,11 +25,14 @@
         }
 
         .main-content{
+
+            display: flex;
+            justify-content: center;
+            padding-top: 100px;
+
             background-image: url("assets/background/05.jpg");
-            background-position: right;
-            
-            background-size: cover;
-            
+            background-position: right;            
+            background-size: cover;            
             background-repeat: no-repeat;
             background-attachment: fixed;
         }
@@ -88,6 +91,8 @@
 </template>
 <script>
 
+    openMenu()
+    
     document.querySelector('#btnLogin').addEventListener('click',()=>{
 
         function localizaUser(data){
@@ -128,17 +133,17 @@
                     localStorage.setItem('lng',json[0].lng)   
                     localStorage.setItem('log',true)   
                     localizaUser(json[0])
-                    document.querySelector('#log-inout').innerHTML = 'Sair'
-                    document.querySelector('#footer').style.display = 'block'   
-                    document.querySelector('.dashboard').style.width = '70%'                 
+//                    document.querySelector('#log-inout').innerHTML = 'Sair'
+//                    document.querySelector('#footer').style.display = 'block'   
+//                    document.querySelector('.dashboard').style.width = '70%'                 
                     openHTML('dashboard.html','screen')
-                    loadActivity()
-                    fillPerfil(json[0].id)
-                    openScreen(false)
+
+//                    fillPerfil(json[0].id)
+//                    openScreen(false)
                 }else{
                     alert('Usuário ou senha inválido!')
                     localStorage.clear();
-                    openScreen(true)
+//                    openScreen(true)
                 }
 
             })

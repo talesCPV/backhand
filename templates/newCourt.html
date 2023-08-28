@@ -21,6 +21,10 @@
         <label for="edtCourtName">Nome</label>
         <input type="text" id="edtCourtName">
 
+        <label for="edtBusca">Busca</label>
+        <input type="text" id="edtBusca">
+        <button id="btnBusca">Busca</button>
+
         <label for="map">Marque a localização</label>
         <div id="map-new-court"></div>
         <select id="mapSource_1">
@@ -42,6 +46,8 @@
 
 </template>
 <script>
+
+
     var marker = new L.Marker([0, 0]);
 
 
@@ -88,9 +94,36 @@
         }
 
     })
+/*
+    document.querySelector('#btnBusca').addEventListener('click',()=>{
+
+        eval("https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly")
+
+
+        geocoder = new google.maps.Geocoder();
+
+        geocoder
+            .geocode(request)
+            .then((result) => {
+                const { results } = result;
+                console.log(results)
+//                map.setCenter(results[0].geometry.location);
+//                marker.setPosition(results[0].geometry.location);
+//                marker.setMap(map);
+//                responseDiv.style.display = "block";
+//                response.innerText = JSON.stringify(result, null, 2);
+                return results;
+            })
+            .catch((e) => {
+                alert("Geocode was not successful for the following reason: " + e);
+            });
+        }
 
 
 
+
+    })
+*/
 
 
 </script>

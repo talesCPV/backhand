@@ -305,12 +305,20 @@ function makeActivity(ATV,classScreen,showUser=true){
 
 }
 
-function loadActivity(){
+function loadActivity(keep=true){
 
-    const screen = document.querySelector('.dashboard')
+    if(!keep){
+        mainData.data.dashPos = 0
+    }
+
     if(mainData.data.dashPos == '0'){
-        screen.innerHTML = ''
-        mainData.data.activities = []
+        try{
+            const screen = document.querySelector('.dashboard')
+            screen.innerHTML = ''
+            mainData.data.activities = []    
+        }catch{
+
+        }
     }
 
     const params = new Object;

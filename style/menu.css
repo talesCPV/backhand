@@ -114,6 +114,21 @@
     justify-content: center;
   }
 
+  .sub-menu-item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .sub-menu-item label{
+    font-size: 0.7em;
+  }
+
+  .sub-menu-item p{
+    padding: 0;
+  }
+
+
 /* ......../ media query /.......... */
 
 @media (max-width: 768px) {
