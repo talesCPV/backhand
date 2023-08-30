@@ -49,27 +49,29 @@ function pinMap(latlng,map){
     marker.addTo(map)
 }
 
-function findCity(city){
+function geocoding(myMap,address){
 
-    const data = new URLSearchParams();        
-    data.append("url","https://www.bing.com/maps?cc="+city)
+    const url = 'https://geocode.maps.co/search?q='+address.trim()
 
-    const myRequest = new Request("backend/scrap.php",{
-        method : "POST",
-        body : data
+    const myRequest = new Request(url,{
+        method : "POST"
     });
 
-    return new Promise((resolve,reject) =>{
-        fetch(myRequest)
-        .then(function (response){
-            console.log(response)
+    fetch(myRequest)
+    .then(function (response){
+
+        if (response.status === 200) { 
             response.text().then((txt)=>{
-                console.log(txt)
+                try{
+                    const json = JSON.parse(txt)
+                    var newLatLng = new L.LatLng(json[4].lat,json[4].lon);
+                    myMap.setView(newLatLng, 12);
+                }catch{
+                    alert('Favor verificar o nome da cidade digitado')
+                }   
             })
-            .catch(err => console.log(err))
-            
-        });
-    }); 
+        }
+    })
 
 }
 

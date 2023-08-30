@@ -18,12 +18,12 @@
 
     <div class="form newcourtForm">
 
-        <label for="edtCourtName">Nome</label>
-        <input type="text" id="edtCourtName">
+        <label for="edtBusca">Cidade</label>
+        <div class="edtbtn" style="width: 100%;padding: 10px;">
+            <input type="text" id="edtBusca" placeholder="ex: São José dos Campos-SP,Brazil">
+            <button id="btnBusca"><i class="fas fa-search"></i></button>
+        </div>
 
-        <label for="edtBusca">Busca</label>
-        <input type="text" id="edtBusca">
-        <button id="btnBusca">Busca</button>
 
         <label for="map">Marque a localização</label>
         <div id="map-new-court"></div>
@@ -31,6 +31,9 @@
             <option value="maplayer">Mapa</option>
             <option value="satlayer" selected>Satelite</option>
         </select>
+
+        <label for="edtCourtName">Nome da quadra</label>
+        <input type="text" id="edtCourtName">
 
         <label for="cmbSport">Esporte</label>
         <select id="cmbSport">
@@ -51,7 +54,7 @@
     var marker = new L.Marker([0, 0]);
 
 
-    map_1 = createMap('map-new-court')
+    const map_1 = createMap('map-new-court')
 
 
     document.querySelector('#mapSource_1').addEventListener('change',()=>{
@@ -94,36 +97,11 @@
         }
 
     })
-/*
+
     document.querySelector('#btnBusca').addEventListener('click',()=>{
-
-        eval("https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly")
-
-
-        geocoder = new google.maps.Geocoder();
-
-        geocoder
-            .geocode(request)
-            .then((result) => {
-                const { results } = result;
-                console.log(results)
-//                map.setCenter(results[0].geometry.location);
-//                marker.setPosition(results[0].geometry.location);
-//                marker.setMap(map);
-//                responseDiv.style.display = "block";
-//                response.innerText = JSON.stringify(result, null, 2);
-                return results;
-            })
-            .catch((e) => {
-                alert("Geocode was not successful for the following reason: " + e);
-            });
-        }
-
-
-
-
+        geocoding(map_1,document.querySelector('#edtBusca').value)
     })
-*/
+
 
 
 </script>
